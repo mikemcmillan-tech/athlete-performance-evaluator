@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Athlete Performance Evaluator</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 :root{--or:#F5881F;--or2:#D96A00;--dk:#0E1318;--dk2:#161C22;--dk3:#1E262E;--dk4:#28323C;--bd:#283038;--mt:#607080;--tx:#DDE6EE;--sb:#8AAABE;--s1:#C93B3B;--s1b:#F09595;--s3:#6B9A2A;--s4:#1F9E70;--s3b:#97C459;--s4b:#5DCAA5;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -119,6 +120,20 @@ select option{background:var(--dk3)}
   .dash-grid{grid-template-columns:1fr}
   .hdr-title{font-size:16px}.nav-btn{font-size:11px;padding:6px 9px}
 }
+/* ── PROGRESS CHART ── */
+.prog-metric-wrap{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.prog-metric-lbl{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sb);flex-shrink:0}
+.prog-metric-sel{flex:1;min-width:160px;max-width:260px;background:var(--dk3);border:1px solid var(--bd);border-radius:4px;color:var(--tx);font-family:'Barlow',sans-serif;font-size:14px;padding:7px 32px 7px 11px;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238AAABE' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;transition:border-color .2s}
+.prog-metric-sel:focus{border-color:var(--or)}
+.prog-metric-sel option{background:var(--dk3)}
+.prog-chart-wrap{position:relative;height:220px;width:100%}
+.prog-empty{font-size:13px;color:var(--mt);text-align:center;padding:32px 0;line-height:1.6}
+.prog-6wk-row{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid var(--bd)}
+.prog-6wk-row:last-child{border-bottom:none}
+.prog-6wk-lbl{flex:0 0 60px;font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;color:var(--or);padding-top:1px}
+.prog-6wk-txt{font-size:13px;color:var(--sb);line-height:1.6}
+.btn-save-prog{background:transparent;border:1px solid var(--s4);border-radius:4px;color:var(--s4b);font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:12px 18px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-save-prog:hover{background:var(--s4);color:#fff}
 </style>
 </head>
 <body>
@@ -177,18 +192,18 @@ select option{background:var(--dk3)}
     <div class="card">
       <div class="card-title">Jump Tests — leave blank if not tested</div>
       <div class="g2">
-        <div class="field"><label>Vertical Jump (inches)</label><input type="number" id="inp-vj" placeholder="e.g. 28" step="0.1" min="0"><div class="hint">Max standing vertical</div></div>
-        <div class="field"><label>Broad Jump (feet)</label><input type="number" id="inp-bj" placeholder="e.g. 7.5" step="0.01" min="0"><div class="hint">Horizontal distance</div></div>
+        <div class="field"><label>Vertical Jump (inches)</label><input type="number" id="inp-vj" placeholder="e.g. 28" step="0.1" min="0"><div class="hint">Measures vertical lower-body power and explosive force production.</div></div>
+        <div class="field"><label>Broad Jump (feet)</label><input type="number" id="inp-bj" placeholder="e.g. 7.5" step="0.01" min="0"><div class="hint">Measures horizontal power and how well force is projected forward — important for acceleration.</div></div>
       </div>
-      <div class="field"><label>RSI (Reactive Strength Index)</label><input type="number" id="inp-rsi" placeholder="e.g. 2.3" step="0.01" min="0"><div class="hint">&lt;1.5 Low · 1.5–2.0 Moderate · 2.0–2.5 Well established · 2.5–3.0 High · &gt;3.0 World class</div></div>
+      <div class="field"><label>RSI (Reactive Strength Index)</label><input type="number" id="inp-rsi" placeholder="e.g. 2.3" step="0.01" min="0"><div class="hint">Measures reactive strength — the ability to absorb and reapply force quickly off the ground. &lt;1.5 Low · 1.5–2.0 Moderate · 2.0–2.5 Well established · 2.5–3.0 High · &gt;3.0 World class</div></div>
     </div>
     <div class="card">
       <div class="card-title">Speed Tests</div>
       <div class="g2">
-        <div class="field"><label>5–10 Fly (seconds)</label><input type="number" id="inp-510" placeholder="e.g. 1.22" step="0.01" min="0"><div class="hint">Acceleration zone</div></div>
-        <div class="field"><label>10–10 Fly (seconds)</label><input type="number" id="inp-1010" placeholder="e.g. 1.10" step="0.01" min="0"><div class="hint">Max velocity zone</div></div>
+        <div class="field"><label>5–10 Fly (seconds)</label><input type="number" id="inp-510" placeholder="e.g. 1.22" step="0.01" min="0"><div class="hint">Measures acceleration and how efficiently the athlete builds speed in the early phase.</div></div>
+        <div class="field"><label>10–10 Fly (seconds)</label><input type="number" id="inp-1010" placeholder="e.g. 1.10" step="0.01" min="0"><div class="hint">Measures max velocity and top-end sprint efficiency.</div></div>
       </div>
-      <div class="field"><label>GPS Max Velocity (mph)</label><input type="number" id="inp-gps" placeholder="e.g. 20.3" step="0.1" min="0"><div class="hint">Catapult or GPS unit</div></div>
+      <div class="field"><label>GPS Max Velocity (mph)</label><input type="number" id="inp-gps" placeholder="e.g. 20.3" step="0.1" min="0"><div class="hint">Measures real-world top-end speed in a sport-specific environment.</div></div>
     </div>
     <div id="err-t2" class="err-box">No level selected — go back and pick an athlete level.</div>
     <div id="err-d2" class="err-box">Enter at least 2 test values to generate a report.</div>
@@ -207,6 +222,7 @@ select option{background:var(--dk3)}
       <button class="btn-p" onclick="goProg()">Build Program &rarr;</button>
     </div>
     <div class="btn-row" style="margin-top:8px">
+      <button class="btn-save-prog" id="btn-save-prog" onclick="saveProgressEntry()">&#128200; Save Progress Entry</button>
       <button class="btn-s" onclick="window.print()">Print / PDF</button>
       <button class="btn-s" style="flex:1" onclick="resetAll()">New Evaluation</button>
     </div>
@@ -348,7 +364,11 @@ function goProg(){var po=el('prog-out'),pb=el('prog-btns'),ep=el('err-pg');if(po
 function goRpt(){var o=el('rpt-out');if(o)o.innerHTML=buildReport(_S);go(5);}
 function tog(btn){var b=btn.nextElementSibling;b.classList.toggle('open');btn.textContent=b.classList.contains('open')?'Hide':'How this was calculated';}
 function startTest(aid){var a=DB.get(aid);if(!a){go(1);return;}resetAll();el('inp-name').value=a.name;tier=a.tier;document.querySelectorAll('.tier-btn').forEach(function(b){if(b.getAttribute('data-tier')===a.tier)b.classList.add('sel');});go(2);}
-function goHist(aid){buildHist(aid);go(6);}
+function goHist(aid){
+  buildHist(aid);
+  go(6);
+  setTimeout(function(){ renderHistChart(aid,'vj'); }, 50);
+}
 
 // ─── EVALUATION ───────────────────────────────────────────────────────────────
 function runEval(){
@@ -358,6 +378,107 @@ function runEval(){
   if([vj,bj,rsi,s5,s10,gps].filter(function(x){return x!==null;}).length<2){el('err-d2').style.display='block';return;}
   build(vj,bj,rsi,s5,s10,gps);go(3);
 }
+
+// ─── APE SCORE HELPERS ────────────────────────────────────────────────────────
+
+// Returns the APE Score (0–100) from an array of 1–5 metric scores.
+// Null/undefined values are automatically ignored.
+// Weighted APE Score — speed metrics weighted higher than jump/reactive metrics.
+// Weights: ac/mv = 1.5 (top speed qualities), gv/ft = 1.3, vp/hp = 1.2, rs = 1.0
+function getAPEScore(scores) {
+  var weights = { vp:1.2, hp:1.2, rs:1.0, ac:1.5, mv:1.5, gv:1.3, ft:1.3 };
+  var total = 0, weightSum = 0;
+  for (var key in scores) {
+    if (scores.hasOwnProperty(key) && scores[key] !== null && scores[key] !== undefined && !isNaN(scores[key])) {
+      total     += scores[key] * (weights[key] || 1.0);
+      weightSum += (weights[key] || 1.0);
+    }
+  }
+  if (!weightSum) return null;
+  return Math.round((total / weightSum) * 20);
+}
+
+// Returns label, color, and short sentence for a given APE Score.
+function getAPELabel(score) {
+  if (score === null) return { label: '', color: 'var(--mt)', sub: '' };
+  if (score >= 80) return {
+    label: 'Elite',
+    color: '#1F9E70',
+    sub:   'High-level profile across available testing.'
+  };
+  if (score >= 60) return {
+    label: 'Above Average',
+    color: '#5DCAA5',
+    sub:   'Strong profile with room for targeted gains.'
+  };
+  if (score >= 40) return {
+    label: 'Developing',
+    color: '#BA7517',
+    sub:   'Foundation is building, but key qualities still need development.'
+  };
+  return {
+    label: 'Needs Improvement',
+    color: '#C93B3B',
+    sub:   'Major performance qualities need attention.'
+  };
+}
+
+// Returns an array of 2–4 coach-friendly insight strings.
+// rows = [{lbl, sc}, ...] — same format used in build() for score rows.
+// defType = the deficiency classification string from the evaluation.
+function getAPEInsight(rows, defType) {
+  var scored = rows.filter(function(r) { return r.sc !== null; });
+
+  // Not enough data to produce a meaningful insight
+  if (scored.length < 2) {
+    return ['Not enough complete data for a full insight. Add jump and sprint testing for stronger recommendations.'];
+  }
+
+  // Find best and worst scored metric
+  var best  = scored[0];
+  var worst = scored[0];
+  for (var i = 1; i < scored.length; i++) {
+    if (scored[i].sc > best.sc)  best  = scored[i];
+    if (scored[i].sc < worst.sc) worst = scored[i];
+  }
+
+  var lines = [];
+
+  // Line 1: biggest strength
+  lines.push('Biggest strength: ' + best.lbl + '.');
+
+  // Line 2: biggest limitation (Solid or below)
+  if (worst.sc <= 3) {
+    lines.push('Biggest limitation: ' + worst.lbl + '.');
+  }
+
+  // Line 3: profile classification
+  var profileMap = {
+    'Force Deficient': 'Current profile suggests force-deficient development.',
+    'Form Deficient':  'Current profile suggests mechanics and speed expression need work.',
+    'Mixed Deficiency':'Current profile shows development needs across both power and speed.',
+    'Well Developed':  'Current profile is well-rounded across power and speed qualities.'
+  };
+  if (profileMap[defType]) lines.push(profileMap[defType]);
+
+  // Line 4: primary opportunity (only if weakest metric is below Solid)
+  var oppMap = {
+    'Vertical Power':  'improve vertical force output through loaded jumps and strength training.',
+    'Horizontal Power':'improve horizontal power and acceleration transfer.',
+    'Reactive Str.':   'build reactive strength and ground contact quality.',
+    'Acceleration':    'develop first-step speed and short-area acceleration mechanics.',
+    'Max Velocity':    'develop top-end speed through fly sprints and stride mechanics.',
+    'GPS Max Vel.':    'raise real-world top-end speed through open-space sprint exposure.',
+    'Force Transfer':  'convert existing power into sprint speed through contrast training.'
+  };
+  if (worst.sc <= 3 && oppMap[worst.lbl]) {
+    lines.push('Primary opportunity: ' + oppMap[worst.lbl]);
+  }
+
+  return lines;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function build(vj,bj,rsi,s5,s10,gps){
   var name=el('inp-name').value.trim()||'Athlete';
@@ -380,6 +501,9 @@ function build(vj,bj,rsi,s5,s10,gps){
   var pa=avg([vp,hp]),sa=avg([ac,mv,gv]);
   if(pa!==null&&sa!==null){
     var off=sa-pa;ft=off>=1.5?5:off>=0.5?4:off>=-1.0?3:2;
+    // Floor: if both power and speed are weak, cap transfer at 2 — high transfer
+    // score is misleading when neither quality is actually developed.
+    if(pa<3&&sa<3){ ft=2; }
     var ftLbl=ft>=5?'Excellent':ft===4?'Strong':ft===3?'Appropriate':'Below expected';
     ftR=ftLbl+' transfer';
     ftL='Power avg '+pa.toFixed(1)+' vs Speed avg '+sa.toFixed(1)+' &rarr; offset '+off.toFixed(1)+' &rarr; <strong>'+ftLbl+' transfer ('+ft+'/5)</strong>';
@@ -447,8 +571,52 @@ function build(vj,bj,rsi,s5,s10,gps){
   var strH=strs.length?strs.map(function(s){return'<div class="sw-i">+ '+s+'</div>';}).join(''):'<div class="sw-i" style="color:var(--mt)">Complete more tests to identify strengths</div>';
   var wkH=wks.length?wks.map(function(w){return'<div class="sw-i">− '+w+'</div>';}).join(''):'<div class="sw-i" style="color:var(--mt)">No critical gaps detected</div>';
 
+  // ── APE Score (uses named helper functions) ───────────────────────────────
+  var apeScore = getAPEScore({ vp:vp, hp:hp, rs:rs, ac:ac, mv:mv, gv:gv, ft:ft });
+  var apeMeta  = getAPELabel(apeScore);
+
+  var apeCard = apeScore !== null
+    ? '<div class="card" style="border-top:3px solid '+apeMeta.color+';display:flex;align-items:center;gap:20px;flex-wrap:wrap">'
+      + '<div style="text-align:center;flex-shrink:0">'
+      + '<div style="font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:'+apeMeta.color+';margin-bottom:3px">APE Score</div>'
+      + '<div style="font-family:Rajdhani,sans-serif;font-size:56px;font-weight:700;color:'+apeMeta.color+';line-height:1">'+apeScore+'</div>'
+      + '<div style="font-size:10px;color:var(--mt);margin-top:2px">out of 100</div>'
+      + '</div>'
+      + '<div style="flex:1;min-width:160px">'
+      + '<div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:4px">'+apeMeta.label+'</div>'
+      + '<div style="font-size:13px;color:var(--sb);line-height:1.55;margin-bottom:10px">'+apeMeta.sub+'</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap">'
+      + '<span style="font-size:11px;padding:2px 9px;border-radius:3px;background:rgba(31,158,112,.15);color:#5DCAA5;border:1px solid rgba(31,158,112,.25)">80+ Elite</span>'
+      + '<span style="font-size:11px;padding:2px 9px;border-radius:3px;background:rgba(93,202,165,.12);color:#5DCAA5;border:1px solid rgba(93,202,165,.2)">60–79 Above Avg</span>'
+      + '<span style="font-size:11px;padding:2px 9px;border-radius:3px;background:rgba(186,117,23,.15);color:#EF9F27;border:1px solid rgba(186,117,23,.25)">40–59 Developing</span>'
+      + '<span style="font-size:11px;padding:2px 9px;border-radius:3px;background:rgba(201,59,59,.12);color:#F09595;border:1px solid rgba(201,59,59,.2)">&lt;40 Needs Work</span>'
+      + '</div></div></div>'
+    : '';
+
+  // ── Performance Insight (uses named helper function) ──────────────────────
+  var insightLines = getAPEInsight(rows, dT);
+  var insightCard;
+  if (insightLines.length === 1 && insightLines[0].indexOf('Not enough') === 0) {
+    // Not enough data state
+    insightCard = '<div class="card"><div class="card-title">Performance Insight</div>'
+      + '<div style="font-size:13px;color:var(--mt);line-height:1.6">'
+      + insightLines[0] + '</div></div>';
+  } else {
+    var insightHTML = '';
+    for (var ii = 0; ii < insightLines.length; ii++) {
+      insightHTML += '<div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--bd)">'
+        + '<span style="color:var(--or);font-weight:700;flex-shrink:0;padding-top:1px">›</span>'
+        + '<span style="font-size:13px;color:var(--sb);line-height:1.6">'+insightLines[ii]+'</span>'
+        + '</div>';
+    }
+    insightCard = '<div class="card"><div class="card-title">Performance Insight</div>'
+      + insightHTML + '</div>';
+  }
+
   el('rc').innerHTML=
     '<div class="conf"><span class="conf-lbl">Data Confidence</span><div class="conf-dots">'+dots+'</div><span class="conf-txt">'+cLvl+' · '+cnt+'/6 metrics</span></div>'
+    + apeCard
+    + insightCard
     +'<div class="bk-banner" style="border-left-color:'+bk.c+'"><div class="bk-ico">'+bk.ico+'</div><div><div class="bk-name" style="color:'+bk.c+'">'+bk.n+'</div><div class="bk-ath">'+esc(name)+' · '+tl+'</div></div></div>'
     +'<div class="card"><div class="card-title">Coaching Output</div><div class="fg"><div class="fb"><div class="fl">Primary Focus</div><div class="fv">'+bk.pri+'</div></div><div class="fb"><div class="fl">Secondary Focus</div><div class="fv">'+bk.sec+'</div></div></div><div class="wb"><div class="fl">What We Are Training and Why</div><div class="wv">'+bk.w+'</div></div><div style="margin-top:8px"><div class="fl">Recommended Methods</div><div class="mc">'+mth+'</div></div></div>'
     +'<div class="sw-g"><div class="sw-c s"><div class="sw-t">Strengths</div>'+strH+'</div><div class="sw-c w"><div class="sw-t">Priority Areas</div>'+wkH+'</div></div>'
@@ -458,7 +626,50 @@ function build(vj,bj,rsi,s5,s10,gps){
     +(vp?pBox('Vert Power',PCTL[vp]):'')+(hp?pBox('Horiz Power',PCTL[hp]):'')+(rs?pBox('Reactive Str.',PCTL[rs]):'')
     +(ac?pBox('Acceleration',PCTL[ac]):'')+(mv?pBox('Max Velocity',PCTL[mv]):'')+(gv?pBox('GPS Max Vel',PCTL[gv]):'')
     +(ft?pBox('Force Transfer',PCTL[ft]):'')
-    +'</div></div>';
+    +'</div></div>'
+
+    // ── Understanding Your Testing ──────────────────────────────────────────
+    +'<div class="card">'
+    +'<div class="card-title">Understanding Your Testing</div>'
+    +'<div style="font-size:13px;color:var(--sb);line-height:1.65;margin-bottom:14px">Each test targets a specific athletic quality. Understanding what you\'re measuring helps connect your numbers to real training decisions.</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    +'<div class="fb"><div class="fl">Vertical Jump</div><div style="font-size:12px;color:var(--sb);line-height:1.55;margin-top:2px">Measures vertical lower-body power and explosive force production.</div></div>'
+    +'<div class="fb"><div class="fl">Broad Jump</div><div style="font-size:12px;color:var(--sb);line-height:1.55;margin-top:2px">Measures horizontal power and how well force is projected forward — key for acceleration.</div></div>'
+    +'<div class="fb"><div class="fl">RSI</div><div style="font-size:12px;color:var(--sb);line-height:1.55;margin-top:2px">Measures reactive strength — the ability to absorb and reapply force quickly off the ground.</div></div>'
+    +'<div class="fb"><div class="fl">5–10 Fly</div><div style="font-size:12px;color:var(--sb);line-height:1.55;margin-top:2px">Measures acceleration and how efficiently the athlete builds speed in the early phase.</div></div>'
+    +'<div class="fb"><div class="fl">10–10 Fly</div><div style="font-size:12px;color:var(--sb);line-height:1.55;margin-top:2px">Measures max velocity and top-end sprint efficiency.</div></div>'
+    +'<div class="fb"><div class="fl">GPS Speed</div><div style="font-size:12px;color:var(--sb);line-height:1.55;margin-top:2px">Measures real-world top-end speed in a sport-specific environment.</div></div>'
+    +'</div></div>'
+
+    // ── How This Impacts Your Training ─────────────────────────────────────
+    +'<div class="card">'
+    +'<div class="card-title">How This Impacts Your Training</div>'
+    +'<div style="font-size:13px;color:var(--sb);line-height:1.7">'
+    +'Your test results don\'t just show where you stand — they determine exactly what you should be training and why. '
+    +'Low jump scores shift the focus toward building raw force. Low fly times point to acceleration or max velocity mechanics. '
+    +'A low RSI means reactive loading isn\'t safe yet and must come first. '
+    +'When power and speed scores are mismatched, the gap between them reveals a transfer problem that requires contrast and sprint-specific work. '
+    +'Every number has a training decision behind it — this evaluation makes that connection explicit.'
+    +'</div></div>'
+
+    // ── Athlete Progress Tracking ───────────────────────────────────────────
+    +'<div class="card">'
+    +'<div class="card-title">Athlete Progress Tracking</div>'
+    +'<div class="prog-metric-wrap">'
+    +'<span class="prog-metric-lbl">Metric</span>'
+    +'<select class="prog-metric-sel" id="prog-metric-sel" onchange="renderProgressChart(this.value)">'
+    +'<option value="vj">Vertical Jump</option>'
+    +'<option value="bj">Broad Jump</option>'
+    +'<option value="rsi">RSI</option>'
+    +'<option value="f5">5–10 Fly</option>'
+    +'<option value="f10">10–10 Fly</option>'
+    +'<option value="gps">GPS Speed</option>'
+    +'</select></div>'
+    +'<div class="prog-empty" id="prog-chart-empty">Save future testing sessions to view progress over time.</div>'
+    +'<div id="prog-summary" style="display:none;font-size:13px;font-weight:600;padding:4px 0 12px;letter-spacing:.02em"></div>'
+    +'<div class="prog-chart-wrap" id="prog-chart-wrap" style="display:none"><canvas id="prog-chart"></canvas></div>'
+    +'<div id="prog-insight" style="display:none;margin-top:12px;padding:10px 13px;background:var(--dk3);border:1px solid var(--bd);border-radius:4px;font-size:13px;color:var(--sb);line-height:1.6"></div>'
+    +'</div>';
 
   _S={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,ft:ft,tier:tier,name:name,defType:dT,defLabel:dLab,defLimiter:dLim,defExplain:dExp};
 
@@ -469,9 +680,469 @@ function build(vj,bj,rsi,s5,s10,gps){
 
   var ce=el('rc-cmp');if(ce)ce.innerHTML='';
   if(_S.aid){var prev=DB.prev(_S.aid);if(prev&&ce)ce.innerHTML=buildComp(prev,{raw:{vj:vj,bj:bj,rsi:rsi,f5:s5,f10:s10,gps:gps},sc:_S,bkt:bkt,bktName:bk.n,defType:dT,ts:Date.now()});}
+
+  // Render progress chart once the DOM is updated
+  setTimeout(function(){ renderProgressChart('vj'); }, 50);
 }
 
 function pBox(lbl,val){return '<div style="background:var(--dk3);border:1px solid var(--bd);border-radius:4px;padding:8px 10px"><div class="fl" style="margin-bottom:2px">'+lbl+'</div><div style="font-size:13px;color:var(--tx);font-weight:600">'+val+'</div></div>';}
+
+// ─── PROGRESS CHART ───────────────────────────────────────────────────────────
+var _chartInst = null; // holds the active Chart.js instance
+
+var METRIC_META = {
+  vj:  { label: 'Vertical Jump', unit: 'in',  higherBetter: true  },
+  bj:  { label: 'Broad Jump',    unit: 'ft',  higherBetter: true  },
+  rsi: { label: 'RSI',           unit: '',    higherBetter: true  },
+  f5:  { label: '5–10 Fly',      unit: 's',   higherBetter: false },
+  f10: { label: '10–10 Fly',     unit: 's',   higherBetter: false },
+  gps: { label: 'GPS Speed',     unit: 'mph', higherBetter: true  }
+};
+
+function renderProgressChart(metricKey) {
+  var emptyEl   = el('prog-chart-empty');
+  var wrapEl    = el('prog-chart-wrap');
+  var canvas    = el('prog-chart');
+  var summaryEl = el('prog-summary');
+  if(!emptyEl || !wrapEl || !canvas) return;
+
+  function hide(){
+    emptyEl.style.display = 'block';
+    wrapEl.style.display  = 'none';
+    if(summaryEl) summaryEl.style.display = 'none';
+    if(_chartInst){ _chartInst.destroy(); _chartInst = null; }
+  }
+
+  if(!_S.aid){ hide(); return; }
+
+  var sessions = DB.history(_S.aid);
+  var points   = [];
+  for(var i = 0; i < sessions.length; i++){
+    var raw = sessions[i].raw;
+    var val = raw ? raw[metricKey] : null;
+    if(val !== null && val !== undefined && !isNaN(parseFloat(val))){
+      points.push({ date: sessions[i].date || ('Session '+(i+1)), val: parseFloat(val) });
+    }
+  }
+
+  if(points.length < 2){ hide(); return; }
+
+  emptyEl.style.display = 'none';
+  wrapEl.style.display  = 'block';
+
+  var meta   = METRIC_META[metricKey] || { label: metricKey, unit: '', higherBetter: true };
+  var labels = points.map(function(p){ return p.date; });
+  var values = points.map(function(p){ return p.val; });
+
+  // ── Helper: format a raw value with its unit ──────────────────────────────
+  function fmtVal(v){
+    if(v === null || v === undefined) return '—';
+    var n = parseFloat(v);
+    if(isNaN(n)) return '—';
+    if(meta.unit === 's')   return n.toFixed(2) + 's';
+    if(meta.unit === 'ft')  return n.toFixed(2) + 'ft';
+    if(meta.unit === 'mph') return n.toFixed(1) + ' mph';
+    if(meta.unit === 'in')  return n.toFixed(1) + ' in';
+    return n.toFixed(2);
+  }
+
+  // ── Helper: format a delta value with sign ────────────────────────────────
+  function fmtDelta(d){
+    var sign = d > 0 ? '+' : '';
+    if(meta.unit === 's')   return sign + d.toFixed(2) + 's';
+    if(meta.unit === 'ft')  return sign + d.toFixed(2) + 'ft';
+    if(meta.unit === 'mph') return sign + d.toFixed(1) + ' mph';
+    if(meta.unit === 'in')  return sign + d.toFixed(1) + ' in';
+    return sign + d.toFixed(2);
+  }
+
+  // ── Per-point direction: compare each value to the previous ──────────────
+  // Returns 'up', 'down', or 'same'
+  function direction(curr, prev){
+    var diff = curr - prev;
+    if(Math.abs(diff) < 0.001) return 'same';
+    return meta.higherBetter ? (diff > 0 ? 'up' : 'down') : (diff < 0 ? 'up' : 'down');
+  }
+  function dirColor(d){
+    return d === 'up' ? '#5DCAA5' : d === 'down' ? '#F09595' : '#607080';
+  }
+
+  // Point colors: first point is orange (baseline), rest are green/red/gray
+  var pointColors = ['#F5881F'];
+  for(var j = 1; j < values.length; j++){
+    pointColors.push(dirColor(direction(values[j], values[j-1])));
+  }
+
+  // ── Overall trend summary (first → last) ──────────────────────────────────
+  var first     = values[0];
+  var last      = values[values.length - 1];
+  var totalDiff = last - first;
+  var overallDir = direction(last, first);
+  var noChange  = overallDir === 'same';
+
+  if(summaryEl){
+    if(noChange){
+      summaryEl.innerHTML = '<span style="color:var(--mt)">No change from first test</span>';
+    } else {
+      var arrow     = overallDir === 'up' ? ' &#8593;' : ' &#8595;';
+      var label     = overallDir === 'up' ? ' improvement since first test' : ' since first test';
+      var color     = dirColor(overallDir);
+      // For lower-is-better, a negative delta IS the improvement — show it clearly
+      var deltaDisplay = fmtDelta(totalDiff);
+      summaryEl.innerHTML = '<span style="color:' + color + '">'
+        + deltaDisplay + arrow + label
+        + '</span>'
+        + '<span style="color:var(--mt);font-weight:400;margin-left:10px">'
+        + fmtVal(first) + ' &rarr; ' + fmtVal(last)
+        + '</span>';
+    }
+    summaryEl.style.display = 'block';
+  }
+
+  // ── Build chart ───────────────────────────────────────────────────────────
+  if(_chartInst){ _chartInst.destroy(); _chartInst = null; }
+
+  _chartInst = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: meta.label + (meta.unit ? ' (' + meta.unit + ')' : ''),
+        data:  values,
+        // Segment coloring: each line segment green/red/gray based on direction
+        segment: {
+          borderColor: function(ctx){
+            var i   = ctx.p0DataIndex;
+            var dir = direction(values[i+1], values[i]);
+            return dirColor(dir);
+          }
+        },
+        backgroundColor: 'rgba(100,120,140,0.06)',
+        pointBackgroundColor: pointColors,
+        pointBorderColor:     pointColors,
+        pointRadius:     5,
+        pointHoverRadius: 8,
+        borderWidth: 2.5,
+        tension: 0.3,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 350 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1E262E',
+          titleColor:  '#DDE6EE',
+          bodyColor:   '#8AAABE',
+          borderColor: '#283038',
+          borderWidth: 1,
+          padding: 11,
+          callbacks: {
+            // Title: show the date
+            title: function(items){ return items[0].label; },
+            // Body: show the exact value
+            label: function(ctx){
+              return meta.label + ': ' + fmtVal(ctx.parsed.y);
+            },
+            // Footer: show change from previous session
+            afterLabel: function(ctx){
+              var idx = ctx.dataIndex;
+              if(idx === 0) return 'Baseline — first test';
+              var prev  = values[idx - 1];
+              var curr  = values[idx];
+              var diff  = curr - prev;
+              var dir   = direction(curr, prev);
+              var arrow = dir === 'up' ? '\u2191' : dir === 'down' ? '\u2193' : '\u2192';
+              var word  = dir === 'up' ? 'improved' : dir === 'down' ? 'declined' : 'unchanged';
+              return fmtDelta(diff) + ' ' + arrow + ' vs previous (' + word + ')';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: '#607080',
+            font:  { size: 11 },
+            maxRotation: 35,
+            minRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 8
+          },
+          grid:   { color: '#283038' },
+          border: { color: '#283038' }
+        },
+        y: {
+          ticks: {
+            color: '#607080',
+            font:  { size: 11 },
+            // Add unit to y-axis labels
+            callback: function(v){ return v + (meta.unit ? ' ' + meta.unit : ''); }
+          },
+          grid:   { color: '#283038' },
+          border: { color: '#283038' }
+        }
+      }
+    }
+  });
+
+  // ── Coaching insight below chart ──────────────────────────────────────────
+  var insightEl = el('prog-insight');
+  if(insightEl){
+    var insightMap = (typeof CHART_INSIGHTS !== 'undefined') ? CHART_INSIGHTS : {};
+    var metricInsights = insightMap[metricKey];
+    if(metricInsights){
+      var insightText = noChange ? metricInsights.same
+                      : overallDir === 'up' ? metricInsights.up
+                      : metricInsights.down;
+      var insightIcon = noChange ? '&#8594;' : overallDir === 'up' ? '&#8593;' : '&#8595;';
+      var insightColor = noChange ? 'var(--mt)' : overallDir === 'up' ? '#5DCAA5' : '#F09595';
+      insightEl.innerHTML = '<span style="color:' + insightColor + ';font-weight:700;margin-right:6px">' + insightIcon + '</span>' + insightText;
+      insightEl.style.display = 'block';
+    } else {
+      insightEl.style.display = 'none';
+    }
+  }
+}
+
+// Coaching insight copy per metric × direction
+var CHART_INSIGHTS = {
+  vj:{
+    up:   'Vertical jump is trending up — posterior chain loading and max-effort jumps are paying off. Keep progressive overload.',
+    down: 'Vertical jump has declined. Check for accumulated fatigue or a drop in strength work. Prioritize loaded jumps and trap bar deadlifts.',
+    same: 'Vertical jump is holding steady. Progressive overload on trap bar deadlifts and loaded jumps will push it higher.'
+  },
+  bj:{
+    up:   'Horizontal power is improving — acceleration mechanics will benefit directly. Continue sled and broad jump progressions.',
+    down: 'Horizontal power has slipped. Refocus on broad jump work and sled pushes to rebuild horizontal force output.',
+    same: 'Broad jump is stable. Contrast sets (heavy lift into broad jump) are the right tool to stimulate new horizontal power gains.'
+  },
+  rsi:{
+    up:   'Reactive strength is building — the athlete is absorbing and returning force more efficiently. Progress plyometric loading.',
+    down: 'RSI has dropped. Reduce plyometric intensity and revisit landing mechanics and ankle stiffness before reloading.',
+    same: 'RSI is consistent. Introduce progressive hurdle hops and tighter ground contact cues to push the next adaptation.'
+  },
+  f5:{
+    up:   'Acceleration times are faster — first-step power and start mechanics are improving. Continue sled and stance start work.',
+    down: 'Acceleration has slowed. Review start mechanics and horizontal force application. Resisted sprints and wall drills are the priority.',
+    same: 'Acceleration is holding. Falling starts and contrast sprints will apply the right stimulus to break through the current plateau.'
+  },
+  f10:{
+    up:   'Max velocity is improving — stride mechanics and neuromuscular output are developing well. Continue fly sprint exposure.',
+    down: 'Top-end speed has declined. Refocus on fly sprints at full intent and wicket work to reset stride mechanics.',
+    same: 'Max velocity is holding. Increase fly sprint frequency and add wicket runs to unlock the next stride length adaptation.'
+  },
+  gps:{
+    up:   'Field max speed is trending up — real-world outputs are improving. Continue open-space sprint exposure and fly work.',
+    down: 'GPS top speed has dropped. Ensure the athlete is reaching true max speed in sessions. Add full-length acceleration runs.',
+    same: 'GPS speed is consistent. Longer sprint distances and reduced braking will allow fuller max velocity expression.'
+  }
+};
+
+// ─── HISTORY PAGE CHART ───────────────────────────────────────────────────────
+// Separate chart instance so it never conflicts with the results page chart.
+var _histChartInst = null;
+
+function renderHistChart(aid, metricKey) {
+  var emptyEl   = el('hist-chart-empty');
+  var wrapEl    = el('hist-chart-wrap');
+  var canvas    = el('hist-chart');
+  var summaryEl = el('hist-summary');
+  var insightEl = el('hist-insight');
+  if (!emptyEl || !wrapEl || !canvas) return;
+
+  function hide() {
+    emptyEl.style.display = 'block';
+    wrapEl.style.display  = 'none';
+    if (summaryEl) summaryEl.style.display = 'none';
+    if (insightEl) insightEl.style.display = 'none';
+    if (_histChartInst) { _histChartInst.destroy(); _histChartInst = null; }
+  }
+
+  var sessions = DB.history(aid);
+  var points   = [];
+  for (var i = 0; i < sessions.length; i++) {
+    var raw = sessions[i].raw;
+    var val = raw ? raw[metricKey] : null;
+    if (val !== null && val !== undefined && !isNaN(parseFloat(val))) {
+      points.push({ date: sessions[i].date || ('Session ' + (i + 1)), val: parseFloat(val) });
+    }
+  }
+
+  if (points.length < 2) { hide(); return; }
+
+  emptyEl.style.display = 'none';
+  wrapEl.style.display  = 'block';
+
+  var meta   = METRIC_META[metricKey] || { label: metricKey, unit: '', higherBetter: true };
+  var labels = points.map(function(p) { return p.date; });
+  var values = points.map(function(p) { return p.val; });
+
+  // Format a single value with its unit
+  function fmtV(v) {
+    if (v === null || v === undefined) return '—';
+    var n = parseFloat(v); if (isNaN(n)) return '—';
+    if (meta.unit === 's')   return n.toFixed(2) + 's';
+    if (meta.unit === 'ft')  return n.toFixed(2) + 'ft';
+    if (meta.unit === 'mph') return n.toFixed(1) + ' mph';
+    if (meta.unit === 'in')  return n.toFixed(1) + ' in';
+    return n.toFixed(2);
+  }
+
+  // Format a delta with its sign and unit
+  function fmtD(d) {
+    var sign = d > 0 ? '+' : '';
+    if (meta.unit === 's')   return sign + d.toFixed(2) + 's';
+    if (meta.unit === 'ft')  return sign + d.toFixed(2) + 'ft';
+    if (meta.unit === 'mph') return sign + d.toFixed(1) + ' mph';
+    if (meta.unit === 'in')  return sign + d.toFixed(1) + ' in';
+    return sign + d.toFixed(2);
+  }
+
+  // Improvement direction (accounts for lower-is-better metrics)
+  function dir(curr, prev) {
+    var diff = curr - prev;
+    if (Math.abs(diff) < 0.001) return 'same';
+    return meta.higherBetter ? (diff > 0 ? 'up' : 'down') : (diff < 0 ? 'up' : 'down');
+  }
+  function dirCol(d) {
+    return d === 'up' ? '#5DCAA5' : d === 'down' ? '#F09595' : '#607080';
+  }
+
+  // Per-point colors: first = orange baseline, rest = green/red/gray
+  var ptColors = ['#F5881F'];
+  for (var j = 1; j < values.length; j++) {
+    ptColors.push(dirCol(dir(values[j], values[j - 1])));
+  }
+
+  // Overall summary (first → last)
+  var first      = values[0];
+  var last       = values[values.length - 1];
+  var totalDiff  = last - first;
+  var overallDir = dir(last, first);
+  var noChange   = overallDir === 'same';
+
+  if (summaryEl) {
+    if (noChange) {
+      summaryEl.innerHTML = '<span style="color:var(--mt)">No change from first test</span>';
+    } else {
+      var arrow = overallDir === 'up' ? '&#8593;' : '&#8595;';
+      var sCol  = dirCol(overallDir);
+      var label = overallDir === 'up' ? ' improvement since first test' : ' since first test';
+      summaryEl.innerHTML = '<span style="color:' + sCol + '">' + fmtD(totalDiff) + ' ' + arrow + label + '</span>'
+        + '<span style="color:var(--mt);font-weight:400;margin-left:10px">' + fmtV(first) + ' &rarr; ' + fmtV(last) + '</span>';
+    }
+    summaryEl.style.display = 'block';
+  }
+
+  // Destroy old chart before drawing new one
+  if (_histChartInst) { _histChartInst.destroy(); _histChartInst = null; }
+
+  _histChartInst = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: meta.label + (meta.unit ? ' (' + meta.unit + ')' : ''),
+        data:  values,
+        segment: {
+          borderColor: function(ctx) {
+            var i = ctx.p0DataIndex;
+            return dirCol(dir(values[i + 1], values[i]));
+          }
+        },
+        backgroundColor:   'rgba(100,120,140,0.06)',
+        pointBackgroundColor: ptColors,
+        pointBorderColor:     ptColors,
+        pointRadius:     5,
+        pointHoverRadius: 8,
+        borderWidth: 2.5,
+        tension: 0.3,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 350 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1E262E',
+          titleColor:  '#DDE6EE',
+          bodyColor:   '#8AAABE',
+          borderColor: '#283038',
+          borderWidth: 1,
+          padding: 11,
+          callbacks: {
+            title: function(items) { return items[0].label; },
+            label: function(ctx)   { return meta.label + ': ' + fmtV(ctx.parsed.y); },
+            afterLabel: function(ctx) {
+              var idx = ctx.dataIndex;
+              if (idx === 0) return 'Baseline — first test';
+              var d    = values[idx] - values[idx - 1];
+              var dDir = dir(values[idx], values[idx - 1]);
+              var a    = dDir === 'up' ? '\u2191' : dDir === 'down' ? '\u2193' : '\u2192';
+              var w    = dDir === 'up' ? 'improved' : dDir === 'down' ? 'declined' : 'unchanged';
+              return fmtD(d) + ' ' + a + ' vs previous (' + w + ')';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#607080', font: { size: 11 }, maxRotation: 35, autoSkip: true, maxTicksLimit: 8 },
+          grid:   { color: '#283038' },
+          border: { color: '#283038' }
+        },
+        y: {
+          ticks: {
+            color: '#607080', font: { size: 11 },
+            callback: function(v) { return v + (meta.unit ? ' ' + meta.unit : ''); }
+          },
+          grid:   { color: '#283038' },
+          border: { color: '#283038' }
+        }
+      }
+    }
+  });
+
+  // Coaching insight below chart
+  if (insightEl) {
+    var insightMap     = (typeof CHART_INSIGHTS !== 'undefined') ? CHART_INSIGHTS : {};
+    var metricInsights = insightMap[metricKey];
+    if (metricInsights) {
+      var txt   = noChange ? metricInsights.same : overallDir === 'up' ? metricInsights.up : metricInsights.down;
+      var icon  = noChange ? '&#8594;' : overallDir === 'up' ? '&#8593;' : '&#8595;';
+      var iCol  = dirCol(overallDir);
+      insightEl.innerHTML = '<span style="color:' + iCol + ';font-weight:700;margin-right:6px">' + icon + '</span>' + txt;
+      insightEl.style.display = 'block';
+    } else {
+      insightEl.style.display = 'none';
+    }
+  }
+}
+
+// Visual confirmation button — data is already auto-saved on every Evaluate
+function saveProgressEntry(){
+  var btn = el('btn-save-prog');
+  if(!btn) return;
+  var orig = btn.textContent;
+  btn.textContent = 'Saved \u2713';
+  btn.style.background = 'var(--s4)';
+  btn.style.color = '#fff';
+  setTimeout(function(){
+    btn.textContent = orig;
+    btn.style.background = '';
+    btn.style.color = '';
+  }, 1800);
+  // Re-render chart to reflect latest save
+  var sel = el('prog-metric-sel');
+  renderProgressChart(sel ? sel.value : 'vj');
+}
 
 // ─── COMPARISON CARD ──────────────────────────────────────────────────────────
 var CM=[{l:'Vertical Power',rk:'vj',sk:'vp',u:'in',lb:false},{l:'Horizontal Power',rk:'bj',sk:'hp',u:'ft',lb:false},{l:'Reactive Str.',rk:'rsi',sk:'rs',u:'',lb:false},{l:'Acceleration',rk:'f5',sk:'ac',u:'s',lb:true},{l:'Max Velocity',rk:'f10',sk:'mv',u:'s',lb:true},{l:'GPS Max Vel',rk:'gps',sk:'gps',u:'mph',lb:false}];
@@ -726,6 +1397,46 @@ function buildProg(S,days,phase){
   if(!notes.length)notes.push('Balanced profile. Maintain mixed stimulus. Adjust volume based on athlete response.');
   o+='<div style="'+cS+'"><div style="'+cT+'">Coaching Notes</div>'+ul(notes)+'</div>';
 
+  // ── 6-Week Progression ────────────────────────────────────────────────────
+  var wks=[];
+  if(isI){
+    wks=[
+      {w:'Week 1', t:'Establish Rhythm',       f:'Sub-maximal sprint work (80–85%). Log sprint times and movement quality as your in-season baseline.'},
+      {w:'Week 2', t:'Maintain Intent',         f:'Adjust volume based on game schedule. 2–4 reps per sprint set. No grinding — quality over quantity every session.'},
+      {w:'Week 3', t:'Standard Maintenance',    f:'Full in-season protocol. Monitor athlete response between sessions and games. Protect freshness before competition.'},
+      {w:'Week 4', t:'Assess Fatigue',          f:'If athlete is carrying fatigue, reduce to 2 reps per set. If fresh, hold standard volume. Sprint quality must stay high.'},
+      {w:'Week 5', t:'Refresh and Sharpen',     f:'If freshness is high, slightly lift sprint quality intent. Protect intensity — never chase volume this late in a block.'},
+      {w:'Week 6', t:'Review and Reassess',     f:'Evaluate progress, adjust the plan for the next block. Optional retest of priority metrics if athlete is fresh enough.'}
+    ];
+  } else if(isP) {
+    wks=[
+      {w:'Week 1', t:'Off-Season Transition',   f:'Drop strength volume 20%. Begin sprint quality work at 85–90%. Re-establish a sharp movement baseline before building.'},
+      {w:'Week 2', t:'Build Sprint Intensity',  f:'Introduce contrast pairings (heavy lift then sprint). Strength holds at 80% — shift energy output toward sprint performance.'},
+      {w:'Week 3', t:'Sharpen Sprint Quality',  f:'Max-intent fly sprints. Strength drops to 2× per week maintenance only. Sprint mechanics must be automatic by now.'},
+      {w:'Week 4', t:'Express Qualities',       f:'Full sprint outputs. Minimal strength work. Monitor athlete freshness closely — any fatigue signals need immediate volume cuts.'},
+      {w:'Week 5', t:'Peak Performance',        f:'Best-effort sprints and jumps. Simulate competition outputs where possible. Protect recovery — quality of rest is training.'},
+      {w:'Week 6', t:'Taper',                   f:'Drop volume 40–50%. Keep intensity at 90–95%. Full recovery between every rep. Athlete must arrive at competition sharp.'}
+    ];
+  } else {
+    wks=[
+      {w:'Week 1', t:'Establish Baseline',      f:'Sub-maximal effort (70–80%). Movement quality and mechanics first. Log all starting values — this sets your reference point.'},
+      {w:'Week 2', t:'Build Volume',            f:'Introduce the primary training focus. Sprint work at 80–85%. Add one set to main strength lifts. Track athlete response.'},
+      {w:'Week 3', t:'Progress Intensity',      f:'One additional rep or set on primary exercises. Sprint quality at 85–90%. Begin tracking metric improvements from Week 1.'},
+      {w:'Week 4', t:'Peak Volume',             f:'Full training load. Sprints at 90–95%. Max reps on strength work. This is the highest-demand week — manage recovery closely.'},
+      {w:'Week 5', t:'Highest Quality Week',    f:'Best-effort sprints and jumps. Maintain strength load. Retest 1–2 priority metrics to confirm progress and guide Week 6.'},
+      {w:'Week 6', t:'Deload and Retest',       f:'Drop volume 30–40%. Keep intensity at 85%. Full retest of all metrics. Evaluate the block and plan the next 6-week cycle.'}
+    ];
+  }
+  var wkH='';
+  for(var wi=0;wi<wks.length;wi++){
+    var wk=wks[wi];
+    wkH+='<div class="prog-6wk-row">'
+      +'<div class="prog-6wk-lbl">'+wk.w+'</div>'
+      +'<div class="prog-6wk-txt"><strong style="color:var(--tx)">'+wk.t+'</strong><br>'+wk.f+'</div>'
+      +'</div>';
+  }
+  o+='<div style="'+cS+'"><div style="'+cT+'">6-Week Progression — '+pl+'</div>'+wkH+'</div>';
+
   return o;
 }
 
@@ -864,6 +1575,25 @@ function buildHist(aid){
     h+='</div><div style="flex:1;margin-left:9px;font-size:12px;font-weight:600;color:'+trc+'">'+trl+'</div></div>';
   }
   h+='</div>';
+
+  // ── Progress chart card ──────────────────────────────────────────────────
+  h+='<div class="card">'
+   +'<div class="card-title">Progress Chart</div>'
+   +'<div class="prog-metric-wrap">'
+   +'<span class="prog-metric-lbl">Metric</span>'
+   +'<select class="prog-metric-sel" id="hist-metric-sel" onchange="renderHistChart(\''+aid+'\',this.value)">'
+   +'<option value="vj">Vertical Jump</option>'
+   +'<option value="bj">Broad Jump</option>'
+   +'<option value="rsi">RSI</option>'
+   +'<option value="f5">5–10 Fly</option>'
+   +'<option value="f10">10–10 Fly</option>'
+   +'<option value="gps">GPS Speed</option>'
+   +'</select></div>'
+   +'<div id="hist-summary" style="display:none;font-size:13px;font-weight:600;padding:4px 0 12px;letter-spacing:.02em"></div>'
+   +'<div class="prog-empty" id="hist-chart-empty">Add more testing sessions to view progress over time.</div>'
+   +'<div class="prog-chart-wrap" id="hist-chart-wrap" style="display:none"><canvas id="hist-chart"></canvas></div>'
+   +'<div id="hist-insight" style="display:none;margin-top:12px;padding:10px 13px;background:var(--dk3);border:1px solid var(--bd);border-radius:4px;font-size:13px;color:var(--sb);line-height:1.6"></div>'
+   +'</div>';
 
   // Classification history
   var rev=sessions.slice().reverse();
