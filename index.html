@@ -471,15 +471,15 @@ select option{background:var(--dk3)}
    ══════════════════════════════════════════════════ */
 .ath-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
 .ath-info{min-width:0;flex:1}
-.ath-name{font-family:'Rajdhani',sans-serif;font-size:19px;font-weight:700;color:#fff;text-transform:uppercase;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ath-pill{display:inline-flex;align-items:center;gap:4px;margin-top:3px;font-size:11px;font-weight:600;border-radius:3px;padding:2px 8px}
-.ath-unassigned{font-size:11px;color:var(--mt);margin-top:3px}
+.ath-name{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:#fff;text-transform:uppercase;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ath-pill{display:inline-flex;align-items:center;gap:4px;margin-top:3px;font-size:12px;font-weight:600;border-radius:3px;padding:3px 9px}
+.ath-unassigned{display:inline-block;font-size:11px;font-weight:600;color:var(--mt);margin-top:3px;padding:2px 8px;border-radius:3px;border:1px dashed var(--bd);background:transparent}
 .ath-sport-line{font-size:11px;color:var(--mt);margin-top:2px}
 .ath-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .ath-tier-chip{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:3px}
 .ath-ape-block{text-align:right}
-.ath-ape-num{font-family:'Rajdhani',sans-serif;font-size:30px;font-weight:700;line-height:1}
-.ath-ape-lbl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-top:1px;opacity:.85}
+.ath-ape-num{font-family:'Rajdhani',sans-serif;font-size:34px;font-weight:700;line-height:1}
+.ath-ape-lbl{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-top:2px;opacity:.85}
 .ath-divider{height:1px;background:var(--bd);margin:10px 0}
 .ath-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:12px;color:var(--mt)}
 .ath-meta-date{font-size:11px;color:var(--sb)}
@@ -496,7 +496,7 @@ select option{background:var(--dk3)}
 .lb-row.lb-silver{background:rgba(184,196,204,.05);border-left:3px solid #B8C4CC}
 .lb-row.lb-bronze{background:rgba(205,127,50,.05);border-left:3px solid #CD7F32}
 .lb-medal{font-size:22px;line-height:1}
-.lb-rank-num{font-family:'Rajdhani',sans-serif;font-size:17px;font-weight:700;color:var(--mt)}
+.lb-rank-num{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--mt);min-width:24px;text-align:center;background:var(--dk3);border:1px solid var(--bd);border-radius:3px;padding:2px 4px;display:inline-block}
 .lb-val-num{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;line-height:1}
 .lb-ape-sub{font-size:9px;font-weight:700;margin-top:2px}
 </style>
@@ -712,6 +712,14 @@ select option{background:var(--dk3)}
 
 <script>
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
+// DB is a self-contained module with a clean API surface.
+// To migrate to Supabase or Firebase in the future:
+//   1. Replace r()/w() with async fetch calls to your backend
+//   2. Keep all public methods (getAll, get, create, addSession, etc.) with the same signatures
+//   3. Add loading states and error handling at the call sites (buildDash, buildLeaderboard, etc.)
+//   4. Session data schema: { id, ts, date, raw:{vj,bj,rsi,f5,f10,gps}, sc:{vp,hp,rs,ac,mv,gps,ft}, bkt, bktName, defType, focus, cnt, apeScore, note }
+//   5. Athlete schema: { id, name, nk, tier, sport, position, age, team (team id), gradYear, notes, created, s:[] }
+//   6. Team schema: { id, name, color, created }
 var DB = (function(){
   var K = 'ape_v1';
   // r() auto-migrates v1→v2: adds t:{} for teams on first read
@@ -731,6 +739,8 @@ var DB = (function(){
   return {
     getAll: function(){
       var d=r(),al=list(d);
+      // Safety filter: drop any malformed records missing required fields
+      al=al.filter(function(a){return a&&a.id&&a.name&&a.tier&&Array.isArray(a.s);});
       al.forEach(function(a){a.last=a.s.length?a.s[a.s.length-1]:null;});
       al.sort(function(a,b){var at=a.last?a.last.ts:0,bt=b.last?b.last.ts:0;return bt!==at?bt-at:a.name.localeCompare(b.name);});
       return al;
@@ -850,10 +860,12 @@ var TIERS={youth:'Youth (U14)',hs:'High School',college:'College',pro:'Pro / Eli
 var BENCH={
   youth: {vj:[14,14,18,22,26],bj:[5.0,5.0,5.7,6.4,7.1],f5:[1.42,1.42,1.33,1.25,1.17],f10:[1.35,1.35,1.27,1.19,1.11],gps:[15.0,15.0,16.5,17.5,18.5]},
   hs:    {vj:[18,18,23,27,31],bj:[6.0,6.0,6.8,7.5,8.2],f5:[1.42,1.38,1.28,1.20,1.12],f10:[1.35,1.30,1.20,1.13,1.05],gps:[16.5,16.5,18.0,19.0,20.5]},
-  // College benchmarks reflect real training-population distributions (not combine-only data).
-  // Bands widened so that a solid college athlete (1.25-1.38s fly, 1.15-1.28s 10-10) scores 2-3
-  // and a strong performer (sub-1.22s / sub-1.12s) scores 4. Elite = top 5-10% of college programs.
-  college:{vj:[22,22,26,30,34],bj:[7.0,7.0,7.8,8.5,9.2],f5:[1.42,1.40,1.30,1.20,1.10],f10:[1.35,1.30,1.20,1.12,1.02],gps:[17.5,17.5,19.5,21.0,22.5]},
+  // College sprints — widened bands to reflect real training-population distributions.
+  // 5-10 Fly avg band: 1.34–1.46s · Solid: 1.22–1.34s · Strong: 1.10–1.22s · Elite: ≤1.10s
+  // 10-10 Fly avg band: 1.25–1.36s · Solid: 1.13–1.25s · Strong: 1.03–1.13s · Elite: ≤1.03s
+  // An athlete running 1.38–1.46 on 5-10 fly scores Average (2), not Below Avg (1).
+  // Elite standards remain tight — only top-program scholarship-level times score 5.
+  college:{vj:[22,22,26,30,34],bj:[7.0,7.0,7.8,8.5,9.2],f5:[1.55,1.46,1.34,1.22,1.10],f10:[1.45,1.36,1.25,1.13,1.03],gps:[17.5,17.5,19.5,21.0,22.5]},
   pro:   {vj:[26,26,30,34,38],bj:[8.5,8.5,9.2,9.9,10.6],f5:[1.20,1.20,1.14,1.08,1.02],f10:[1.10,1.10,1.04,0.98,0.92],gps:[18.5,18.5,20.0,21.5,23.0]}
 };
 var SW=['','Below Avg','Average','Solid','Strong','Elite'];
@@ -945,7 +957,10 @@ function refreshTeamSelect(selectedId){
   var sid=String(selectedId||'').trim();
   var teams=DB.getTeams();
   sel.innerHTML='<option value="">— No team —</option>'
-    +teams.map(function(t){return'<option value="'+t.id+'"'+(t.id===sid?' selected':'')+'>'+esc(t.name)+'</option>';}).join('');
+    +teams.map(function(t){return'<option value="'+t.id+'">'+esc(t.name)+'</option>';}).join('');
+  // Set value explicitly after options are in the DOM — more reliable than the selected attribute
+  sel.value=sid;
+  if(sel.value!==sid)sel.value=''; // fallback: ID no longer exists (e.g. team was deleted)
   // Update hint: prompt user to create a team if none exist yet
   var hint=el('team-hint');
   if(hint){
@@ -1049,35 +1064,37 @@ function getAPEInsight(rows, defType) {
 
   var lines = [];
 
-  // Line 1: biggest strength
-  lines.push('Biggest strength: ' + best.lbl + '.');
+  // Line 1: biggest strength (sc 4–5 = noteworthy; sc 3 = mention as relative strength)
+  var strengthLabel = best.sc >= 4 ? 'Top quality: ' : 'Relative strength: ';
+  lines.push(strengthLabel + best.lbl + (best.sc >= 4 ? ' is a standout quality.' : ' leads this profile.'));
 
-  // Line 2: biggest limitation (Solid or below)
-  if (worst.sc <= 3) {
-    lines.push('Biggest limitation: ' + worst.lbl + '.');
+  // Line 2: biggest gap (only flag if Solid or below)
+  if (worst.sc <= 3 && worst.lbl !== best.lbl) {
+    var gapLabel = worst.sc <= 2 ? 'Key gap: ' : 'Development area: ';
+    lines.push(gapLabel + worst.lbl + (worst.sc <= 2 ? ' needs priority attention.' : ' has the most room to grow.'));
   }
 
-  // Line 3: profile classification
+  // Line 3: profile classification — phrased as a coaching read
   var profileMap = {
-    'Force Deficient': 'Current profile suggests force-deficient development.',
-    'Form Deficient':  'Current profile suggests mechanics and speed expression need work.',
-    'Mixed Deficiency':'Current profile shows development needs across both power and speed.',
-    'Well Developed':  'Current profile is well-rounded across power and speed qualities.'
+    'Force Deficient': 'Speed is ahead of the force base. More strength and power will raise the speed ceiling.',
+    'Form Deficient':  'Good power base, but it is not fully expressing into sprint velocity yet. Mechanics work is the unlock.',
+    'Mixed Deficiency':'Both power and speed have room to grow. A strong foundation now creates bigger gains later.',
+    'Well Developed':  'Power and speed qualities are well matched. Targeted work on the weakest metric drives the next gain.'
   };
   if (profileMap[defType]) lines.push(profileMap[defType]);
 
-  // Line 4: primary opportunity (only if weakest metric is below Solid)
+  // Line 4: primary coaching action (only if weakest metric is below Solid)
   var oppMap = {
-    'Vertical Power':  'improve vertical force output through loaded jumps and strength training.',
-    'Horizontal Power':'improve horizontal power and acceleration transfer.',
-    'Reactive Str.':   'build reactive strength and ground contact quality.',
-    'Acceleration':    'develop first-step speed and short-area acceleration mechanics.',
-    'Max Velocity':    'develop top-end speed through fly sprints and stride mechanics.',
-    'GPS Max Vel.':    'raise real-world top-end speed through open-space sprint exposure.',
-    'Force Transfer':  'convert existing power into sprint speed through contrast training.'
+    'Vertical Power':  'Focus: loaded jumps and compound strength work to raise vertical force output.',
+    'Horizontal Power':'Focus: broad jump progressions and sled work to build horizontal power.',
+    'Reactive Str.':   'Focus: pogo progressions and ankle stiffness work before advancing plyometric loading.',
+    'Acceleration':    'Focus: short sprint starts (5–15yd), wall drills, and resisted sprints for first-step speed.',
+    'Max Velocity':    'Focus: fly sprints 20–40m and wicket runs to develop top-end speed mechanics.',
+    'GPS Max Vel.':    'Focus: open-space sprint exposure and full-distance acceleration runs.',
+    'Force Transfer':  'Focus: contrast training — heavy lift paired directly with sprint — to convert power into speed.'
   };
   if (worst.sc <= 3 && oppMap[worst.lbl]) {
-    lines.push('Primary opportunity: ' + oppMap[worst.lbl]);
+    lines.push(oppMap[worst.lbl]);
   }
 
   return lines;
@@ -1188,16 +1205,17 @@ function build(vj,bj,rsi,s5,s10,gps){
   var apeMeta  = getAPELabel(apeScore);
   var apeType  = getAthleteType(vp, hp, rs, ac, mv, gv);
 
+  var apeGlow = apeScore >= 80 ? ';box-shadow:0 0 0 1px '+apeMeta.color+'33,0 4px 24px '+apeMeta.color+'18' : apeScore >= 65 ? ';box-shadow:0 0 0 1px '+apeMeta.color+'22,0 2px 14px '+apeMeta.color+'10' : '';
   var apeCard = apeScore !== null
-    ? '<div class="card" style="border-top:3px solid '+apeMeta.color+';padding:20px 22px">'
+    ? '<div class="card" style="border-top:3px solid '+apeMeta.color+';padding:20px 22px'+apeGlow+'">'
       + '<div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:14px">'
-      + '<div style="text-align:center;flex-shrink:0;min-width:80px">'
-      + '<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:'+apeMeta.color+';margin-bottom:2px">APE Score</div>'
-      + '<div style="font-family:Rajdhani,sans-serif;font-size:64px;font-weight:700;color:'+apeMeta.color+';line-height:1">'+apeScore+'</div>'
-      + '<div style="font-size:10px;color:var(--mt);margin-top:1px">/ 100</div>'
+      + '<div style="text-align:center;flex-shrink:0;min-width:88px;background:'+apeMeta.color+'0D;border:1px solid '+apeMeta.color+'33;border-radius:8px;padding:12px 14px">'
+      + '<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:'+apeMeta.color+';margin-bottom:4px">APE Score</div>'
+      + '<div style="font-family:Rajdhani,sans-serif;font-size:68px;font-weight:700;color:'+apeMeta.color+';line-height:1">'+apeScore+'</div>'
+      + '<div style="font-size:10px;color:var(--mt);margin-top:2px;letter-spacing:.06em">/ 100</div>'
       + '</div>'
       + '<div style="flex:1;min-width:140px">'
-      + '<div style="font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:.02em;margin-bottom:4px">'+apeMeta.label+'</div>'
+      + '<div style="font-family:Rajdhani,sans-serif;font-size:24px;font-weight:700;color:#fff;letter-spacing:.02em;margin-bottom:4px">'+apeMeta.label+'</div>'
       + '<div style="font-size:13px;color:var(--sb);line-height:1.6;margin-bottom:10px">'+apeMeta.sub+'</div>'
       + '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'
       + (apeMeta.pct ? '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:'+apeMeta.color+'18;color:'+apeMeta.color+';border:1px solid '+apeMeta.color+'44;font-weight:600">&#128200; '+apeMeta.pct+' vs '+tl+'</span>' : '')
@@ -1249,13 +1267,16 @@ function build(vj,bj,rsi,s5,s10,gps){
     +'</div>'
     +'<div class="card"><div class="card-title">Coaching Output</div>'
       +'<div class="fg">'
-        +'<div class="fb"><div class="fl">Primary Focus</div><div class="fv">'+bk.pri+'</div></div>'
+        +'<div class="fb" style="border-left:3px solid var(--or)"><div class="fl">&#128163; Primary Focus</div><div class="fv" style="font-size:15px">'+bk.pri+'</div></div>'
         +'<div class="fb"><div class="fl">Secondary Focus</div><div class="fv">'+bk.sec+'</div></div>'
       +'</div>'
-      +'<div class="wb" style="margin-top:10px"><div class="fl">What We Are Training and Why</div><div class="wv" style="margin-top:6px">'+bk.w+'</div></div>'
-      +'<div style="margin-top:12px"><div class="fl">Recommended Methods</div><div class="mc">'+mth+'</div></div>'
+      +'<div class="wb" style="margin-top:10px;border-left:3px solid var(--bd)"><div class="fl">What We Are Training and Why</div><div class="wv" style="margin-top:6px">'+bk.w+'</div></div>'
+      +'<div style="margin-top:12px"><div class="fl">Recommended Methods</div><div class="mc" style="margin-top:8px">'+mth+'</div></div>'
     +'</div>'
-    +'<div class="sw-g"><div class="sw-c s"><div class="sw-t">&#9650; Strengths</div>'+strH+'</div><div class="sw-c w"><div class="sw-t">&#9660; Priority Areas</div>'+wkH+'</div></div>'
+    +'<div class="sw-g">'
+    +'<div class="sw-c s"><div class="sw-t" style="display:flex;align-items:center;justify-content:space-between">&#9650; Strengths'+(strs.length?'<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(31,158,112,.2);color:#5DCAA5">'+strs.length+'</span>':'')+'</div>'+strH+'</div>'
+    +'<div class="sw-c w"><div class="sw-t" style="display:flex;align-items:center;justify-content:space-between">&#9660; Priority Areas'+(wks.length?'<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(201,59,59,.2);color:#F09595">'+wks.length+'</span>':'')+'</div>'+wkH+'</div>'
+    +'</div>'
     +'<div class="card"><div class="card-title">Performance Scores — '+tl+' Benchmarks</div>'+scH+'</div>'
     +'<div class="card" style="border-top:2px solid var(--or)"><div class="card-title">Deficiency Profile</div>'
       +'<div style="background:var(--dk3);border:1px solid var(--bd);border-radius:6px;padding:14px 16px">'
@@ -2615,8 +2636,11 @@ function buildDash(){
       +'<div class="ath-right">'
       +'<span class="ath-tier-chip" style="background:'+tm2.c+'22;color:'+tm2.c+';border:1px solid '+tm2.c+'55">'+tm2.label+'</span>'
       +(apeMeta
-        ?'<div class="ath-ape-block"><div class="ath-ape-num" style="color:'+apeMeta.color+'">'+ape+'</div>'
-          +'<div class="ath-ape-lbl" style="color:'+apeMeta.color+'">APE</div></div>'
+        ?'<div class="ath-ape-block">'
+          +'<div class="ath-ape-num" style="color:'+apeMeta.color+'">'+ape+'</div>'
+          +'<div class="ath-ape-lbl" style="color:'+apeMeta.color+'">APE</div>'
+          +(apeMeta.pct?'<div style="font-size:9px;font-weight:700;color:'+apeMeta.color+';opacity:.7;letter-spacing:.04em;margin-top:1px;white-space:nowrap">'+apeMeta.pct+'</div>':'')
+          +'</div>'
         :'')
       +'</div>'
       +'</div>'
@@ -2630,9 +2654,12 @@ function buildDash(){
       // ── Last result strip ──
       +(last
         ?'<div class="ath-last-strip" style="border-left:3px solid '+bc+'">'
-          +'<div class="ath-last-bkt">'+esc(last.bktName||'')+'</div>'
+          +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">'
+          +'<div class="ath-last-bkt" style="flex:1;min-width:0">'+esc(last.bktName||'')+'</div>'
+          +(apeMeta&&apeMeta.label?'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;background:'+apeMeta.color+'18;color:'+apeMeta.color+';border:1px solid '+apeMeta.color+'33;white-space:nowrap;flex-shrink:0">'+apeMeta.label+'</span>':'')
+          +'</div>'
           +'<div class="ath-last-def">'+esc(last.defType||'')+'</div></div>'
-        :'<div style="font-size:12px;color:var(--mt);font-style:italic;margin-bottom:12px">No test data yet</div>')
+        :'<div style="font-size:12px;color:var(--mt);font-style:italic;margin-bottom:12px">No test data yet — add first evaluation.</div>')
       // ── Action buttons ──
       +'<div class="ath-actions">'
       +'<button class="btn-p" style="padding:8px 11px;font-size:12px;flex:1" onclick="startTest(\''+a.id+'\')">&#9889; New Test</button>'
@@ -2715,7 +2742,7 @@ function buildHist(aid){
     +'<div class="pg-title" style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">'+esc(a.name)
     +'<span style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:3px;background:'+tm3.c+'22;color:'+tm3.c+';border:1px solid '+tm3.c+'55">'+tm3.label+'</span>'
     +(teamTm3
-      ?'<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:3px;background:'+teamTm3.color+'1A;color:'+teamTm3.color+';border:1px solid '+teamTm3.color+'44">'+esc(teamTm3.name)+'</span>'
+      ?'<span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:3px;background:'+teamTm3.color+'1A;color:'+teamTm3.color+';border:1px solid '+teamTm3.color+'44">'+esc(teamTm3.name)+'</span>'
       :'<span style="font-size:10px;font-weight:500;color:var(--mt)">Unassigned</span>')
     +'</div>'
     +'<div class="pg-sub">'
@@ -2831,35 +2858,9 @@ function saveNote(aid,sid){
   }
 }
 
-// ─── ATHLETE EDIT ─────────────────────────────────────────────────────────────
-function editAthCard(aid){
-  var a=DB.get(aid);if(!a)return;
-  var card=el('athcard-'+aid);if(!card)return;
-  var tiers=[{k:'youth',l:'Youth (U14)'},{k:'hs',l:'High School'},{k:'college',l:'College'},{k:'pro',l:'Pro / Elite'}];
-  var tierOpts=tiers.map(function(t){return '<option value="'+t.k+'"'+(a.tier===t.k?' selected':'')+'>'+t.l+'</option>';}).join('');
-  var teams=DB.getTeams();
-  var teamOpts='<option value="">— No team —</option>'
-    +teams.map(function(t){return '<option value="'+t.id+'"'+(a.team===t.id?' selected':'')+'>'+esc(t.name)+'</option>';}).join('');
-  card.innerHTML=''
-    +'<div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--or);margin-bottom:12px">Edit Profile</div>'
-    +'<div class="field" style="margin-bottom:10px"><label>Name</label><input type="text" id="edit-name-'+aid+'" value="'+esc(a.name)+'"></div>'
-    +'<div class="g2" style="margin-bottom:10px">'
-    +'<div class="field" style="margin-bottom:0"><label>Sport</label><input type="text" id="edit-sport-'+aid+'" value="'+esc(a.sport||'')+'"></div>'
-    +'<div class="field" style="margin-bottom:0"><label>Position</label><input type="text" id="edit-pos-'+aid+'" value="'+esc(a.position||'')+'"></div>'
-    +'</div>'
-    +'<div class="g2" style="margin-bottom:10px">'
-    +'<div class="field" style="margin-bottom:0"><label>Age</label><input type="number" id="edit-age-'+aid+'" value="'+(a.age||'')+'" min="5" max="50" step="1"></div>'
-    +'<div class="field" style="margin-bottom:0"><label>Grad Year</label><input type="number" id="edit-grady-'+aid+'" value="'+(a.gradYear||'')+'" min="2020" max="2035" step="1"></div>'
-    +'</div>'
-    +'<div class="field" style="margin-bottom:10px"><label>Team</label><select id="edit-team-'+aid+'">'+teamOpts+'</select></div>'
-    +'<div class="field" style="margin-bottom:10px"><label>Tier</label><select id="edit-tier-'+aid+'">'+tierOpts+'</select></div>'
-    +'<div class="field" style="margin-bottom:14px"><label>Notes</label><textarea class="notes-ta" id="edit-notes-'+aid+'" style="min-height:48px;margin-top:0">'+esc(a.notes||'')+'</textarea></div>'
-    +'<div style="display:flex;gap:8px">'
-    +'<button class="btn-p" id="ath-edit-save-'+aid+'" style="padding:9px 14px;font-size:13px;flex:1" onclick="saveAthEdit(\''+aid+'\')">Save Changes</button>'
-    +'<button class="btn-s" style="padding:9px 11px;font-size:13px" onclick="buildDash()">Cancel</button>'
-    +'</div>';
-}
-
+// ─── ATHLETE EDIT (inline card version — kept for emergency fallback only) ─────
+// The primary edit path is editAthlete(aid) → page 1 form.
+// saveAthEdit is still wired to any inline form that might appear in custom views.
 function saveAthEdit(aid){
   var nameEl=el('edit-name-'+aid),tierEl=el('edit-tier-'+aid);
   var sportEl=el('edit-sport-'+aid),posEl=el('edit-pos-'+aid),ageEl=el('edit-age-'+aid);
@@ -2875,17 +2876,7 @@ function saveAthEdit(aid){
     gradYEl?parseFloat(gradYEl.value)||null:null,
     notesEl?notesEl.value.trim():''
   );
-  // Flash "Saved" on the save button, then rebuild the dashboard
-  var saveBtn=el('ath-edit-save-'+aid);
-  if(saveBtn){
-    saveBtn.innerHTML='Saved &#10003;';
-    saveBtn.style.background='var(--s4)';
-    saveBtn.style.borderColor='var(--s4)';
-    saveBtn.style.color='#fff';
-    setTimeout(function(){ buildDash(); }, 700);
-  } else {
-    buildDash();
-  }
+  buildDash();
 }
 
 // ─── ATHLETE DELETE ───────────────────────────────────────────────────────────
@@ -2957,15 +2948,36 @@ function exportAllAthletesXLSX(){
 }
 function exportLeaderboardXLSX(){
   if(!_xlsxCheck())return;
-  var athletes=DB.getAll(),rows=[];
+  var athletes=DB.getAll(),teams=DB.getTeams(),rows=[];
+  var teamMap={};teams.forEach(function(t){teamMap[t.id]=t.name;});
   athletes.forEach(function(a){
     if(!a.s.length)return;
-    var last=a.s[a.s.length-1],sc=last.sc||{},ape=getAPEScore(sc);
-    rows.push({'Athlete':a.name,'Tier':TIERS[a.tier]||a.tier,'Sessions':a.s.length,'Last Test':last.date||'','APE Score':ape!=null?ape:'','Classification':last.defType||'','Training Bucket':last.bktName||''});
+    var last=a.s[a.s.length-1],sc=last.sc||{},raw=last.raw||{};
+    var ape=last.apeScore!=null?last.apeScore:getAPEScore(sc);
+    var apeMeta=ape!=null?getAPELabel(ape):null;
+    rows.push({
+      'Athlete':a.name,
+      'Team':a.team&&teamMap[a.team]?teamMap[a.team]:'',
+      'Sport':a.sport||'',
+      'Position':a.position||'',
+      'Level':TIERS[a.tier]||a.tier,
+      'Sessions':a.s.length,
+      'Last Test':last.date||'',
+      'APE Score':ape!=null?ape:'',
+      'APE Label':apeMeta?apeMeta.label:'',
+      'VJ (in)':raw.vj!=null?raw.vj:'',
+      'BJ (ft)':raw.bj!=null?raw.bj:'',
+      'RSI':raw.rsi!=null?raw.rsi:'',
+      '5-10 Fly (s)':raw.f5!=null?raw.f5:'',
+      '10-10 Fly (s)':raw.f10!=null?raw.f10:'',
+      'GPS (mph)':raw.gps!=null?raw.gps:'',
+      'Classification':last.defType||'',
+      'Training Bucket':last.bktName||''
+    });
   });
   if(!rows.length){alert('No data to export.');return;}
   rows.sort(function(a,b){return(typeof b['APE Score']==='number'?b['APE Score']:-1)-(typeof a['APE Score']==='number'?a['APE Score']:-1);});
-  rows=rows.map(function(r,i){return{'Rank':i+1,'Athlete':r['Athlete'],'Tier':r['Tier'],'Sessions':r['Sessions'],'Last Test':r['Last Test'],'APE Score':r['APE Score'],'Classification':r['Classification'],'Training Bucket':r['Training Bucket']};});
+  rows=rows.map(function(r,i){return Object.assign({'Rank':i+1},r);});
   var ws=XLSX.utils.json_to_sheet(rows);
   var wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Leaderboard');
@@ -3043,7 +3055,9 @@ function doCreateTeam(){
   if(!name){if(errEl)errEl.style.display='block';if(nameEl)nameEl.focus();return;}
   if(errEl)errEl.style.display='none';
   DB.createTeam(name,colorEl?colorEl.value:'#F5881F');
+  if(nameEl)nameEl.value='';
   buildTeams();
+  refreshTeamSelect('');
 }
 
 function editTeamCard(tid){
@@ -3071,6 +3085,7 @@ function saveTeamEdit(tid){
   if(!name){nameEl.style.borderColor='var(--s1)';nameEl.focus();return;}
   DB.updateTeam(tid,name,colorEl?colorEl.value:null);
   buildTeams();
+  refreshTeamSelect('');
 }
 
 function confirmDelTeam(tid){
@@ -3085,6 +3100,7 @@ function confirmDelTeam(tid){
 function doDelTeam(tid){
   DB.deleteTeam(tid);
   buildTeams();
+  refreshTeamSelect('');
 }
 
 // ─── TEAM STATS ───────────────────────────────────────────────────────────────
@@ -3337,7 +3353,7 @@ function saveProfileEdit(){
       saveBtn.style.color='';
       _clearEditMode();
       goDash();
-    }, 700);
+    }, 1200);
   } else {
     _clearEditMode();
     goDash();
