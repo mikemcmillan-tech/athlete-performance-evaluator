@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Athlete Performance Evaluator</title>
@@ -711,6 +712,10 @@ select option{background:var(--dk3)}
 </div>
 
 <script>
+ var SUPABASE_URL = 'https://fqakqczqfqhdamnfbdqt.supabase.co';
+var SUPABASE_ANON_KEY = 'PASTE_YOUR_ANON_PUBLIC_KEY_HERE';
+
+var _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);  
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
 // DB is a self-contained module with a clean API surface.
 // To migrate to Supabase or Firebase in the future:
