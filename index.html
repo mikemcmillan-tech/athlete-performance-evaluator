@@ -652,7 +652,7 @@ select option{background:var(--dk3)}
     <div id="err-d2" class="err-box">Enter at least 2 test values to generate a report.</div>
     <div class="btn-row">
       <button class="btn-s" onclick="go(1)">&larr; Back</button>
-      <button class="btn-p" onclick="runEval()">&#9889; Evaluate Athlete</button>
+      <button class="btn-p" id="btn-eval" onclick="runEval()">&#9889; Evaluate Athlete</button>
     </div>
   </div>
 
@@ -660,7 +660,7 @@ select option{background:var(--dk3)}
     <div id="rc-cmp"></div>
     <div id="rc"></div>
     <div class="btn-row">
-      <button class="btn-s" onclick="go(2)">&larr; Edit Data</button>
+      <button class="btn-s" onclick="_resetEvalBtn();go(2)">&larr; Edit Data</button>
       <button class="btn-s" onclick="goRpt()">Client Report</button>
       <button class="btn-p" onclick="goProg()">Build Program &rarr;</button>
     </div>
@@ -897,11 +897,17 @@ function go(n){
 function selTier(t,btn){tier=t;document.querySelectorAll('.tier-btn').forEach(function(b){b.classList.remove('sel');});btn.classList.add('sel');el('err-t1').style.display='none';}
 function goNext(){
   if(!tier){el('err-t1').style.display='block';return;}
+  // Validate name in ALL paths — prevents creating athletes with blank or empty names
+  var nameEl=el('inp-name');
+  var nameVal=nameEl?nameEl.value.trim():'';
+  if(!nameVal){
+    if(nameEl){nameEl.style.borderColor='var(--s1)';nameEl.focus();}
+    return;
+  }
+  if(nameEl)nameEl.style.borderColor=''; // clear any previous validation red border
   // In edit mode, save profile changes before advancing to test data
   if(_S.editingAthlete){
-    var name=el('inp-name').value.trim();
-    if(!name){el('inp-name').style.borderColor='var(--s1)';el('inp-name').focus();return;}
-    DB.updateAthlete(_S.editingAthlete,name,tier,
+    DB.updateAthlete(_S.editingAthlete,nameVal,tier,
       el('inp-sport')?el('inp-sport').value.trim():'',
       el('inp-pos')?el('inp-pos').value.trim():'',
       el('inp-age')?parseFloat(el('inp-age').value)||null:null,
@@ -914,7 +920,7 @@ function goNext(){
   go(2);
 }
 function resetAll(){
-  ['inp-name','inp-sport','inp-pos','inp-age','inp-grady','inp-notes','inp-vj','inp-bj','inp-rsi','inp-510','inp-1010','inp-gps'].forEach(function(id){var e=el(id);if(e)e.value='';});
+  ['inp-name','inp-sport','inp-pos','inp-age','inp-grady','inp-notes','inp-vj','inp-bj','inp-rsi','inp-510','inp-1010','inp-gps'].forEach(function(id){var e=el(id);if(e){e.value='';e.style.borderColor='';}});
   refreshTeamSelect(''); // repopulate options and reset selection
   var ph=el('inp-phase'),dy=el('inp-days');if(ph)ph.value='';if(dy)dy.value='';
   tier=null;_S={};
@@ -922,6 +928,7 @@ function resetAll(){
   ['rc','rc-cmp','prog-out'].forEach(function(id){var e=el(id);if(e)e.innerHTML='';});
   var pb=el('prog-btns');if(pb)pb.style.display='none';
   _clearEditMode(); // hides edit-save-row, edit-mode-banner, resets card title
+  _resetEvalBtn(); // re-enable evaluate button in case it was locked from a prior eval
   go(1);
 }
 function goDash(){buildDash();go(0);var nt=el('nav-teams');if(nt)nt.classList.remove('act');}
@@ -961,23 +968,33 @@ function refreshTeamSelect(selectedId){
   // Set value explicitly after options are in the DOM — more reliable than the selected attribute
   sel.value=sid;
   if(sel.value!==sid)sel.value=''; // fallback: ID no longer exists (e.g. team was deleted)
-  // Update hint: prompt user to create a team if none exist yet
+  // Update hint: prompt user to create a team if none exist; explain unassignment rule if teams do exist
   var hint=el('team-hint');
   if(hint){
     if(!teams.length){
       hint.innerHTML='No teams yet &mdash; <button type="button" style="background:none;border:none;color:var(--or);font-size:11px;font-family:Barlow,sans-serif;cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px" onclick="buildTeams()">create one in Teams</button>';
     }else{
-      hint.textContent='';
+      hint.textContent='To remove a team assignment, use Edit Profile on the dashboard.';
     }
   }
 }
 
 // ─── EVALUATION ───────────────────────────────────────────────────────────────
+function _resetEvalBtn(){
+  var b=el('btn-eval');if(!b)return;
+  b.disabled=false;
+  b.innerHTML='&#9889; Evaluate Athlete';
+  b.style.opacity='';
+}
 function runEval(){
   el('err-t2').style.display='none';el('err-d2').style.display='none';
+  // Validation — button stays enabled so errors are visible and user can retry
   if(!tier){el('err-t2').style.display='block';return;}
   var vj=gn('inp-vj'),bj=gn('inp-bj'),rsi=gn('inp-rsi'),s5=gn('inp-510'),s10=gn('inp-1010'),gps=gn('inp-gps');
   if([vj,bj,rsi,s5,s10,gps].filter(function(x){return x!==null;}).length<2){el('err-d2').style.display='block';return;}
+  // All validation passed — lock the button immediately to prevent duplicate sessions
+  var evalBtn=el('btn-eval');
+  if(evalBtn){evalBtn.disabled=true;evalBtn.innerHTML='&#9889; Evaluating...';evalBtn.style.opacity='0.6';}
   build(vj,bj,rsi,s5,s10,gps);go(3);
 }
 
