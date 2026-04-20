@@ -713,9 +713,23 @@ select option{background:var(--dk3)}
 
 <script>
  var SUPABASE_URL = 'https://fqakqczqfqhdamnfbdqt.supabase.co';
-var SUPABASE_ANON_KEY = 'PASTE_YOUR_ANON_PUBLIC_KEY_HERE';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxYWtxY3pxZnFoZGFtbmZiZHF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NTc4MjQsImV4cCI6MjA5MjEzMzgyNH0.yNQmPez_iMkO6IpOp20VzMJdX7hkF7NHqYdCIHokQ3U;
 
 var _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);  
+async function getUser() {
+  const { data, error } = await _sb.auth.getUser();
+  if (error) {
+    console.error('getUser error', error);
+    return null;
+  }
+  return data.user || null;
+}
+
+async function requireUser() {
+  const user = await getUser();
+  if (!user) throw new Error('No authenticated user');
+  return user;
+}  
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
 // DB is a self-contained module with a clean API surface.
 // To migrate to Supabase or Firebase in the future:
