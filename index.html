@@ -1135,6 +1135,53 @@ var PCTL=['','Bottom 20%','20th–40th','40th–60th','70th–85th','Top 10%'];
 var TM={youth:{label:'Youth (U14)',c:'#6B9A2A'},hs:{label:'High School',c:'#BA7517'},college:{label:'College',c:'#1F9E70'},pro:{label:'Pro / Elite',c:'#F5881F'}};
 var DC=['','#C93B3B','#BA7517','#6B9A2A','#1F9E70','#0F7A54'];
 
+// ─── SPORT / POSITION CONTEXT ─────────────────────────────────────────────────
+// Each entry: keys to match (position + sport lowercased), priority metrics,
+// short coach note, and which metric the position lives or dies by.
+var SPORT_CTX=[
+  // Football — skill
+  {keys:['wide receiver','wr','receiver'],   pri:['ac','mv'],       gate:'ac', note:'WR: Speed is the position. Acceleration and max velocity are the only numbers that matter to a scout.'},
+  {keys:['cornerback','corner','cb','safety','db','defensive back'],pri:['ac','mv','rs'],gate:'ac',note:'DB: Mirror-speed position. Acceleration and reactive strength determine whether you can stay on receivers.'},
+  {keys:['running back','rb'],               pri:['ac','vp','ft'],  gate:'ac', note:'RB: Explosive first step into power. Acceleration drives everything, but force transfer closes the gap.'},
+  {keys:['tight end','te'],                  pri:['vp','ac','ft'],  gate:'vp', note:'TE: Power-speed hybrid. Vertical jump and first step are the combo scouts look for.'},
+  {keys:['linebacker','lb'],                 pri:['ac','vp','rs'],  gate:'ac', note:'LB: Sideline-to-sideline speed + physical power. First step quickness and jump scores both matter.'},
+  {keys:['quarterback','qb'],                pri:['ac','rs'],       gate:'ac', note:'QB: Pocket mobility and reactive ability. First-step quickness separates mobile from immobile.'},
+  {keys:['offensive lineman','offensive line','ol','guard','tackle','center','ot','og'], pri:['vp','hp'],gate:'vp',note:'OL: Power is the job. Vertical and broad jump scores predict your ability to move defenders — higher is faster.'},
+  {keys:['defensive lineman','defensive end','dl','de','dt','edge'],pri:['vp','ac','rs'],gate:'ac',note:'DL/Edge: First step and explosive power. Get-off speed is the most valuable thing a D-lineman has.'},
+  // Soccer
+  {keys:['forward','striker','winger','attacker'],pri:['ac','mv','ft'],gate:'ac',note:'Forward/Winger: Explosive speed and force transfer for goal-scoring runs. Acceleration is your weapon.'},
+  {keys:['midfielder','mid','cm','cdm','box-to-box'],pri:['mv','rs','gps'],gate:'gps',note:'Midfielder: Max velocity and GPS speed over repeated sprints. This is the most physically demanding position on the pitch.'},
+  {keys:['defender','centre back','center back','fullback','full back'],pri:['ac','rs'],gate:'ac',note:'Defender: Recovery speed is everything. First-step quickness and reactive strength determine whether you get beaten.'},
+  {keys:['goalkeeper','keeper','gk'],         pri:['vp','rs'],       gate:'vp', note:'Goalkeeper: Explosive lateral power and reactive strength for saves. Jump scores directly translate to shot-stopping.'},
+  // Basketball
+  {keys:['point guard','pg'],                 pri:['ac','ft','rs'],  gate:'ac', note:'PG: First-step quickness and change-of-direction speed. Force transfer from power into movement is the key quality.'},
+  {keys:['shooting guard','sg'],              pri:['ac','mv','ft'],  gate:'ac', note:'SG: Speed off the catch and explosiveness off the dribble. Acceleration and max velocity.'},
+  {keys:['small forward','sf'],               pri:['vp','ac','ft'],  gate:'ac', note:'SF: The athletic swing position. Power and speed both matter equally — you need both sides of the profile.'},
+  {keys:['power forward','pf'],               pri:['vp','hp','rs'],  gate:'vp', note:'PF: Power production and reactive ability. Jump scores and RSI directly translate to rebounding and shot-blocking.'},
+  {keys:['center','big man'],                 pri:['vp','hp'],       gate:'vp', note:'Center: Raw power and force production. Vertical and broad jump predict your ability to create and finish around the rim.'},
+  // Track
+  {keys:['sprinter','100m','200m','400m'],    pri:['ac','mv'],       gate:'mv', note:'Sprinter: Pure speed. Acceleration through max velocity — every tenth of a second is a place finish.'},
+  {keys:['jumper','long jump','triple jump','high jump'],pri:['vp','hp','rs'],gate:'vp',note:'Jumper: Power and reactive strength drive competition performance. Jump scores and RSI are your competition predictors.'},
+  {keys:['thrower','shot put','discus','javelin','hammer'],pri:['vp','hp'],gate:'vp',note:'Thrower: Rotational and linear power. Broad and vertical jump scores predict implement velocity.'},
+  // Baseball / Softball
+  {keys:['outfielder','center field','cf','rf','lf'],pri:['ac','mv'],gate:'ac',note:'Outfielder: Route running speed and first-step quickness to cover gaps.'},
+  {keys:['shortstop','second base','infielder','ss','2b'],pri:['ac','rs'],gate:'ac',note:'Infielder: Quick-twitch first step and reactive ability for range.'},
+  {keys:['pitcher'],                          pri:['vp','hp'],       gate:'vp', note:'Pitcher: Lower-body power drives mound velocity. Jump scores are the best predictor of fastball speed available without a radar gun.'},
+  {keys:['catcher'],                          pri:['rs','ac'],       gate:'rs', note:'Catcher: Reactive strength and short-area quickness for blocks and throws.'},
+];
+function getSportCtx(sport,pos){
+  var q=((pos||'')+' '+(sport||'')).toLowerCase().trim();
+  if(!q)return null;
+  for(var i=0;i<SPORT_CTX.length;i++){
+    var sc=SPORT_CTX[i];
+    for(var j=0;j<sc.keys.length;j++){if(q.indexOf(sc.keys[j])!==-1)return sc;}
+  }
+  return null;
+}
+// Returns priority label for a metric key
+var METRIC_NAMES={vp:'Vertical Power',hp:'Horizontal Power',rs:'Reactive Strength',ac:'Acceleration',mv:'Max Velocity',gps:'GPS Speed',gv:'GPS Speed',ft:'Force Transfer'};
+
+
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 function el(id){return document.getElementById(id);}
 function gn(id){var v=parseFloat(el(id).value);return(isNaN(v)||v<=0)?null:v;}
@@ -1453,6 +1500,9 @@ function build(vj,bj,rsi,s5,s10,gps){
   };
   var bk=BK[bkt];
 
+  // Sport/position context
+  var ctx2=getSportCtx(sport,position);
+
   var rows=[
     {lbl:'Vertical Power',  cat:'Vert Jump',   raw:vpR,sc:vp,lg:vpL,rf:false},
     {lbl:'Horizontal Power',cat:'Broad Jump',  raw:hpR,sc:hp,lg:hpL,rf:false},
@@ -1463,6 +1513,15 @@ function build(vj,bj,rsi,s5,s10,gps){
     {lbl:'Force Transfer',  cat:'Derived',     raw:ftR,sc:ft,lg:ftL,rf:false}
   ];
   var scH='';
+  // Position context banner
+  if(ctx2){
+    scH+='<div style="background:var(--or-glow);border:1px solid rgba(245,136,31,.3);border-radius:6px;padding:11px 14px;margin-bottom:14px">';
+    scH+='<div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--or);margin-bottom:4px">Position Profile</div>';
+    scH+='<div style="font-size:12px;color:var(--tx);line-height:1.55">'+esc(ctx2.note)+'</div>';
+    scH+='<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">';
+    ctx2.pri.forEach(function(k){scH+='<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;background:var(--or);color:#fff">'+((METRIC_NAMES[k])||k)+'</span>';});
+    scH+='</div></div>';
+  }
   for(var i=0;i<rows.length;i++){
     var rr=rows[i];
     if(rr.sc===null){
@@ -1618,7 +1677,7 @@ function build(vj,bj,rsi,s5,s10,gps){
     +'<div id="prog-insight" style="display:none;margin-top:12px;padding:10px 13px;background:var(--dk3);border:1px solid var(--bd);border-radius:4px;font-size:13px;color:var(--sb);line-height:1.6"></div>'
     +'</div>';
 
-  _S={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,ft:ft,tier:tier,name:name,sport:sport,position:position,age:age,team:team,gradYear:gradYear,notes:notes,bodyweight:bodyweight,height:height,defType:dT,defLabel:dLab,defLimiter:dLim,defExplain:dExp};
+  _S={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,ft:ft,tier:tier,name:name,sport:sport,position:position,age:age,team:team,gradYear:gradYear,notes:notes,bodyweight:bodyweight,height:height,defType:dT,defLabel:dLab,defLimiter:dLim,defExplain:dExp,rawVJ:vj,rawBJ:bj,rawRSI:rsi,rawF5:s5,rawF10:s10};
 
   DB.auto(name,tier,
     {vj:vj,bj:bj,rsi:rsi,f5:s5,f10:s10,gps:gps},
@@ -2591,59 +2650,180 @@ function buildProg(S,days,phase){
 
 // ─── CLIENT REPORT ────────────────────────────────────────────────────────────
 function buildReport(S){
-  var vp=S.vp,hp=S.hp,rs=S.rs,ac=S.ac,mv=S.mv,gps=S.gps;
+  var vp=S.vp,hp=S.hp,rs=S.rs,ac=S.ac,mv=S.mv,gps=S.gps,ft=S.ft;
   var lv=S.tier,name=S.name||'Athlete',tl=TIERS[lv]||lv;
   var ds=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-  var or='#F5881F',dT=S.defType||'Incomplete Data';
+  var or='#F5881F';
   var cfg=DB.loadSettings();
   var coachName=cfg.coachName||'';
   var gymName=cfg.gymName||'Athlete Performance Evaluator';
   var contact=cfg.contact||'';
   var tagline=cfg.tagline||'';
-  var apeScore=S.aid?DB.last(S.aid):null;if(apeScore)apeScore=apeScore.apeScore;
+  var dT=S.defType||'Incomplete Data';
+
+  // APE score
+  var apeScore=null;
+  if(S.aid){var lastSess=DB.last(S.aid);if(lastSess)apeScore=lastSess.apeScore;}
+  if(apeScore==null&&S.vp!==undefined){
+    apeScore=getAPEScore({vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gv:gps,ft:ft});
+  }
+  var apeMeta=apeScore!=null?getAPELabel(apeScore):null;
+
+  // Sport context
+  var ctx=getSportCtx(S.sport,S.position);
+
+  // Deficiency language
   var dh,de,fp,fs,tm;
-  if(dT==='Force Deficient'){dh='Your speed is ahead of your power base.';de='You move well but need more strength and power to support those speed gains. Building your force base is the unlock.';fp='Strength and power development';fs='Reactive strength and loaded jumps';tm='To take your speed higher, we need to build what drives it. Stronger legs and more explosive power mean faster acceleration and better top-end speed.';}
-  else if(dT==='Form Deficient'){dh='You have the physical tools but are not yet applying force efficiently into speed.';de='Your jump scores are solid. The gap is in how efficiently that force converts into sprint velocity. Sprint mechanics are the priority.';fp='Sprint mechanics and force application';fs='Acceleration and max velocity exposure';tm='Your body has the power. Now we train it to move fast. Sprint mechanics and fly sprints will help you express the force you already have.';}
-  else if(dT==='Mixed Deficiency'){dh='Both power and speed qualities have room to grow.';de='You are in an early development phase. A strong foundation will unlock improvement across all speed qualities.';fp='General athletic development';fs='Basic sprint mechanics and fundamental strength';tm='Building the foundation first means bigger gains later. Everything we do now sets the ceiling for your speed down the road.';}
-  else{dh='Your power and speed qualities are well matched.';de='You are in a strong position across both power and speed. The focus shifts to refining and expressing those qualities consistently.';fp='Refinement and efficiency';fs='Specific weak-link improvement';tm='You have the physical tools. The work now is sharpening them. Small improvements in your weak link will have the biggest impact.';}
-  var CSW=['','Needs Work','Average','Solid','Strong','Elite'];
-  function lc(sc){if(!sc)return'#8AAABE';return sc>=5?'#0F7A54':sc>=4?'#1F9E70':sc>=3?'#6B9A2A':sc>=2?'#BA7517':'#C93B3B';}
-  var cats=[{l:'Vertical Power',sc:vp,c:'Jumping Power'},{l:'Horizontal Power',sc:hp,c:'Horizontal Drive'},{l:'Reactive Strength',sc:rs,c:'Ground Stiffness'},{l:'Acceleration',sc:ac,c:'First-Step Speed'},{l:'Max Velocity',sc:mv,c:'Fly Speed'},{l:'GPS Max Velocity',sc:gps,c:'Top Speed'}];
-  var o='<div style="background:#fff;color:#111;font-family:Barlow,sans-serif;max-width:720px;margin:0 auto;padding:32px 28px">';
-  o+='<div style="border-bottom:3px solid '+or+';padding-bottom:18px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-end">'
-    +'<div><div style="font-family:Rajdhani,sans-serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:'+or+';margin-bottom:5px">'+esc(gymName)+(coachName?' &middot; '+esc(coachName):'')+'</div>'
-    +'<div style="font-family:Rajdhani,sans-serif;font-size:30px;font-weight:700;color:#111">'+esc(name)+'</div>'
-    +'<div style="font-size:14px;color:#555;margin-top:3px">'+tl+' Athlete'+(S.sport?' &middot; '+esc(S.sport):'')+'</div></div>'
-    +'<div style="text-align:right"><div style="font-size:13px;color:#888">'+ds+'</div>'+(apeScore!=null?'<div style="font-family:Rajdhani,sans-serif;font-size:28px;font-weight:700;color:'+or+'">'+Math.round(apeScore)+'<span style="font-size:12px;font-weight:700;letter-spacing:.08em;margin-left:3px">APE</span></div>':'')+'<div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#aaa;margin-top:3px">Performance Report</div></div></div>';
-  o+='<div style="background:#f8f8f8;border-left:4px solid '+or+';border-radius:4px;padding:18px 20px;margin-bottom:24px">'
-    +'<div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+or+';margin-bottom:5px">Your Athletic Profile</div>'
-    +'<div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;color:#111;margin-bottom:7px">'+dh+'</div>'
-    +'<div style="font-size:14px;color:#444;line-height:1.65">'+de+'</div></div>';
-  o+='<div style="margin-bottom:24px">'
-    +'<div style="font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid #e5e5e5">Performance Breakdown</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">';
-  for(var i=0;i<cats.length;i++){
-    var ct=cats[i],cl2=ct.sc!==null?CSW[ct.sc]:'Not Tested',col=lc(ct.sc),bw=ct.sc!==null?Math.round(ct.sc/5*100):0;
-    o+='<div style="background:#fafafa;border:1px solid #e8e8e8;border-radius:5px;padding:11px 13px">'
-      +'<div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#999;margin-bottom:2px">'+ct.l+'</div>'
-      +'<div style="font-size:13px;color:#777;margin-bottom:7px">'+ct.c+'</div>'
-      +'<div style="height:4px;background:#e5e5e5;border-radius:3px;overflow:hidden;margin-bottom:5px"><div style="width:'+bw+'%;height:4px;background:'+col+';border-radius:3px"></div></div>'
-      +'<div style="font-size:13px;font-weight:700;color:'+col+'">'+cl2+'</div></div>';
+  if(dT==='Force Deficient'){dh='Speed is ahead of the power base.';de='Sprint scores are strong, but the force foundation has not caught up. More raw power means more speed ceiling.';fp='Force production + loaded jumps';fs='Contrast training + sled work';tm='Your speed already shows up — the next level is building the strength that drives it. Heavier compound work and loaded jump exposure will raise your ceiling.';}
+  else if(dT==='Form Deficient'){dh='Strong physically, not yet expressing it into speed.';de='Jump scores are solid. The gap is in how efficiently force converts into sprint velocity. Mechanics are the unlock.';fp='Sprint mechanics + force application';fs='Flying sprints + acceleration exposure';tm='The power is there. The training focus shifts to teaching the body to express it at speed — fly sprints, wall drives, and stride mechanics.';}
+  else if(dT==='Mixed Deficiency'){dh='Early development — both qualities have significant room to grow.';de='This is a foundation-building phase. Everything built here sets the ceiling for athletic performance down the road.';fp='General strength + power development';fs='Basic sprint mechanics + capacity work';tm='Build the foundation first and everything improves together. This is the phase where consistent training produces the biggest total gains.';}
+  else if(dT==='Well Developed'){dh='Power and speed qualities are well matched and developed.';de='Strong across both force production and sprint velocity. The goal shifts to refining the weak link for the next performance level.';fp='Weak-link refinement';fs='Specificity + sport application';tm='You have the physical tools. The gains now come from precision — targeting the single gap that is holding the ceiling down.';}
+  else{dh='Incomplete test data — run full battery for classification.';de='';fp='—';fs='—';tm='';}
+
+  // Score display helpers
+  function lc(sc){if(!sc)return'#9AACB8';return sc>=5?'#1F9E70':sc>=4?'#5DCAA5':sc>=3?'#6B9A2A':sc>=2?'#BA7517':'#C93B3B';}
+  var CLB=['','Needs Work','Average','Solid','Strong','Elite'];
+
+  // Metric insight line — concise coaching note per score
+  function metricInsight(key,sc,raw){
+    if(sc===null)return'Not tested.';
+    var tips={
+      vp:{5:'Elite vertical power. Maintain with contrast training and plyometric volume.',4:'Strong explosive power. Add contrast training to transfer into sprint speed.',3:'Solid foundation. Loaded jump progressions will push this to the next tier.',2:'Below threshold for most positions. Trap bar jumps and heavy compound work first.',1:'Significant power gap. Foundational strength and force development is the priority.'},
+      hp:{5:'Elite horizontal force. This directly drives sprint acceleration.',4:'Strong. Tie this into sprint mechanics with sled and broad jump-to-sprint work.',3:'Adequate. Sled pushes and horizontal plyos will close the gap.',2:'Horizontal power is limiting your sprint. Broad jump progressions + sled work.',1:'Force projection is the main gap. Sled, hip hinge, and broad jump training first.'},
+      rs:{5:'World-class reactive strength. Maintain with low-volume high-quality reactive work.',4:'High RSI. Advanced plyometrics and depth drops are appropriate.',3:'Well established. Intermediate plyos — depth drops to box jumps — are the next step.',2:'Moderate. Build toward RSI 2.0 with ankle stiffness drills and pogo hops before loading.',1:'Below safe threshold for intensive plyometrics. Start with pogo hops and landing mechanics only.'},
+      ac:{5:'Elite first-step speed. Maintain sprint frequency and resisted work.',4:'Strong acceleration. Fine-tune with 5-15 yard resisted sprints and fall-in starts.',3:'Solid. Sled sprints at 10-20% bodyweight and wall-drive mechanics will push this.',2:'Acceleration is limiting your sport speed. Falling starts and heavy sled exposure.',1:'Major first-step gap. Mechanics and resisted sprint work before any free-sprint volume.'},
+      mv:{5:'Elite top-end speed. Maintain with flying sprint exposure at full velocity.',4:'Strong max velocity. Wicket runs and fly sprints 20-40m to optimize stride.',3:'Adequate. Wicket runs and 30m flies with full recovery will build the ceiling.',2:'Max velocity is below the power output. Stride mechanics and fly sprint exposure.',1:'Top-end speed needs development. Address acceleration first, then extend to max velocity work.'},
+      gps:{5:'Elite GPS speed — sport-specific top end is confirmed.',4:'Strong real-world speed. Transfer work with sport-pattern sprints.',3:'Solid. GPS speed suggests good application of lab numbers to sport.',2:'Field speed is below tested sprint numbers — sport-specific conditioning is the bridge.',1:'Sport-speed output is limited. Both conditioning and sprint mechanics need attention.'},
+      ft:{5:'Excellent force transfer — power is fully converting into sprint speed.',4:'Strong transfer. Contrast training will continue to close any remaining gap.',3:'Transfer is appropriate. A small gap — continue paired power-speed work.',2:'Power not expressing into speed. Contrast training: heavy lift immediately followed by sprint.',1:'Significant transfer gap. Power is not moving into velocity — contrast and sprint-specific mechanics first.'}
+    };
+    var t=tips[key];if(!t)return'';return t[sc]||'';
+  }
+
+  // Build metric rows for the score grid
+  var metrics=[
+    {key:'vp',label:'Vertical Power',    cat:'Vertical Jump',  sc:vp,  raw:S.rawVJ!=null?S.rawVJ+' in':null},
+    {key:'hp',label:'Horizontal Power',  cat:'Broad Jump',     sc:hp,  raw:S.rawBJ!=null?S.rawBJ+' ft':null},
+    {key:'rs',label:'Reactive Strength', cat:'RSI',            sc:rs,  raw:S.rawRSI!=null?S.rawRSI:null},
+    {key:'ac',label:'Acceleration',      cat:'5–10 Fly',       sc:ac,  raw:S.rawF5!=null?S.rawF5+'s':null},
+    {key:'mv',label:'Max Velocity',      cat:'10–10 Fly',      sc:mv,  raw:S.rawF10!=null?S.rawF10+'s':null},
+    {key:'gps',label:'GPS Speed',        cat:'GPS Max Vel',    sc:gps, raw:null},
+    {key:'ft',label:'Force Transfer',    cat:'Derived',        sc:ft,  raw:null}
+  ].filter(function(m){return m.sc!==null;});
+
+  var o='<div style="background:#fff;color:#111;font-family:Barlow,sans-serif;max-width:760px;margin:0 auto;font-size:14px;line-height:1.6">';
+
+  // ── Header bar ───────────────────────────────────────────────────────────
+  o+='<div style="background:#111;padding:18px 28px;display:flex;justify-content:space-between;align-items:center">'
+    +'<div><div style="font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:.04em;text-transform:uppercase">'+esc(gymName)+'</div>'
+    +(coachName?'<div style="font-size:12px;color:#999;margin-top:1px">Coach '+esc(coachName)+(contact?' &nbsp;·&nbsp; '+esc(contact):'')+'</div>':'')
+    +(tagline&&!coachName?'<div style="font-size:11px;color:#888;margin-top:2px">'+esc(tagline)+'</div>':'')
+    +'</div>'
+    +'<div style="text-align:right"><div style="font-size:11px;color:#777;text-transform:uppercase;letter-spacing:.12em">Performance Report</div>'
+    +'<div style="font-size:12px;color:#888;margin-top:3px">'+ds+'</div></div>'
+    +'</div>';
+
+  // ── Athlete hero ─────────────────────────────────────────────────────────
+  o+='<div style="background:#F5F5F5;border-left:5px solid '+or+';padding:22px 28px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap">'
+    +'<div><div style="font-family:Rajdhani,sans-serif;font-size:34px;font-weight:700;color:#111;text-transform:uppercase;line-height:1">'+esc(name)+'</div>'
+    +'<div style="font-size:13px;color:#666;margin-top:4px">'+tl
+    +(S.sport?' &nbsp;·&nbsp; '+esc(S.sport):'')
+    +(S.position?' &nbsp;·&nbsp; '+esc(S.position):'')
+    +(S.age?' &nbsp;·&nbsp; Age '+S.age:'')
+    +'</div></div>'
+    +(apeMeta?'<div style="text-align:right;flex-shrink:0">'
+      +'<div style="font-family:Rajdhani,sans-serif;font-size:58px;font-weight:700;color:'+apeMeta.color+';line-height:1">'+Math.round(apeScore)+'</div>'
+      +'<div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+apeMeta.color+';margin-top:2px">APE SCORE</div>'
+      +'<div style="font-size:12px;color:#888;margin-top:2px">'+apeMeta.label+' &nbsp;·&nbsp; '+apeMeta.pct+'</div>'
+      +'</div>':'')
+    +'</div>';
+
+  // ── Position profile callout ────────────────────────────────────────────
+  if(ctx){
+    var priLabels=ctx.pri.map(function(k){return'<span style="display:inline-block;padding:2px 9px;background:'+or+'18;border:1px solid '+or+'44;border-radius:3px;font-size:11px;font-weight:700;color:'+or+';margin:2px 3px 2px 0">'+((METRIC_NAMES[k])||k)+'</span>';}).join('');
+    o+='<div style="padding:16px 28px;border-bottom:1px solid #E8E8E8;background:#FFFDF9">'
+      +'<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:'+or+';margin-bottom:6px">Position Profile</div>'
+      +'<div style="font-size:13px;color:#333;line-height:1.55;margin-bottom:8px">'+esc(ctx.note)+'</div>'
+      +'<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#999;margin-bottom:6px">Key Metrics</div>'
+      +'<div>'+priLabels+'</div>'
+      +'</div>';
+  }
+
+  // ── Performance scores ──────────────────────────────────────────────────
+  o+='<div style="padding:22px 28px 10px">'
+    +'<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#999;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #EEEEEE">Performance Scores — '+tl+' Benchmarks</div>';
+  o+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+  for(var mi=0;mi<metrics.length;mi++){
+    var m=metrics[mi];
+    var col=lc(m.sc),lbl=CLB[m.sc]||'';
+    var pct=m.sc!==null?Math.round(m.sc/5*100):0;
+    var isPri=ctx&&ctx.pri.indexOf(m.key)!==-1;
+    o+='<div style="background:'+(isPri?'#FFFDF9':'#FAFAFA')+';border:1px solid '+(isPri?or+'44':'#E8E8E8')+';border-radius:5px;padding:13px 15px'+(isPri?';border-left:3px solid '+or:'')+';">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">'
+      +'<div><div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#999">'+m.label+'</div>'
+      +'<div style="font-size:11px;color:#AAA;margin-top:1px">'+m.cat+'</div></div>'
+      +(m.raw?'<div style="font-family:Rajdhani,sans-serif;font-size:17px;font-weight:700;color:#444;text-align:right;flex-shrink:0">'+m.raw+'</div>':'')
+      +'</div>'
+      +'<div style="height:5px;background:#EEEEEE;border-radius:3px;overflow:hidden;margin-bottom:7px"><div style="width:'+pct+'%;height:5px;background:'+col+';border-radius:3px;transition:width .3s"></div></div>'
+      +'<div style="display:flex;align-items:center;justify-content:space-between">'
+      +'<div style="font-size:13px;font-weight:700;color:'+col+'">'+lbl+'</div>'
+      +'<div style="font-size:10px;color:#999">'+m.sc+'/5</div>'
+      +'</div>'
+      +(isPri?'<div style="font-size:11px;font-weight:700;color:'+or+';margin-top:5px;text-transform:uppercase;letter-spacing:.05em">&#9733; Priority Metric</div>':'')
+      +'</div>';
   }
   o+='</div></div>';
-  o+='<div style="background:#fdf6ee;border-left:4px solid '+or+';border-radius:4px;padding:18px 20px;margin-bottom:24px">'
-    +'<div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+or+';margin-bottom:7px">What This Means For Your Training</div>'
-    +'<div style="font-size:14px;color:#444;line-height:1.65">'+tm+'</div></div>';
-  o+='<div style="margin-bottom:24px">'
-    +'<div style="font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#888;margin-bottom:12px;padding-bottom:7px;border-bottom:1px solid #e5e5e5">Your Training Focus</div>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
-    +'<div style="background:#fff8f0;border:1px solid #f5d9b8;border-radius:5px;padding:13px 15px"><div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:'+or+';margin-bottom:3px">Primary Focus</div><div style="font-size:15px;font-weight:600;color:#222">'+fp+'</div></div>'
-    +'<div style="background:#f8f8f8;border:1px solid #e5e5e5;border-radius:5px;padding:13px 15px"><div style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#888;margin-bottom:3px">Secondary Focus</div><div style="font-size:15px;font-weight:600;color:#222">'+fs+'</div></div>'
-    +'</div></div>';
-  o+='<div style="background:#111;border-radius:6px;padding:21px 23px;text-align:center">'
-    +'<div style="font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:'+or+';margin-bottom:7px">Next Steps</div>'
-    +'<div style="font-size:15px;font-weight:600;color:#fff;line-height:1.6">We will build your full program based on this profile and track your progress weekly.</div>'
-    +'<div style="font-size:12px;color:#aaa;margin-top:6px">'+esc(gymName)+(coachName?' &middot; Coach '+esc(coachName):'')+(contact?' &middot; '+esc(contact):'')+'</div></div></div>';
+
+  // ── Coaching insight per metric ─────────────────────────────────────────
+  var insightRows=metrics.filter(function(m){return m.sc!==null;});
+  if(insightRows.length){
+    o+='<div style="padding:0 28px 20px">'
+      +'<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#999;margin-bottom:10px;padding-bottom:8px;border-top:1px solid #EEE;padding-top:16px">Coaching Notes</div>';
+    for(var ii=0;ii<insightRows.length;ii++){
+      var im=insightRows[ii];
+      var ins=metricInsight(im.key,im.sc,im.raw);
+      if(!ins)continue;
+      var ic=lc(im.sc);
+      o+='<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:9px;padding:10px 12px;background:#FAFAFA;border-radius:4px;border-left:3px solid '+ic+'">'
+        +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:'+ic+';flex-shrink:0;width:110px;padding-top:1px">'+im.label+'</div>'
+        +'<div style="font-size:12px;color:#555;line-height:1.55">'+esc(ins)+'</div>'
+        +'</div>';
+    }
+    o+='</div>';
+  }
+
+  // ── Deficiency profile ──────────────────────────────────────────────────
+  if(dT!=='Incomplete Data'){
+    o+='<div style="padding:18px 28px;background:#FFFDF9;border-top:1px solid #F0E8DA;border-bottom:1px solid #F0E8DA">'
+      +'<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:'+or+';margin-bottom:8px">Athletic Classification: '+esc(dT)+'</div>'
+      +'<div style="font-family:Rajdhani,sans-serif;font-size:18px;font-weight:700;color:#111;margin-bottom:6px">'+esc(dh)+'</div>'
+      +'<div style="font-size:13px;color:#555;line-height:1.65">'+esc(de)+'</div>'
+      +'</div>';
+
+    // What this means for training
+    o+='<div style="padding:18px 28px 22px;border-bottom:1px solid #EEE">'
+      +'<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#999;margin-bottom:12px">Training Direction</div>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">'
+      +'<div style="padding:13px 15px;background:#FFF8F0;border:1px solid #F5D9B8;border-radius:5px">'
+      +'<div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:'+or+';margin-bottom:4px">Primary Focus</div>'
+      +'<div style="font-size:14px;font-weight:700;color:#222">'+esc(fp)+'</div>'
+      +'</div>'
+      +'<div style="padding:13px 15px;background:#F8F8F8;border:1px solid #E8E8E8;border-radius:5px">'
+      +'<div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#888;margin-bottom:4px">Secondary Focus</div>'
+      +'<div style="font-size:14px;font-weight:700;color:#222">'+esc(fs)+'</div>'
+      +'</div></div>'
+      +(tm?'<div style="font-size:13px;color:#444;line-height:1.7;padding:13px 15px;background:#F8F8F8;border-radius:4px;border-left:3px solid '+or+'">'+esc(tm)+'</div>':'')
+      +'</div>';
+  }
+
+  // ── Footer ───────────────────────────────────────────────────────────────
+  o+='<div style="background:#111;padding:18px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">'
+    +'<div><div style="font-size:12px;font-weight:700;color:#fff">'+esc(gymName)+(coachName?' &nbsp;·&nbsp; Coach '+esc(coachName):'')+'</div>'
+    +(contact?'<div style="font-size:11px;color:#888;margin-top:2px">'+esc(contact)+'</div>':'')
+    +'</div>'
+    +'<div style="font-size:11px;color:#666;text-align:right">Athlete Performance Evaluator<br>Powered by APE</div>'
+    +'</div>';
+
+  o+='</div>';
   return o;
 }
 
@@ -2912,6 +3092,19 @@ function buildDash(){
     var ape=last?(last.apeScore!=null?last.apeScore:(last.sc?getAPEScore(last.sc):null)):null;
     var apeMeta=ape!=null?getAPELabel(ape):null;
     var teamTm=a.team&&teamMap[a.team]?teamMap[a.team]:null;
+    // Trend: compare last 2 sessions APE scores
+    var trendArrow='',trendColor='var(--mt)';
+    if(a.s&&a.s.length>=2){
+      var s1=a.s[a.s.length-1],s2=a.s[a.s.length-2];
+      var ap1=s1.apeScore!=null?s1.apeScore:(s1.sc?getAPEScore(s1.sc):null);
+      var ap2=s2.apeScore!=null?s2.apeScore:(s2.sc?getAPEScore(s2.sc):null);
+      if(ap1!=null&&ap2!=null){
+        var diff=ap1-ap2;
+        if(diff>=3){trendArrow=' &#8593;'+Math.round(diff);trendColor='var(--s4b)';}
+        else if(diff<=-3){trendArrow=' &#8595;'+Math.round(Math.abs(diff));trendColor='var(--s1b)';}
+        else{trendArrow=' &rarr;';trendColor='var(--mt)';}
+      }
+    }
     h+='<div class="ath-card" id="athcard-'+a.id+'">'
       // ── Card header: name/team (left) + tier badge + APE (right) ──
       +'<div class="ath-hdr">'
@@ -2928,6 +3121,7 @@ function buildDash(){
         ?'<div class="ath-ape-block">'
           +'<div class="ath-ape-num" style="color:'+apeMeta.color+'">'+ape+'</div>'
           +'<div class="ath-ape-lbl" style="color:'+apeMeta.color+'">APE</div>'
+          +(trendArrow?'<div style="font-size:10px;font-weight:700;color:'+trendColor+';margin-top:2px;white-space:nowrap">'+trendArrow+'</div>':'')
           +(apeMeta.pct?'<div style="font-size:9px;font-weight:700;color:'+apeMeta.color+';opacity:.7;letter-spacing:.04em;margin-top:1px;white-space:nowrap">'+apeMeta.pct+'</div>':'')
           +'</div>'
         :'')
