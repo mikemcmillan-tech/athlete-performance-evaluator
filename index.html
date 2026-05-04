@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Athlete Performance Evaluator</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════
    APE — Athlete Performance Evaluator  |  Design System
@@ -500,6 +500,29 @@ select option{background:var(--dk3)}
 .lb-rank-num{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:var(--mt);min-width:24px;text-align:center;background:var(--dk3);border:1px solid var(--bd);border-radius:3px;padding:2px 4px;display:inline-block}
 .lb-val-num{font-family:'Rajdhani',sans-serif;font-size:26px;font-weight:700;line-height:1}
 .lb-ape-sub{font-size:9px;font-weight:700;margin-top:2px}
+
+/* ── Auth Pill ── */
+.auth-pill{display:flex;align-items:center;gap:7px;padding:6px 12px;background:var(--dk3);border:1px solid var(--bd);border-radius:20px;cursor:pointer;transition:all .18s;font-size:12px;color:var(--mt);font-family:'Barlow',sans-serif;white-space:nowrap}
+.auth-pill:hover{border-color:var(--sb);color:var(--tx);background:var(--dk4)}
+.auth-pill.signed-in{border-color:var(--or);color:var(--or)}
+.auth-dot{width:7px;height:7px;border-radius:50%;background:var(--mt);flex-shrink:0}
+.auth-pill.signed-in .auth-dot{background:var(--s4)}
+/* ── Auth Modal ── */
+.auth-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.auth-overlay.open{display:flex;animation:fu .18s ease}
+.auth-box{background:var(--dk2);border:1px solid var(--bd);border-radius:var(--radius-lg);padding:28px 28px 24px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+.auth-tabs{display:flex;gap:0;margin-bottom:22px;border-bottom:1px solid var(--bd)}
+.auth-tab{flex:1;padding:9px 0;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mt);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .18s;margin-bottom:-1px}
+.auth-tab.act{color:var(--or);border-bottom-color:var(--or)}
+.auth-title{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:#fff;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+.auth-sub{font-size:12px;color:var(--mt);margin-bottom:20px;line-height:1.5}
+.auth-err{display:none;font-size:12px;color:var(--s1b);background:rgba(201,59,59,.1);border:1px solid rgba(201,59,59,.3);border-radius:4px;padding:8px 11px;margin-bottom:14px;line-height:1.5}
+.auth-sep{height:1px;background:var(--bd);margin:18px 0}
+.auth-footer{font-size:11px;color:var(--mt);text-align:center;margin-top:14px;line-height:1.6}
+/* ── Settings Modal ── */
+.settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.settings-overlay.open{display:flex;animation:fu .18s ease}
+.settings-box{background:var(--dk2);border:1px solid var(--bd);border-radius:var(--radius-lg);padding:28px 28px 24px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
 </style>
 </head>
 <body>
@@ -514,7 +537,9 @@ select option{background:var(--dk3)}
     <div class="hdr-nav">
       <button class="nav-btn" id="nav-dash" onclick="goDash()">Athletes</button>
       <button class="nav-btn" id="nav-teams" onclick="buildTeams()">Teams</button>
+      <button class="auth-pill" id="auth-pill" onclick="openAuth()"><span class="auth-dot"></span><span id="auth-pill-label">Sign In</span></button>
       <div style="width:1px;height:22px;background:var(--bd);flex-shrink:0"></div>
+      <button class="btn-s" style="padding:7px 12px;font-size:12px;flex:none" onclick="openSettings()" title="Coach Settings">&#9881;</button>
       <button class="btn-p" style="padding:8px 16px;font-size:13px;flex:none;margin-left:2px" onclick="goNew()">+ New Eval</button>
     </div>
   </div>
@@ -581,6 +606,16 @@ select option{background:var(--dk3)}
       <div class="field">
         <label>Notes <span style="font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--mt)">(optional)</span></label>
         <textarea id="inp-notes" class="notes-ta" placeholder="Injury history, goals, context..." style="min-height:56px;margin-top:0"></textarea>
+      </div>
+      <div class="g2">
+        <div class="field">
+          <label>Bodyweight <span style="font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--mt)">(lbs, optional)</span></label>
+          <input type="number" id="inp-bw" placeholder="e.g. 185" step="0.1" min="0">
+        </div>
+        <div class="field">
+          <label>Height <span style="font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--mt)">(optional)</span></label>
+          <input type="text" id="inp-ht" placeholder="e.g. 5'10&quot;" autocomplete="off">
+        </div>
       </div>
       <!-- Separator before level selection -->
       <div style="height:1px;background:var(--bd);margin:20px 0 18px"></div>
@@ -712,35 +747,6 @@ select option{background:var(--dk3)}
 </div>
 
 <script>
- var SUPABASE_URL = 'https://fqakqczqfqhdamnfbdqt.supabase.co';
-var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxYWtxY3pxZnFoZGFtbmZiZHF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NTc4MjQsImV4cCI6MjA5MjEzMzgyNH0.yNQmPez_iMkO6IpOp20VzMJdX7hkF7NHqYdCIHokQ3U';
-
-var _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
- async function testSupabase() {
-  const { data, error } = await _sb.from('athletes').select('*').limit(1);
-
-  if (error) {
-    console.error('Supabase connection error:', error);
-  } else {
-    console.log('Supabase connected:', data);
-  }
-}
-
-testSupabase();  
-async function getUser() {
-  const { data, error } = await _sb.auth.getUser();
-  if (error) {
-    console.error('getUser error', error);
-    return null;
-  }
-  return data.user || null;
-}
-
-async function requireUser() {
-  const user = await getUser();
-  if (!user) throw new Error('No authenticated user');
-  return user;
-}  
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
 // DB is a self-contained module with a clean API surface.
 // To migrate to Supabase or Firebase in the future:
@@ -778,11 +784,12 @@ var DB = (function(){
     get: function(id){return r().a[id]||null;},
     find: function(name,tier){var d=r(),k=nk(name),al=list(d);for(var i=0;i<al.length;i++)if(al[i].nk===k&&al[i].tier===tier)return al[i];return null;},
     // Athlete fields: name, tier, sport, position, age, team (id), gradYear, notes
-    create: function(name,tier,sport,position,age,team,gradYear,notes){
+    create: function(name,tier,sport,position,age,team,gradYear,notes,bodyweight,height){
       var d=r(),id=uid('a');
       var a={id:id,name:name.trim(),nk:nk(name),tier:tier,
              sport:sport||'',position:position||'',age:age||null,
              team:team||'',gradYear:gradYear||null,notes:notes||'',
+             bodyweight:bodyweight||null,height:height||'',
              created:Date.now(),s:[]};
       d.a[id]=a;w(d);return a;
     },
@@ -811,11 +818,11 @@ var DB = (function(){
     last: function(aid){var a=r().a[aid];if(!a||!a.s.length)return null;return a.s[a.s.length-1];},
     prev: function(aid){var a=r().a[aid];if(!a||a.s.length<2)return null;return a.s[a.s.length-2];},
     history: function(aid){var a=r().a[aid];return a?a.s.slice():[];},
-    auto: function(name,tier,raw,comp,sport,position,age,team,gradYear,notes){
+    auto: function(name,tier,raw,comp,sport,position,age,team,gradYear,notes,bodyweight,height){
       try{
         var a=DB.find(name,tier);
         if(!a){
-          a=DB.create(name,tier,sport,position,age,team,gradYear,notes);
+          a=DB.create(name,tier,sport,position,age,team,gradYear,notes,bodyweight,height);
         } else {
           var d=r();
           if(d.a[a.id]){
@@ -827,6 +834,8 @@ var DB = (function(){
             d.a[a.id].team=team||(d.a[a.id].team||'');
             if(gradYear)d.a[a.id].gradYear=gradYear;
             if(notes)d.a[a.id].notes=notes;
+            if(bodyweight)d.a[a.id].bodyweight=bodyweight;
+            if(height)d.a[a.id].height=height;
             w(d);a=d.a[a.id];
           }
         }
@@ -846,11 +855,12 @@ var DB = (function(){
       else{delete d.a[aid];}
       w(d);
     },
-    updateAthlete: function(aid,name,newTier,sport,position,age,team,gradYear,notes){
+    updateAthlete: function(aid,name,newTier,sport,position,age,team,gradYear,notes,bodyweight,height){
       var d=r(),a=d.a[aid];if(!a)return false;
       a.name=name.trim();a.nk=nk(name);a.tier=newTier;
       a.sport=sport||'';a.position=position||'';a.age=age||null;
       a.team=team||'';a.gradYear=gradYear||null;a.notes=notes||'';
+      a.bodyweight=bodyweight||null;a.height=height||'';
       return w(d);
     },
 
@@ -870,6 +880,8 @@ var DB = (function(){
       d.t[tid].name=name.trim();if(color)d.t[tid].color=color;
       return w(d);
     },
+    saveSettings: function(s){try{localStorage.setItem('ape_settings',JSON.stringify(s));}catch(e){}},
+    loadSettings: function(){try{var s=localStorage.getItem('ape_settings');return s?JSON.parse(s):{};}catch(e){return{};}},
     deleteTeam: function(tid){
       var d=r();if(!d.t)return;
       delete d.t[tid];
@@ -879,6 +891,224 @@ var DB = (function(){
     }
   };
 })();
+
+// ─── SUPABASE CLIENT ──────────────────────────────────────────────────────────
+var SUPA_URL='https://fqakqczqfqhdamnfbdqt.supabase.co';
+var SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZxYWtxY3pxZnFoZGFtbmZiZHF0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY1NTc4MjQsImV4cCI6MjA5MjEzMzgyNH0.yNQmPez_iMkO6IpOp20VzMJdX7hkF7NHqYdCIHokQ3U';
+function _supaClient(){
+  if(typeof window.supabase==='undefined')return null;
+  if(!window._sc)window._sc=window.supabase.createClient(SUPA_URL,SUPA_KEY);
+  return window._sc;
+}
+
+// ─── SupaDB — dual-write wrapper ──────────────────────────────────────────────
+var SupaDB=(function(){
+  var _user=null;
+  function uid(){return _user?_user.id:null;}
+  function athleteRow(a){
+    return{id:a.id,coach_id:uid(),name:a.name,tier:a.tier,
+      sport:a.sport||null,position:a.position||null,age:a.age||null,
+      team_id:a.team||null,grad_year:a.gradYear||null,notes:a.notes||null,
+      bodyweight:a.bodyweight||null,height:a.height||null};
+  }
+  function sessRow(s,aid){
+    return{id:s.id,coach_id:uid(),athlete_id:aid,
+      test_date:new Date(s.ts||Date.now()).toISOString(),
+      ape_score:s.apeScore!=null?s.apeScore:null,scores:s.sc||null,raw:s.raw||null,
+      bkt:s.bkt!=null?s.bkt:null,bkt_name:s.bktName||null,def_type:s.defType||null,
+      cnt:s.cnt!=null?s.cnt:null,primary_focus:s.focus||null,session_note:s.note||null};
+  }
+  return{
+    setUser:function(u){_user=u;},
+    getUser:function(){return _user;},
+    syncAll:function(){
+      if(!uid()||!_supaClient())return;
+      var supa=_supaClient();
+      DB.getAll().forEach(function(a){
+        supa.from('athletes').upsert(athleteRow(a)).then(function(){});
+        (a.s||[]).forEach(function(s){supa.from('sessions').upsert(sessRow(s,a.id)).then(function(){});});
+      });
+      DB.getTeams().forEach(function(t){
+        supa.from('teams').upsert({id:t.id,coach_id:uid(),name:t.name,color:t.color}).then(function(){});
+      });
+      var cfg=DB.loadSettings();
+      if(cfg&&(cfg.coachName||cfg.gymName)){
+        supa.from('coach_settings').upsert({coach_id:uid(),coach_name:cfg.coachName||'',
+          gym_name:cfg.gymName||'',tagline:cfg.tagline||'',contact:cfg.contact||''}).then(function(){});
+      }
+    },
+    pullFromSupabase:function(onDone){
+      var coachId=uid();
+      if(!coachId||!_supaClient()){if(onDone)onDone(false);return;}
+      var supa=_supaClient();
+      function getRaw(){try{var s=localStorage.getItem('ape_v1');return s?JSON.parse(s):{v:2,a:{},t:{}};}catch(e){return{v:2,a:{},t:{}};}}
+      function saveRaw(d){try{localStorage.setItem('ape_v1',JSON.stringify(d));}catch(e){}}
+      // Step 1: pull teams
+      supa.from('teams').select('*').eq('coach_id',coachId).then(function(r){
+        var d=getRaw();
+        (r.data||[]).forEach(function(t){d.t[t.id]={id:t.id,name:t.name,color:t.color||'#f5881f',created:Date.now()};});
+        saveRaw(d);
+      });
+      // Step 2: pull athletes + sessions
+      supa.from('athletes').select('*').eq('coach_id',coachId).then(function(ra){
+        if(ra.error){if(onDone)onDone(false);return;}
+        var athList=ra.data||[];
+        if(!athList.length){if(onDone)onDone(true);return;}
+        supa.from('sessions').select('*').eq('coach_id',coachId).then(function(rs){
+          var sessList=rs.data||[];
+          var sessMap={};
+          sessList.forEach(function(s){if(!sessMap[s.athlete_id])sessMap[s.athlete_id]=[];sessMap[s.athlete_id].push(s);});
+          var d=getRaw();
+          athList.forEach(function(a){
+            var rec={id:a.id,name:a.name,nk:a.name.trim().toLowerCase().replace(/\s+/g,' '),
+              tier:a.tier||'',sport:a.sport||'',position:a.position||'',age:a.age||null,
+              team:a.team_id||null,gradYear:a.grad_year||null,notes:a.notes||'',
+              bodyweight:a.bodyweight||null,height:a.height||'',
+              created:a.created_at?new Date(a.created_at).getTime():Date.now(),s:[]};
+            (sessMap[a.id]||[]).forEach(function(s){
+              rec.s.push({id:s.id,ts:s.test_date?new Date(s.test_date).getTime():Date.now(),
+                date:s.test_date?new Date(s.test_date).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}):new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
+                apeScore:s.ape_score!=null?s.ape_score:null,sc:s.scores||null,raw:s.raw||{},
+                bkt:s.bkt!=null?s.bkt:null,bktName:s.bkt_name||null,defType:s.def_type||null,
+                cnt:s.cnt!=null?s.cnt:null,focus:s.primary_focus||'',note:s.session_note||''});
+            });
+            rec.s.sort(function(a,b){return(a.ts||0)-(b.ts||0);});
+            d.a[a.id]=rec;
+          });
+          saveRaw(d);
+          // Step 3: pull coach settings
+          supa.from('coach_settings').select('*').eq('coach_id',coachId).single()
+            .then(function(rset){
+              if(rset.data){
+                DB.saveSettings({coachName:rset.data.coach_name||'',gymName:rset.data.gym_name||'',tagline:rset.data.tagline||'',contact:rset.data.contact||''});
+              }
+              if(onDone)onDone(true);
+            }).catch(function(){if(onDone)onDone(true);});
+        });
+      });
+    }
+  };
+})();
+
+// ─── AUTH FUNCTIONS ───────────────────────────────────────────────────────────
+function openAuth(){
+  var u=SupaDB.getUser();
+  if(u){
+    // Already signed in — show signed-out option
+    if(confirm('Sign out of '+u.email+'?'))handleSignout();
+    return;
+  }
+  var ov=el('auth-overlay');if(ov)ov.classList.add('open');
+  _authSwitchTab('signin');
+}
+function closeAuth(){var ov=el('auth-overlay');if(ov)ov.classList.remove('open');}
+function _authSwitchTab(tab){
+  var tabs=document.querySelectorAll('.auth-tab');
+  tabs.forEach(function(t){t.classList.toggle('act',t.getAttribute('data-tab')===tab);});
+  var sp=el('auth-panel-signin'),up=el('auth-panel-signup');
+  if(sp)sp.style.display=tab==='signin'?'block':'none';
+  if(up)up.style.display=tab==='signup'?'block':'none';
+  var e=el('auth-err');if(e){e.style.display='none';}
+}
+function _authShowErr(msg){var e=el('auth-err');if(e){e.textContent=msg;e.style.display='block';}}
+function _authUpdatePill(user){
+  var pill=el('auth-pill'),lbl=el('auth-pill-label');
+  if(user){
+    if(pill)pill.classList.add('signed-in');
+    if(lbl)lbl.textContent=user.email.split('@')[0];
+  }else{
+    if(pill)pill.classList.remove('signed-in');
+    if(lbl)lbl.textContent='Sign In';
+  }
+}
+function handleSignin(){
+  var email=el('auth-email-si')?el('auth-email-si').value.trim():'';
+  var pass=el('auth-pass-si')?el('auth-pass-si').value:'';
+  if(!email||!pass){_authShowErr('Enter your email and password.');return;}
+  var supa=_supaClient();if(!supa){_authShowErr('Supabase not available.');return;}
+  var btn=el('auth-btn-si');if(btn){btn.disabled=true;btn.textContent='Signing in…';}
+  supa.auth.signInWithPassword({email:email,password:pass}).then(function(r){
+    if(btn){btn.disabled=false;btn.textContent='Sign In';}
+    if(r.error){_authShowErr(r.error.message);return;}
+    _authOnSuccess(r.data.user,false);
+  }).catch(function(e){if(btn){btn.disabled=false;btn.textContent='Sign In';}_authShowErr(e.message||'Sign in failed.');});
+}
+function handleSignup(){
+  var email=el('auth-email-su')?el('auth-email-su').value.trim():'';
+  var pass=el('auth-pass-su')?el('auth-pass-su').value:'';
+  var pass2=el('auth-pass-su2')?el('auth-pass-su2').value:'';
+  if(!email||!pass){_authShowErr('Enter your email and password.');return;}
+  if(pass!==pass2){_authShowErr('Passwords do not match.');return;}
+  if(pass.length<6){_authShowErr('Password must be at least 6 characters.');return;}
+  var supa=_supaClient();if(!supa){_authShowErr('Supabase not available.');return;}
+  var btn=el('auth-btn-su');if(btn){btn.disabled=true;btn.textContent='Creating account…';}
+  supa.auth.signUp({email:email,password:pass}).then(function(r){
+    if(btn){btn.disabled=false;btn.textContent='Create Account';}
+    if(r.error){_authShowErr(r.error.message);return;}
+    _authOnSuccess(r.data.user,true);
+  }).catch(function(e){if(btn){btn.disabled=false;btn.textContent='Create Account';}_authShowErr(e.message||'Sign up failed.');});
+}
+function handleSignout(){
+  var supa=_supaClient();
+  if(supa)supa.auth.signOut().then(function(){});
+  SupaDB.setUser(null);
+  _authUpdatePill(null);
+  _toast('Signed out','#444');
+}
+function _authOnSuccess(user,isNew){
+  SupaDB.setUser(user);
+  _authUpdatePill(user);
+  closeAuth();
+  console.log('[Auth] Signed in:',user.email,isNew?'(new)':'');
+  setTimeout(function(){
+    var localAthletes=DB.getAll();
+    if(localAthletes.length>0){
+      console.log('[Auth] Local data found ('+localAthletes.length+' athletes) — syncing up.');
+      SupaDB.syncAll();
+      _toast('Synced '+localAthletes.length+' athlete'+(localAthletes.length!==1?'s':'')+'!','#1e6f3e');
+    }else{
+      console.log('[Auth] No local data — pulling from Supabase…');
+      SupaDB.pullFromSupabase(function(ok){
+        if(ok){
+          buildDash();
+          _toast('Data loaded from cloud!','#1e6f3e');
+        }else{
+          _toast('Connected. No cloud data yet.','#444');
+        }
+      });
+    }
+  },800);
+}
+
+// ─── COACH SETTINGS ───────────────────────────────────────────────────────────
+function openSettings(){var ov=el('settings-overlay');if(ov)ov.classList.add('open');_loadSettingsForm();}
+function closeSettings(){var ov=el('settings-overlay');if(ov)ov.classList.remove('open');}
+function _loadSettingsForm(){
+  var cfg=DB.loadSettings();
+  var cn=el('set-coach-name'),gn=el('set-gym-name'),tg=el('set-tagline'),ct=el('set-contact');
+  if(cn)cn.value=cfg.coachName||'';
+  if(gn)gn.value=cfg.gymName||'';
+  if(tg)tg.value=cfg.tagline||'';
+  if(ct)ct.value=cfg.contact||'';
+}
+function saveSettings(){
+  var cfg={
+    coachName:el('set-coach-name')?el('set-coach-name').value.trim():'',
+    gymName:el('set-gym-name')?el('set-gym-name').value.trim():'',
+    tagline:el('set-tagline')?el('set-tagline').value.trim():'',
+    contact:el('set-contact')?el('set-contact').value.trim():''
+  };
+  DB.saveSettings(cfg);
+  // Sync to Supabase if signed in
+  var u=SupaDB.getUser();
+  if(u&&_supaClient()){
+    _supaClient().from('coach_settings').upsert({coach_id:u.id,coach_name:cfg.coachName,
+      gym_name:cfg.gymName,tagline:cfg.tagline,contact:cfg.contact}).then(function(){});
+  }
+  closeSettings();
+  _toast('Settings saved!','#1e6f3e');
+}
+
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 var tier=null, _S={}, _dashFilter={team:'',sport:'',level:''}, _lbState={metric:'ape',team:'',sport:'',pos:'',level:'',limit:10};
@@ -943,14 +1173,16 @@ function goNext(){
       el('inp-age')?parseFloat(el('inp-age').value)||null:null,
       el('inp-team')?el('inp-team').value:'',
       el('inp-grady')?parseFloat(el('inp-grady').value)||null:null,
-      el('inp-notes')?el('inp-notes').value.trim():''
+      el('inp-notes')?el('inp-notes').value.trim():'',
+      el('inp-bw')?parseFloat(el('inp-bw').value)||null:null,
+      el('inp-ht')?el('inp-ht').value.trim():''
     );
     _clearEditMode();
   }
   go(2);
 }
 function resetAll(){
-  ['inp-name','inp-sport','inp-pos','inp-age','inp-grady','inp-notes','inp-vj','inp-bj','inp-rsi','inp-510','inp-1010','inp-gps'].forEach(function(id){var e=el(id);if(e){e.value='';e.style.borderColor='';}});
+  ['inp-name','inp-sport','inp-pos','inp-age','inp-grady','inp-notes','inp-bw','inp-ht','inp-vj','inp-bj','inp-rsi','inp-510','inp-1010','inp-gps'].forEach(function(id){var e=el(id);if(e){e.value='';e.style.borderColor='';}});
   refreshTeamSelect(''); // repopulate options and reset selection
   var ph=el('inp-phase'),dy=el('inp-days');if(ph)ph.value='';if(dy)dy.value='';
   tier=null;_S={};
@@ -978,6 +1210,9 @@ function startTest(aid){
   if(ag)ag.value=a.age||'';
   if(gy)gy.value=a.gradYear||'';
   if(nt)nt.value=a.notes||'';
+  var bwE=el('inp-bw'),htE=el('inp-ht');
+  if(bwE)bwE.value=a.bodyweight||'';
+  if(htE)htE.value=a.height||'';
   refreshTeamSelect(a.team||'');
   tier=a.tier;
   document.querySelectorAll('.tier-btn').forEach(function(b){if(b.getAttribute('data-tier')===a.tier)b.classList.add('sel');});
@@ -1158,6 +1393,8 @@ function build(vj,bj,rsi,s5,s10,gps){
   var team=el('inp-team')?el('inp-team').value:'';
   var gradYear=el('inp-grady')?parseFloat(el('inp-grady').value)||null:null;
   var notes=el('inp-notes')?el('inp-notes').value.trim():'';
+  var bodyweight=el('inp-bw')?parseFloat(el('inp-bw').value)||null:null;
+  var height=el('inp-ht')?el('inp-ht').value.trim():'';
   var b=BENCH[tier],tl=TIERS[tier];
 
   var vp=null,vpR='',vpL='';
@@ -1381,12 +1618,12 @@ function build(vj,bj,rsi,s5,s10,gps){
     +'<div id="prog-insight" style="display:none;margin-top:12px;padding:10px 13px;background:var(--dk3);border:1px solid var(--bd);border-radius:4px;font-size:13px;color:var(--sb);line-height:1.6"></div>'
     +'</div>';
 
-  _S={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,ft:ft,tier:tier,name:name,sport:sport,position:position,age:age,team:team,gradYear:gradYear,notes:notes,defType:dT,defLabel:dLab,defLimiter:dLim,defExplain:dExp};
+  _S={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,ft:ft,tier:tier,name:name,sport:sport,position:position,age:age,team:team,gradYear:gradYear,notes:notes,bodyweight:bodyweight,height:height,defType:dT,defLabel:dLab,defLimiter:dLim,defExplain:dExp};
 
   DB.auto(name,tier,
     {vj:vj,bj:bj,rsi:rsi,f5:s5,f10:s10,gps:gps},
     {sc:{vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,ft:ft},bkt:bkt,bktName:bk.n,defType:dT,focus:bk.pri,cnt:cnt,apeScore:apeScore},
-    sport,position,age,team,gradYear,notes
+    sport,position,age,team,gradYear,notes,bodyweight,height
   );
 
   var ce=el('rc-cmp');if(ce)ce.innerHTML='';
@@ -2358,6 +2595,12 @@ function buildReport(S){
   var lv=S.tier,name=S.name||'Athlete',tl=TIERS[lv]||lv;
   var ds=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
   var or='#F5881F',dT=S.defType||'Incomplete Data';
+  var cfg=DB.loadSettings();
+  var coachName=cfg.coachName||'';
+  var gymName=cfg.gymName||'Athlete Performance Evaluator';
+  var contact=cfg.contact||'';
+  var tagline=cfg.tagline||'';
+  var apeScore=S.aid?DB.last(S.aid):null;if(apeScore)apeScore=apeScore.apeScore;
   var dh,de,fp,fs,tm;
   if(dT==='Force Deficient'){dh='Your speed is ahead of your power base.';de='You move well but need more strength and power to support those speed gains. Building your force base is the unlock.';fp='Strength and power development';fs='Reactive strength and loaded jumps';tm='To take your speed higher, we need to build what drives it. Stronger legs and more explosive power mean faster acceleration and better top-end speed.';}
   else if(dT==='Form Deficient'){dh='You have the physical tools but are not yet applying force efficiently into speed.';de='Your jump scores are solid. The gap is in how efficiently that force converts into sprint velocity. Sprint mechanics are the priority.';fp='Sprint mechanics and force application';fs='Acceleration and max velocity exposure';tm='Your body has the power. Now we train it to move fast. Sprint mechanics and fly sprints will help you express the force you already have.';}
@@ -2368,11 +2611,10 @@ function buildReport(S){
   var cats=[{l:'Vertical Power',sc:vp,c:'Jumping Power'},{l:'Horizontal Power',sc:hp,c:'Horizontal Drive'},{l:'Reactive Strength',sc:rs,c:'Ground Stiffness'},{l:'Acceleration',sc:ac,c:'First-Step Speed'},{l:'Max Velocity',sc:mv,c:'Fly Speed'},{l:'GPS Max Velocity',sc:gps,c:'Top Speed'}];
   var o='<div style="background:#fff;color:#111;font-family:Barlow,sans-serif;max-width:720px;margin:0 auto;padding:32px 28px">';
   o+='<div style="border-bottom:3px solid '+or+';padding-bottom:18px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-end">'
-    +'<div><div style="font-family:Rajdhani,sans-serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:'+or+';margin-bottom:5px">Athlete Performance Evaluator</div>'
+    +'<div><div style="font-family:Rajdhani,sans-serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:'+or+';margin-bottom:5px">'+esc(gymName)+(coachName?' &middot; '+esc(coachName):'')+'</div>'
     +'<div style="font-family:Rajdhani,sans-serif;font-size:30px;font-weight:700;color:#111">'+esc(name)+'</div>'
-    +'<div style="font-size:14px;color:#555;margin-top:3px">'+tl+' Athlete</div></div>'
-    +'<div style="text-align:right"><div style="font-size:13px;color:#888">'+ds+'</div>'
-    +'<div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#aaa;margin-top:3px">Performance Report</div></div></div>';
+    +'<div style="font-size:14px;color:#555;margin-top:3px">'+tl+' Athlete'+(S.sport?' &middot; '+esc(S.sport):'')+'</div></div>'
+    +'<div style="text-align:right"><div style="font-size:13px;color:#888">'+ds+'</div>'+(apeScore!=null?'<div style="font-family:Rajdhani,sans-serif;font-size:28px;font-weight:700;color:'+or+'">'+Math.round(apeScore)+'<span style="font-size:12px;font-weight:700;letter-spacing:.08em;margin-left:3px">APE</span></div>':'')+'<div style="font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#aaa;margin-top:3px">Performance Report</div></div></div>';
   o+='<div style="background:#f8f8f8;border-left:4px solid '+or+';border-radius:4px;padding:18px 20px;margin-bottom:24px">'
     +'<div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+or+';margin-bottom:5px">Your Athletic Profile</div>'
     +'<div style="font-family:Rajdhani,sans-serif;font-size:20px;font-weight:700;color:#111;margin-bottom:7px">'+dh+'</div>'
@@ -2401,7 +2643,7 @@ function buildReport(S){
   o+='<div style="background:#111;border-radius:6px;padding:21px 23px;text-align:center">'
     +'<div style="font-family:Rajdhani,sans-serif;font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:'+or+';margin-bottom:7px">Next Steps</div>'
     +'<div style="font-size:15px;font-weight:600;color:#fff;line-height:1.6">We will build your full program based on this profile and track your progress weekly.</div>'
-    +'<div style="font-size:12px;color:#aaa;margin-top:6px">Athlete Performance Evaluator</div></div></div>';
+    +'<div style="font-size:12px;color:#aaa;margin-top:6px">'+esc(gymName)+(coachName?' &middot; Coach '+esc(coachName):'')+(contact?' &middot; '+esc(contact):'')+'</div></div></div>';
   return o;
 }
 
@@ -2921,7 +3163,8 @@ function saveAthEdit(aid){
     ageEl?parseFloat(ageEl.value)||null:null,
     teamEl?teamEl.value:'',
     gradYEl?parseFloat(gradYEl.value)||null:null,
-    notesEl?notesEl.value.trim():''
+    notesEl?notesEl.value.trim():'',
+    null,''
   );
   buildDash();
 }
@@ -3097,14 +3340,31 @@ function buildTeams(){
 }
 
 function doCreateTeam(){
-  var nameEl=el('new-team-name'),colorEl=el('new-team-color'),errEl=el('team-create-err');
-  var name=nameEl?nameEl.value.trim():'';
-  if(!name){if(errEl)errEl.style.display='block';if(nameEl)nameEl.focus();return;}
-  if(errEl)errEl.style.display='none';
-  DB.createTeam(name,colorEl?colorEl.value:'#F5881F');
-  if(nameEl)nameEl.value='';
-  buildTeams();
-  refreshTeamSelect('');
+  try{
+    var nameEl=el('new-team-name'),colorEl=el('new-team-color'),errEl=el('team-create-err');
+    var name=nameEl?nameEl.value.trim():'';
+    if(!name){if(errEl)errEl.style.display='block';if(nameEl)nameEl.focus();return;}
+    if(errEl)errEl.style.display='none';
+    var color=colorEl?colorEl.value:'#f5881f';
+    var t=DB.createTeam(name,color);
+    if(SupaDB&&SupaDB.getUser()){
+      var supa=_supaClient();
+      if(supa)supa.from('teams').upsert({id:t.id,coach_id:SupaDB.getUser().id,name:t.name,color:t.color}).then(function(){});
+    }
+    if(nameEl)nameEl.value='';
+    buildTeams();
+    refreshTeamSelect('');
+    _toast('Team "'+name+'" created!','#1e6f3e');
+  }catch(e){
+    console.error('[Teams] doCreateTeam error:',e);
+    alert('Error creating team: '+e.message);
+  }
+}
+function _toast(msg,bg){
+  var t=document.createElement('div');t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:'+(bg||'#1e6f3e')+';color:#fff;padding:10px 22px;border-radius:8px;font-size:13px;font-family:Barlow,sans-serif;z-index:9999;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none';
+  document.body.appendChild(t);
+  setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},2500);
 }
 
 function editTeamCard(tid){
@@ -3344,6 +3604,9 @@ function editAthlete(aid){
   if(ag)ag.value=a.age||'';
   if(gy)gy.value=a.gradYear||'';
   if(nt)nt.value=a.notes||'';
+  var bwE2=el('inp-bw'),htE2=el('inp-ht');
+  if(bwE2)bwE2.value=a.bodyweight||'';
+  if(htE2)htE2.value=a.height||'';
   // Populate team dropdown and pre-select current team
   refreshTeamSelect(a.team||'');
   // Select current tier button
@@ -3382,7 +3645,9 @@ function saveProfileEdit(){
     el('inp-age')?parseFloat(el('inp-age').value)||null:null,
     el('inp-team')?el('inp-team').value:'',
     el('inp-grady')?parseFloat(el('inp-grady').value)||null:null,
-    el('inp-notes')?el('inp-notes').value.trim():''
+    el('inp-notes')?el('inp-notes').value.trim():'',
+    el('inp-bw')?parseFloat(el('inp-bw').value)||null:null,
+    el('inp-ht')?el('inp-ht').value.trim():''
   );
   // Flash the save button then navigate — gives clear feedback that the save worked
   var sr=el('edit-save-row');
@@ -3425,9 +3690,68 @@ function _clearEditMode(){
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-// Populate the team dropdown on first page load so teams created in a previous
-// session are available immediately without navigating away and back.
+// On load: populate team dropdown, then go to dashboard.
 refreshTeamSelect('');
+// Restore Supabase session if one exists from a previous page load
+(function(){
+  var supa=_supaClient();
+  if(supa){
+    supa.auth.getSession().then(function(r){
+      if(r.data&&r.data.session&&r.data.session.user){
+        var u=r.data.session.user;
+        SupaDB.setUser(u);
+        _authUpdatePill(u);
+        console.log('[Auth] Restored session:',u.email);
+      }
+    });
+  }
+})();
+goDash();
 </script>
-</body>
-</html>
+
+<!-- ── Auth Modal ── -->
+<div class="auth-overlay" id="auth-overlay" onclick="if(event.target===this)closeAuth()">
+  <div class="auth-box">
+    <div class="auth-tabs">
+      <button class="auth-tab act" data-tab="signin" onclick="_authSwitchTab('signin')">Sign In</button>
+      <button class="auth-tab" data-tab="signup" onclick="_authSwitchTab('signup')">Create Account</button>
+    </div>
+    <div id="auth-err" class="auth-err"></div>
+
+    <!-- Sign In Panel -->
+    <div id="auth-panel-signin">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to sync your athletes across devices.</div>
+      <div class="field"><label>Email</label><input type="email" id="auth-email-si" placeholder="you@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')handleSignin()"></div>
+      <div class="field"><label>Password</label><input type="password" id="auth-pass-si" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleSignin()"></div>
+      <button class="btn-p" id="auth-btn-si" style="width:100%;margin-top:4px" onclick="handleSignin()">Sign In</button>
+      <div class="auth-footer">No account yet? <a href="#" onclick="_authSwitchTab('signup');return false" style="color:var(--or)">Create one free</a></div>
+    </div>
+
+    <!-- Sign Up Panel -->
+    <div id="auth-panel-signup" style="display:none">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">Free forever. Your data syncs across all your devices.</div>
+      <div class="field"><label>Email</label><input type="email" id="auth-email-su" placeholder="you@email.com" autocomplete="email"></div>
+      <div class="field"><label>Password</label><input type="password" id="auth-pass-su" placeholder="Min. 6 characters" autocomplete="new-password"></div>
+      <div class="field"><label>Confirm Password</label><input type="password" id="auth-pass-su2" placeholder="Repeat password" autocomplete="new-password" onkeydown="if(event.key==='Enter')handleSignup()"></div>
+      <button class="btn-p" id="auth-btn-su" style="width:100%;margin-top:4px" onclick="handleSignup()">Create Account</button>
+      <div class="auth-footer">Already have an account? <a href="#" onclick="_authSwitchTab('signin');return false" style="color:var(--or)">Sign in</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Settings Modal ── -->
+<div class="settings-overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
+  <div class="settings-box">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff">&#9881; Coach Settings</div>
+      <button onclick="closeSettings()" style="background:none;border:none;color:var(--mt);font-size:20px;cursor:pointer;line-height:1;padding:0 4px">&times;</button>
+    </div>
+    <div style="font-size:11px;color:var(--mt);margin-bottom:16px;line-height:1.5">Branding shown on client reports. All fields optional.</div>
+    <div class="field"><label>Coach Name</label><input type="text" id="set-coach-name" placeholder="e.g. Mike McMillan" autocomplete="off"></div>
+    <div class="field"><label>Gym / Facility Name</label><input type="text" id="set-gym-name" placeholder="e.g. New Athlete" autocomplete="off"></div>
+    <div class="field"><label>Tagline <span style="font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--mt)">(optional)</span></label><input type="text" id="set-tagline" placeholder="e.g. Train Smart. Perform Better." autocomplete="off"></div>
+    <div class="field"><label>Contact / Website <span style="font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--mt)">(optional)</span></label><input type="text" id="set-contact" placeholder="e.g. newathlete.com" autocomplete="off"></div>
+    <div style="display:flex;gap:10px;margin-top:6px">
+      <button class="btn-p" style="flex:1" onclick="saveSettings()">&#10003; Save Setting
