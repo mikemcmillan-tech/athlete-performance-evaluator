@@ -1741,6 +1741,10 @@ function build(vj,bj,rsi,s5,s10,gps){
   }
 
 
+  // Position-aware adjusted score — computed once here, used in companion card
+  var _posGroupKey=resolvePosGroup(sport,position);
+  var _adjResult=computeAdjustedScores({vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,ft:ft},_posGroupKey);
+
   // ── Position-Adjusted companion card ────────────────────────────────────────
   var _posCard='';
   if(_adjResult){
@@ -1877,9 +1881,7 @@ function build(vj,bj,rsi,s5,s10,gps){
     +'</div>';
 
   _S={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,ft:ft,tier:tier,name:name,sport:sport,position:position,age:age,team:team,gradYear:gradYear,notes:notes,bodyweight:bodyweight,height:height,defType:dT,defLabel:dLab,defLimiter:dLim,defExplain:dExp,rawVJ:vj,rawBJ:bj,rawRSI:rsi,rawF5:s5,rawF10:s10};
-  // Position-aware adjusted score — computed once here, used in companion card
-  var _posGroupKey=resolvePosGroup(sport,position);
-  var _adjResult=computeAdjustedScores({vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,ft:ft},_posGroupKey);
+
 
   DB.auto(name,tier,
     {vj:vj,bj:bj,rsi:rsi,f5:s5,f10:s10,gps:gps},
