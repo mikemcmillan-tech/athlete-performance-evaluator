@@ -906,17 +906,18 @@ var SupaDB=(function(){
   var _user=null;
   function uid(){return _user?_user.id:null;}
   function athleteRow(a){
-    return{id:a.id,coach_id:uid(),name:a.name,tier:a.tier,
-      sport:a.sport||null,position:a.position||null,age:a.age||null,
+    return{id:a.id,coach_id:uid(),name:a.name,name_key:(a.name||'').trim().toLowerCase(),
+      tier:a.tier,sport:a.sport||null,position:a.position||null,age:a.age||null,
       team_id:a.team||null,grad_year:a.gradYear||null,notes:a.notes||null,
       bodyweight:a.bodyweight||null,height:a.height||null};
   }
   function sessRow(s,aid){
+    var ts=s.ts||Date.now();
     return{id:s.id,coach_id:uid(),athlete_id:aid,
-      test_date:new Date(s.ts||Date.now()).toISOString(),
-      ape_score:s.apeScore!=null?s.apeScore:null,scores:s.sc||null,raw:s.raw||null,
+      ts:ts,date:new Date(ts).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
+      ape_score:s.apeScore!=null?s.apeScore:null,sc:s.sc||null,raw:s.raw||null,
       bkt:s.bkt!=null?s.bkt:null,bkt_name:s.bktName||null,def_type:s.defType||null,
-      cnt:s.cnt!=null?s.cnt:null,primary_focus:s.focus||null,session_note:s.note||null};
+      cnt:s.cnt!=null?s.cnt:null,focus:s.focus||null,note:s.note||null};
   }
   return{
     setUser:function(u){_user=u;},
@@ -966,11 +967,11 @@ var SupaDB=(function(){
               bodyweight:a.bodyweight||null,height:a.height||'',
               created:a.created_at?new Date(a.created_at).getTime():Date.now(),s:[]};
             (sessMap[a.id]||[]).forEach(function(s){
-              rec.s.push({id:s.id,ts:s.test_date?new Date(s.test_date).getTime():Date.now(),
-                date:s.test_date?new Date(s.test_date).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}):new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
-                apeScore:s.ape_score!=null?s.ape_score:null,sc:s.scores||null,raw:s.raw||{},
+              rec.s.push({id:s.id,ts:s.ts?Number(s.ts):Date.now(),
+                date:s.date||new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
+                apeScore:s.ape_score!=null?s.ape_score:null,sc:s.sc||null,raw:s.raw||{},
                 bkt:s.bkt!=null?s.bkt:null,bktName:s.bkt_name||null,defType:s.def_type||null,
-                cnt:s.cnt!=null?s.cnt:null,focus:s.primary_focus||'',note:s.session_note||''});
+                cnt:s.cnt!=null?s.cnt:null,focus:s.focus||'',note:s.note||''});
             });
             rec.s.sort(function(a,b){return(a.ts||0)-(b.ts||0);});
             d.a[a.id]=rec;
