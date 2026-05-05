@@ -906,7 +906,7 @@ var SupaDB=(function(){
   var _user=null;
   function uid(){return _user?_user.id:null;}
   function athleteRow(a){
-    return{id:a.id,coach_id:uid(),name:a.name,name_key:(a.name||'').trim().toLowerCase(),
+    return{id:a.id,coach_id:uid(),name:a.name,
       tier:a.tier,sport:a.sport||null,position:a.position||null,age:a.age||null,
       team_id:a.team||null,grad_year:a.gradYear||null,notes:a.notes||null,
       bodyweight:a.bodyweight||null,height:a.height||null};
