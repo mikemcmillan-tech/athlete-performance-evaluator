@@ -2873,6 +2873,9 @@ function buildReport(S){
 
   // Sport context
   var ctx=getSportCtx(S.sport,S.position);
+  // Position-adjusted score (additive — raw never modified)
+  var posGroupKey=resolvePosGroup(S.sport,S.position);
+  var adjResult=apeScore!=null?computeAdjustedScores({vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gps,ft:ft},posGroupKey):null;
 
   // Deficiency language
   var dh,de,fp,fs,tm;
@@ -2950,6 +2953,47 @@ function buildReport(S){
       +'</div>';
   }
 
+  // ── Position-Adjusted Score section ────────────────────────────────────────
+  if(adjResult&&apeScore!=null){
+    var adjMeta=getAPELabel(adjResult.ape);
+    var rawMeta=getAPELabel(apeScore);
+    var diff=adjResult.ape-apeScore;
+    var diffStr=diff>0?'+'+diff:String(diff);
+    var diffCol=diff>2?'#1F9E70':diff<-2?'#C93B3B':'#888';
+    var pg2=adjResult.groupMeta;
+    o+='<div style="padding:18px 28px;border-bottom:1px solid #E8E8E8;background:#F7FAFF">';
+    o+='<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#3A7BD5;margin-bottom:10px">Position-Adjusted Score</div>';
+    // Score comparison row
+    o+='<div style="display:flex;align-items:center;gap:0;margin-bottom:14px;flex-wrap:wrap;gap:12px">';
+    // Raw APE block
+    o+='<div style="text-align:center;padding:12px 18px;background:#fff;border:1px solid #E0E8F4;border-radius:5px">';
+    o+='<div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;margin-bottom:3px">Raw APE</div>';
+    o+='<div style="font-family:Rajdhani,sans-serif;font-size:42px;font-weight:700;color:'+(rawMeta?rawMeta.color:'#111')+';line-height:1">'+Math.round(apeScore)+'</div>';
+    o+='<div style="font-size:10px;color:#999;margin-top:2px">'+(rawMeta?rawMeta.label:'')+'</div>';
+    o+='</div>';
+    // Arrow
+    o+='<div style="font-size:20px;color:#BCC;padding:0 6px">&#8594;</div>';
+    // Adjusted APE block
+    o+='<div style="text-align:center;padding:12px 18px;background:#fff;border:1px solid #3A7BD533;border-radius:5px;border-left:3px solid #3A7BD5">';
+    o+='<div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#3A7BD5;margin-bottom:3px">'+esc(pg2.label)+' Adjusted</div>';
+    o+='<div style="font-family:Rajdhani,sans-serif;font-size:42px;font-weight:700;color:'+adjMeta.color+';line-height:1">'+adjResult.ape+'</div>';
+    o+='<div style="font-size:11px;font-weight:700;color:'+diffCol+';margin-top:2px">'+diffStr+' vs raw</div>';
+    o+='</div>';
+    // Group desc
+    o+='<div style="flex:1;min-width:160px;padding:12px 14px;background:#fff;border:1px solid #E0E8F4;border-radius:5px">';
+    o+='<div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3A7BD5;margin-bottom:4px">Position Group</div>';
+    o+='<div style="font-size:13px;font-weight:700;color:#222;margin-bottom:3px">'+esc(pg2.label)+'</div>';
+    o+='<div style="font-size:11px;color:#666;line-height:1.5">'+esc(pg2.desc)+'</div>';
+    o+='</div>';
+    o+='</div>';
+    // Explanation line
+    o+='<div style="font-size:12px;color:#666;line-height:1.6;padding:10px 12px;background:#fff;border-radius:4px;border-left:3px solid #3A7BD544">';
+    o+='The raw APE score uses the same weights for every athlete. The position-adjusted score re-weights the same test results to reflect what matters most for ';
+    o+=esc(S.position||'this position')+'. Both scores come from the same data — no new tests required.';
+    o+='</div>';
+    o+='</div>';
+  }
+
   // ── Performance scores ──────────────────────────────────────────────────
   o+='<div style="padding:22px 28px 10px">'
     +'<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#999;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #EEEEEE">Performance Scores — '+tl+' Benchmarks</div>';
@@ -3015,6 +3059,54 @@ function buildReport(S){
       +'</div></div>'
       +(tm?'<div style="font-size:13px;color:#444;line-height:1.7;padding:13px 15px;background:#F8F8F8;border-radius:4px;border-left:3px solid '+or+'">'+esc(tm)+'</div>':'')
       +'</div>';
+  }
+
+  // ── Training priorities (position-weighted gap analysis) ───────────────────
+  if(adjResult&&adjResult.topMetrics&&adjResult.topMetrics.length){
+    // Build priority list: weight × (5 - score) = urgency. Higher = train this first.
+    var trainPri=[];
+    var metLabelMap={vp:'Vertical Power',hp:'Horizontal Power',rs:'Reactive Strength',ac:'Acceleration',mv:'Max Velocity',gps:'GPS Speed',ft:'Force Transfer'};
+    var metCatMap={vp:'Vertical Jump',hp:'Broad Jump',rs:'RSI',ac:'5–10 Fly',mv:'10–10 Fly',gps:'GPS Max Vel',ft:'Derived'};
+    for(var tp=0;tp<adjResult.topMetrics.length;tp++){
+      var tm2=adjResult.topMetrics[tp];
+      if(tm2.score===null||tm2.score===undefined)continue;
+      var gap=5-tm2.score;
+      var urgency=tm2.weight*gap;
+      trainPri.push({key:tm2.key,score:tm2.score,weight:tm2.weight,urgency:urgency,
+        label:metLabelMap[tm2.key]||tm2.key,cat:metCatMap[tm2.key]||''});
+    }
+    trainPri.sort(function(a,b){return b.urgency-a.urgency;});
+    var topPri=trainPri.slice(0,3);
+    if(topPri.length){
+      var priColors=['#C93B3B','#BA7517','#1F9E70'];
+      var priRank=['1st Priority','2nd Priority','3rd Priority'];
+      o+='<div style="padding:18px 28px 22px;border-top:1px solid #EEE">';
+      o+='<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#999;margin-bottom:4px;padding-bottom:8px;border-bottom:1px solid #EEE">Training Priorities — '+esc((adjResult.groupMeta.label||'Position'))+' Profile</div>';
+      o+='<div style="font-size:12px;color:#666;margin-bottom:12px;line-height:1.5">Ranked by position weight × score gap. High weight + low score = train this first.</div>';
+      o+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">';
+      for(var pi=0;pi<topPri.length;pi++){
+        var pr=topPri[pi];
+        var pc=priColors[pi]||'#888';
+        var sc2=pr.score;
+        var lbl2=CLB[sc2]||'';
+        var col2=lc(sc2);
+        var insight=metricInsight(pr.key,sc2,null);
+        o+='<div style="padding:13px 14px;background:#FAFAFA;border:1px solid #E8E8E8;border-radius:5px;border-top:3px solid '+pc+'">';
+        o+='<div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:'+pc+';margin-bottom:4px">'+priRank[pi]+'</div>';
+        o+='<div style="font-size:13px;font-weight:700;color:#222;margin-bottom:2px">'+esc(pr.label)+'</div>';
+        o+='<div style="font-size:10px;color:#999;margin-bottom:8px">'+esc(pr.cat)+'</div>';
+        o+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+        o+='<span style="font-size:13px;font-weight:700;color:'+col2+'">'+lbl2+'</span>';
+        o+='<span style="font-size:11px;color:#999">'+sc2+'/5 &nbsp;·&nbsp; '+pr.weight.toFixed(1)+'× wt</span>';
+        o+='</div>';
+        if(insight){
+          o+='<div style="font-size:11px;color:#555;line-height:1.55;border-top:1px solid #EEE;padding-top:8px">'+esc(insight)+'</div>';
+        }
+        o+='</div>';
+      }
+      o+='</div>';
+      o+='</div>';
+    }
   }
 
   // ── Footer ───────────────────────────────────────────────────────────────
