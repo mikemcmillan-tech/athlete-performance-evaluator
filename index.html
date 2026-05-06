@@ -935,16 +935,23 @@ function _cloudSyncSoon(){
   if(typeof SupaDB==='undefined'||!SupaDB.getUser||!SupaDB.getUser())return;
   clearTimeout(window._cloudSyncTimer);
   window._cloudSyncTimer=setTimeout(function(){
-    try{SupaDB.syncAll();}catch(e){console.warn('[Supabase] sync failed:',e);}
+    try{
+      var p=SupaDB.syncAll();
+      if(p&&p.catch)p.catch(function(e){_cloudSyncFailed(e);});
+    }catch(e){_cloudSyncFailed(e);}
   },250);
+}
+function _cloudSyncFailed(err){
+  console.warn('[Supabase] sync failed:',err);
+  if(typeof _toast==='function')_toast('Cloud sync failed. Local data is saved.','#8A3A2B');
 }
 function _cloudDelete(table,id){
   try{
     if(typeof SupaDB==='undefined'||!SupaDB.getUser||!SupaDB.getUser()||!_supaClient()||!id)return;
     _supaClient().from(table).delete().eq('id',id).then(function(r){
-      if(r&&r.error)console.warn('[Supabase] delete '+table+' failed:',r.error.message||r.error);
-    });
-  }catch(e){console.warn('[Supabase] delete '+table+' failed:',e);}
+      if(r&&r.error)_cloudSyncFailed(r.error.message||r.error);
+    }).catch(function(e){_cloudSyncFailed(e);});
+  }catch(e){_cloudSyncFailed(e);}
 }
 
 // ─── SupaDB — dual-write wrapper ──────────────────────────────────────────────
@@ -969,20 +976,28 @@ var SupaDB=(function(){
     setUser:function(u){_user=u;},
     getUser:function(){return _user;},
     syncAll:function(){
-      if(!uid()||!_supaClient())return;
+      if(!uid()||!_supaClient())return Promise.resolve(false);
       var supa=_supaClient();
+      var writes=[];
       DB.getAll().forEach(function(a){
-        supa.from('athletes').upsert(athleteRow(a)).then(function(){});
-        (a.s||[]).forEach(function(s){supa.from('sessions').upsert(sessRow(s,a.id)).then(function(){});});
+        writes.push(supa.from('athletes').upsert(athleteRow(a)));
+        (a.s||[]).forEach(function(s){writes.push(supa.from('sessions').upsert(sessRow(s,a.id)));});
       });
       DB.getTeams().forEach(function(t){
-        supa.from('teams').upsert({id:t.id,coach_id:uid(),name:t.name,color:t.color}).then(function(){});
+        writes.push(supa.from('teams').upsert({id:t.id,coach_id:uid(),name:t.name,color:t.color}));
       });
       var cfg=DB.loadSettings();
       if(cfg&&(cfg.coachName||cfg.gymName)){
-        supa.from('coach_settings').upsert({coach_id:uid(),coach_name:cfg.coachName||'',
-          gym_name:cfg.gymName||'',tagline:cfg.tagline||'',contact:cfg.contact||''}).then(function(){});
+        writes.push(supa.from('coach_settings').upsert({coach_id:uid(),coach_name:cfg.coachName||'',
+          gym_name:cfg.gymName||'',tagline:cfg.tagline||'',contact:cfg.contact||''}));
       }
+      if(!writes.length)return Promise.resolve(true);
+      return Promise.all(writes).then(function(results){
+        for(var i=0;i<results.length;i++){
+          if(results[i]&&results[i].error)throw new Error(results[i].error.message||'Supabase sync failed');
+        }
+        return true;
+      });
     },
     pullFromSupabase:function(onDone){
       var coachId=uid();
@@ -1106,15 +1121,13 @@ function _authOnSuccess(user,isNew){
   SupaDB.setUser(user);
   _authUpdatePill(user);
   closeAuth();
-  console.log('[Auth] Signed in:',user.email,isNew?'(new)':'');
   setTimeout(function(){
     var localAthletes=DB.getAll();
     if(localAthletes.length>0){
-      console.log('[Auth] Local data found ('+localAthletes.length+' athletes) — syncing up.');
-      SupaDB.syncAll();
-      _toast('Synced '+localAthletes.length+' athlete'+(localAthletes.length!==1?'s':'')+'!','#1e6f3e');
+      SupaDB.syncAll().then(function(){
+        _toast('Synced '+localAthletes.length+' athlete'+(localAthletes.length!==1?'s':'')+'!','#1e6f3e');
+      }).catch(function(e){_cloudSyncFailed(e);});
     }else{
-      console.log('[Auth] No local data — pulling from Supabase…');
       SupaDB.pullFromSupabase(function(ok){
         if(ok){
           buildDash();
@@ -4236,7 +4249,6 @@ refreshTeamSelect('');
         var u=r.data.session.user;
         SupaDB.setUser(u);
         _authUpdatePill(u);
-        console.log('[Auth] Restored session:',u.email);
       }
     });
   }
