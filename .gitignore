@@ -1,0 +1,44 @@
+# Environment / secrets
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Node / build (in case we add tooling later)
+node_modules/
+dist/
+build/
+.next/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Local scratch / migration helpers
+_*.ps1
+_bash_write_test.txt
+
+# Archived legacy exports kept outside release builds
+archive/
+
+# Binary planning/export artifacts; convert final docs to Markdown
+APE_Leaderboard.xlsx
+APE_PRD*.docx
+APE_Supabase_Migration_Guide.docx
+
+# Supabase adapter experiments; current GitHub Pages app uses inline client code
+supabase-client.js
+supabase-db.js
+
+# Misc
+*.tmp
+*.bak

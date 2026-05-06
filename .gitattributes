@@ -1,0 +1,15 @@
+# Keep line endings consistent across Windows / Mac / Linux.
+# OneDrive has been observed flipping CRLF<->LF — this prevents history churn.
+* text=auto eol=lf
+
+# Treat known binaries as binary (skip line-ending normalization)
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.pdf  binary
+*.docx binary
+*.xlsx binary
+*.pptx binary
+*.zip  binary
