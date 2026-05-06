@@ -19,6 +19,7 @@ Use this checklist before publishing APE to GitHub Pages or Vercel.
 - Browser client uses only the anon key.
 - New columns used by `index.html` exist in migrations.
 - Sign in, sign out, local sync, and pull-from-cloud flows are tested.
+- Failed cloud writes show a visible sync-failure toast while preserving local data.
 
 ## GitHub Pages
 
@@ -28,6 +29,7 @@ Use this checklist before publishing APE to GitHub Pages or Vercel.
   - XLSX
   - Supabase JS
 - Supabase Auth redirect URLs include the GitHub Pages URL.
+- Email/password auth works after a hard refresh on the published URL.
 - Reports and print/PDF layout work in Chrome and Safari.
 
 ## Future Vercel
@@ -35,6 +37,7 @@ Use this checklist before publishing APE to GitHub Pages or Vercel.
 - Add Vercel project without introducing an unnecessary framework.
 - Configure environment variables from `.env.example`.
 - Add the Vercel deployment URL to Supabase Auth redirect URLs.
+- Confirm Supabase Auth redirect URLs include both preview and production Vercel domains as needed.
 - Confirm static routing serves `index.html`.
 - Re-test Supabase auth, exports, reports, and mobile layout after deployment.
 
