@@ -230,26 +230,35 @@ select option{background:var(--dk3)}
 /* ══════════════════════════════════════════════════
    DASHBOARD
    ══════════════════════════════════════════════════ */
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dash-hero{
+  background:linear-gradient(135deg,rgba(245,136,31,.12),rgba(31,158,112,.06) 42%,rgba(11,16,23,.92));
+  border:1px solid var(--bd);border-radius:var(--radius-lg);padding:20px 22px;margin-bottom:18px;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:18px;box-shadow:var(--shadow-card);
+}
+.dash-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:flex-end}
 .pg-title{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;line-height:1.1}
 .pg-sub{font-size:12px;color:var(--mt);margin-top:4px;line-height:1.5}
 
 /* Athlete cards */
 .ath-card{
-  background:var(--dk2);border:1px solid var(--bd);
-  border-radius:var(--radius-lg);padding:18px 20px;
-  transition:border-color .2s,box-shadow .2s;
+  background:linear-gradient(180deg,var(--dk2),rgba(19,26,33,.86));border:1px solid var(--bd);
+  border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;
+  transition:border-color .2s,box-shadow .2s,transform .2s;
 }
-.ath-card:hover{border-color:var(--bd2);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.ath-card::before{content:'';position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,var(--or),rgba(31,158,112,.8));opacity:.55}
+.ath-card:hover{border-color:rgba(245,136,31,.38);box-shadow:0 10px 24px rgba(0,0,0,.32);transform:translateY(-2px)}
 
 /* Stats cards */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
 .stat-card{
-  background:var(--dk2);border:1px solid var(--bd);
-  border-radius:var(--radius);padding:16px 18px;
-  transition:border-color .18s;
+  background:linear-gradient(180deg,var(--dk2),var(--dk3));border:1px solid var(--bd);
+  border-radius:var(--radius);padding:15px 16px;min-height:92px;
+  transition:border-color .18s,transform .18s,box-shadow .18s;
 }
-.stat-card:hover{border-color:var(--bd2)}
+.stat-card:hover{border-color:rgba(245,136,31,.34);transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,0,0,.24)}
+.stat-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.stat-ico{font-size:14px;color:var(--or);opacity:.85;line-height:1}
 .stat-num{font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:#fff;line-height:1}
 .stat-lbl{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mt);margin-top:4px}
 .stat-sub{font-size:11px;color:var(--sb);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -257,7 +266,7 @@ select option{background:var(--dk3)}
 /* ══════════════════════════════════════════════════
    FILTER BAR
    ══════════════════════════════════════════════════ */
-.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;align-items:center;background:var(--dk2);border:1px solid var(--bd);border-radius:var(--radius);padding:10px}
 .filter-sel{
   background:var(--dk3);border:1px solid var(--bd);border-radius:var(--radius-sm);
   color:var(--tx);font-family:'Barlow',sans-serif;font-size:12px;
@@ -265,8 +274,9 @@ select option{background:var(--dk3)}
   appearance:none;-webkit-appearance:none;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%235A7080' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-position:right 10px center;
-  transition:border-color .2s;min-width:120px;
+  transition:border-color .2s,background .2s;min-width:120px;
 }
+.filter-sel:hover{border-color:var(--bd2);background:var(--dk4)}
 .filter-sel:focus{border-color:var(--or)}
 .filter-sel option{background:var(--dk3)}
 .filter-active{border-color:var(--or)!important;color:var(--or)}
@@ -275,7 +285,7 @@ select option{background:var(--dk3)}
   color:var(--mt);font-size:11px;font-weight:600;padding:7px 12px;
   cursor:pointer;transition:all .18s;
 }
-.filter-reset:hover{border-color:var(--sb);color:var(--tx)}
+.filter-reset:hover{border-color:var(--or);color:var(--or);background:var(--or-glow)}
 
 /* ══════════════════════════════════════════════════
    LEADERBOARD
@@ -450,6 +460,9 @@ select option{background:var(--dk3)}
   .sc-meta{flex:0 0 104px}.sc-word{flex:0 0 66px;font-size:10px}
   .dash-grid{grid-template-columns:1fr}
   .stats-grid{grid-template-columns:1fr 1fr}
+  .dash-hero{padding:16px;flex-direction:column;gap:14px}
+  .dash-actions{justify-content:flex-start;width:100%}
+  .dash-actions .btn-save-prog,.dash-actions .btn-p{flex:1;min-width:135px}
   .hdr-in{flex-wrap:nowrap}
   .btn-row{flex-direction:column}
   .btn-p,.btn-s{width:100%;text-align:center}
@@ -3387,17 +3400,17 @@ function buildDash(){
   if(totalAth>0){
     var topApeMeta=topAPE!=null?getAPELabel(topAPE):null;
     h+='<div class="stats-grid">'
-      +'<div class="stat-card"><div class="stat-num">'+totalAth+'</div><div class="stat-lbl">Athletes</div></div>'
-      +'<div class="stat-card"><div class="stat-num">'+totalTeams+'</div><div class="stat-lbl">Teams</div></div>'
-      +'<div class="stat-card"><div class="stat-num">'+testsMonth+'</div><div class="stat-lbl">Tests This Month</div></div>'
-      +'<div class="stat-card"><div class="stat-num" style="'+(topApeMeta?'color:'+topApeMeta.color+';':'')+'">'+(topAPE!=null?topAPE:'&#8212;')+'</div><div class="stat-lbl">Top APE</div>'+(topName?'<div class="stat-sub">'+esc(topName)+'</div>':'')+'</div>'
+      +'<div class="stat-card"><div class="stat-top"><div class="stat-num">'+totalAth+'</div><div class="stat-ico">&#9679;</div></div><div class="stat-lbl">Athletes</div><div class="stat-sub">Active roster</div></div>'
+      +'<div class="stat-card"><div class="stat-top"><div class="stat-num">'+totalTeams+'</div><div class="stat-ico">&#9670;</div></div><div class="stat-lbl">Teams</div><div class="stat-sub">Training groups</div></div>'
+      +'<div class="stat-card"><div class="stat-top"><div class="stat-num">'+testsMonth+'</div><div class="stat-ico">&#8599;</div></div><div class="stat-lbl">Tests This Month</div><div class="stat-sub">Recent activity</div></div>'
+      +'<div class="stat-card"><div class="stat-top"><div class="stat-num" style="'+(topApeMeta?'color:'+topApeMeta.color+';':'')+'">'+(topAPE!=null?topAPE:'&#8212;')+'</div><div class="stat-ico">&#9650;</div></div><div class="stat-lbl">Top APE</div>'+(topName?'<div class="stat-sub">'+esc(topName)+'</div>':'<div class="stat-sub">No scored tests</div>')+'</div>'
       +'</div>';
   }
 
   // Title + action buttons
-  h+='<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:11px;margin-bottom:16px">'
-    +'<div><div class="pg-title">Athletes</div><div class="pg-sub">'+totalAth+' saved profile'+(totalAth!==1?'s':'')+'</div></div>'
-    +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+  h+='<div class="dash-hero">'
+    +'<div><div class="pg-title">Athletes</div><div class="pg-sub">'+totalAth+' saved profile'+(totalAth!==1?'s':'')+' &middot; '+testsMonth+' test'+(testsMonth!==1?'s':'')+' this month</div></div>'
+    +'<div class="dash-actions">'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildLeaderboard()">&#127942; Leaderboard</button>'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildTeamStats()">&#128202; Team Stats</button>'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="exportAllAthletesXLSX()">&#8681; Export All</button>'
