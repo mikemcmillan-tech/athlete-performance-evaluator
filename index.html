@@ -23,6 +23,10 @@
   --s1:#C93B3B;--s1b:#F09595;--s3:#6B9A2A;--s4:#1F9E70;--s3b:#97C459;--s4b:#5DCAA5;
   --radius:8px;--radius-sm:5px;--radius-lg:12px;
   --shadow:0 2px 12px rgba(0,0,0,.35);--shadow-card:0 1px 4px rgba(0,0,0,.3);
+  --glow-or:0 0 0 1px rgba(245,136,31,.22),0 4px 28px rgba(245,136,31,.16);
+  --glow-or-sm:0 0 0 3px rgba(245,136,31,.1),0 2px 16px rgba(245,136,31,.1);
+  --shadow-hover:0 8px 28px rgba(0,0,0,.5),0 2px 8px rgba(0,0,0,.3);
+  --lift:.22s cubic-bezier(.4,0,.2,1);
 }
 
 /* ── Reset ── */
@@ -238,18 +242,18 @@ select option{background:var(--dk3)}
 .ath-card{
   background:var(--dk2);border:1px solid var(--bd);
   border-radius:var(--radius-lg);padding:18px 20px;
-  transition:border-color .2s,box-shadow .2s;
+  transition:border-color var(--lift),box-shadow var(--lift),transform var(--lift);
 }
-.ath-card:hover{border-color:var(--bd2);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.ath-card:hover{border-color:var(--or);box-shadow:var(--glow-or);transform:translateY(-2px)}
 
 /* Stats cards */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
 .stat-card{
   background:var(--dk2);border:1px solid var(--bd);
   border-radius:var(--radius);padding:16px 18px;
-  transition:border-color .18s;
+  transition:border-color var(--lift),box-shadow var(--lift),transform var(--lift);
 }
-.stat-card:hover{border-color:var(--bd2)}
+.stat-card:hover{border-color:var(--or);box-shadow:var(--glow-or-sm);transform:translateY(-1px)}
 .stat-num{font-family:'Rajdhani',sans-serif;font-size:32px;font-weight:700;color:#fff;line-height:1}
 .stat-lbl{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mt);margin-top:4px}
 .stat-sub{font-size:11px;color:var(--sb);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -523,6 +527,40 @@ select option{background:var(--dk3)}
 .settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center;padding:20px}
 .settings-overlay.open{display:flex;animation:fu .18s ease}
 .settings-box{background:var(--dk2);border:1px solid var(--bd);border-radius:var(--radius-lg);padding:28px 28px 24px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+
+/* ══════════════════════════════════════════════════
+   APE SCORE RING
+   ══════════════════════════════════════════════════ */
+.ape-ring-wrap{position:relative;width:120px;height:120px;flex-shrink:0}
+.ape-ring-svg{display:block;transform:rotate(-90deg)}
+.ape-ring-track{fill:none;stroke:var(--dk4);stroke-width:9}
+.ape-ring-fill{fill:none;stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset 1.1s cubic-bezier(.4,0,.2,1)}
+.ape-ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;pointer-events:none}
+.ape-ring-num{font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700;line-height:1}
+.ape-ring-sub{font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;margin-top:2px;opacity:.65}
+.ape-badge{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px}
+.ape-range-chip{display:inline-flex;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px}
+
+/* ══════════════════════════════════════════════════
+   EXPANDABLE METRIC CARDS
+   ══════════════════════════════════════════════════ */
+.sc-metric-card{border-bottom:1px solid var(--bd);padding:2px 0;transition:background .14s;border-radius:4px}
+.sc-metric-card:last-of-type{border-bottom:none}
+.sc-metric-card:hover{background:rgba(255,255,255,.024)}
+.sc-metric-card .sc-row{border-bottom:none;cursor:pointer;user-select:none;padding:10px 6px 6px}
+.sc-expand-icon{font-size:18px;color:var(--mt);margin-left:4px;transition:transform .18s;flex-shrink:0;line-height:1}
+.sc-metric-card.sc-expanded .sc-expand-icon{transform:rotate(90deg);color:var(--or)}
+.sc-expand-panel{display:none;padding:0 6px 12px;animation:fu .15s ease}
+.sc-expand-panel.open{display:block}
+.sc-expand-stat{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 9px;border-radius:3px;margin-bottom:8px}
+
+/* ══════════════════════════════════════════════════
+   DASHBOARD UPGRADES
+   ══════════════════════════════════════════════════ */
+@keyframes card-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.ath-card{animation:card-rise .25s ease both}
+.stats-grid .stat-card{cursor:default}
+.stat-num{transition:color .3s}
 </style>
 </head>
 <body>
@@ -1246,6 +1284,7 @@ function goNew(){resetAll();go(1);}
 function goProg(){var po=el('prog-out'),pb=el('prog-btns'),ep=el('err-pg');if(po)po.innerHTML='';if(pb)pb.style.display='none';if(ep)ep.style.display='none';go(4);}
 function goRpt(){var o=el('rpt-out');if(o)o.innerHTML=buildReport(_S);go(5);}
 function tog(btn){var b=btn.nextElementSibling;b.classList.toggle('open');btn.textContent=b.classList.contains('open')?'Hide':'How this was calculated';}
+function _togMetric(card,expId){var p=el(expId);if(p)p.classList.toggle('open');card.classList.toggle('sc-expanded');}
 function startTest(aid){
   var a=DB.get(aid);if(!a){go(1);return;}
   resetAll();
@@ -1430,6 +1469,60 @@ function getAPEInsight(rows, defType) {
   return lines;
 }
 
+// ─── PER-METRIC COACHING ACTIONS ─────────────────────────────────────────────
+// Coaching action text per metric × score (1–5). Shown in expandable card panel.
+var METRIC_ACTIONS = {
+  'Vertical Power':{
+    1:'Foundational strength first. Trap bar deadlifts, goblet squats, and Romanian deadlifts. No loaded jumps until basic force outputs improve.',
+    2:'Loaded jump progressions and heavy compound work. Trap bar jumps and box jumps with full recovery between reps.',
+    3:'Contrast training: heavy lift immediately paired with max-effort jump. Progressive overload on primary lifts.',
+    4:'Maintain with plyometric volume. Strength progression will push this to the elite tier.',
+    5:'Elite level. Low-volume reactive maintenance. Protect with adequate recovery between sessions.'
+  },
+  'Horizontal Power':{
+    1:'Horizontal hip hinge work and sled pushes. Build the pattern before adding load.',
+    2:'Broad jump progressions and sled work at 15–20% bodyweight. Full recovery between efforts.',
+    3:'Sled at 10–20% BW and broad jump-to-sprint pairings. Contrast: deadlift then broad jump.',
+    4:'Strong. Tie into acceleration mechanics with bound-to-sprint transitions.',
+    5:'Elite horizontal force. Maintain with sled and broad jump contrasts paired with sprint work.'
+  },
+  'Reactive Str.':{
+    1:'No intensive plyometrics yet. Pogo hops and landing mechanics only until RSI improves.',
+    2:'Entry-level reactive work. Ankle stiffness drills, bilateral pogo, and landing control.',
+    3:'Intermediate plyometrics are appropriate. Hurdle hops and depth drops to box.',
+    4:'Advanced plyometrics. Depth drops and single-leg reactive work.',
+    5:'World-class RSI. Low-volume, high-quality reactive sessions to maintain.'
+  },
+  'Acceleration':{
+    1:'Mechanics and resisted sprint work before free-sprint volume. Wall drills and falling starts.',
+    2:'Falling starts, wall drills, and sled at 10–20% BW. Short distances: 5–15 yards only.',
+    3:'Resisted sprints 5–20yd and 3-point stance starts. Sled at 10% BW.',
+    4:'Strong. Fine-tune with 5–15yd resisted sprints and falling starts.',
+    5:'Elite first step. Maintain with sprint frequency and short resisted work.'
+  },
+  'Max Velocity':{
+    1:'Build acceleration base first. Max velocity work comes after first-step is established.',
+    2:'Fly sprint exposure. Stride mechanics and 30m flies with full recovery.',
+    3:'Wicket runs and 20–40m fly sprints at 90–95% intent.',
+    4:'Strong top-end. Wicket runs and fly sprints to optimize stride length and frequency.',
+    5:'Elite max velocity. Maintain with full-intent fly sprints and wicket exposure.'
+  },
+  'GPS Max Vel.':{
+    1:'Field speed is limited. Sprint mechanics and open-space exposure are priority.',
+    2:'Increase open-space sprint volume and full-distance acceleration runs.',
+    3:'Solid. Sport-specific conditioning and sprint pattern work.',
+    4:'Strong real-world speed. Sport-pattern sprint transfers and open-space exposure.',
+    5:'Elite GPS speed. Maintain open-space sprint exposure and real-speed expression.'
+  },
+  'Force Transfer':{
+    1:'Significant transfer gap. Contrast training: heavy lift immediately followed by sprint.',
+    2:'Contrast training is the tool. Heavy lift then sprint within 30 seconds.',
+    3:'Appropriate transfer. Continue paired power-speed work and contrast sets.',
+    4:'Strong. Maintain contrast training to keep the power-to-speed link sharp.',
+    5:'Excellent — power is fully expressing into speed. Maintain contrast work.'
+  }
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 
 function build(vj,bj,rsi,s5,s10,gps){
@@ -1526,11 +1619,36 @@ function build(vj,bj,rsi,s5,s10,gps){
   for(var i=0;i<rows.length;i++){
     var rr=rows[i];
     if(rr.sc===null){
-      scH+='<div class="sc-row"><div class="sc-meta"><span class="sc-name">'+rr.lbl+'</span><span class="sc-cat">'+rr.cat+'</span></div><span class="sc-raw sc-nt">Not tested</span><div class="sc-bw"><div class="sc-bg"><div class="sc-fill" style="width:0"></div></div><div class="sc-pct">No data</div></div><span class="sc-num" style="color:var(--mt)">—</span><span class="sc-word" style="color:var(--mt)">—</span></div>';
+      scH+='<div class="sc-metric-card" style="opacity:.45;pointer-events:none">'
+        +'<div class="sc-row"><div class="sc-meta"><span class="sc-name">'+rr.lbl+'</span><span class="sc-cat">'+rr.cat+'</span></div>'
+        +'<span class="sc-raw sc-nt">Not tested</span>'
+        +'<div class="sc-bw"><div class="sc-bg"><div class="sc-fill" style="width:0"></div></div><div class="sc-pct">No data</div></div>'
+        +'<span class="sc-num" style="color:var(--mt)">—</span><span class="sc-word" style="color:var(--mt)">—</span>'
+        +'</div></div>';
     }else{
       var fl=(rr.rf&&rr.sc<=2)?' <span style="background:#C93B3B;color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:2px;margin-left:3px">PRIORITY</span>':'';
-      var cl=rr.lg?'<button class="calc-tog" onclick="tog(this)">How this was calculated</button><div class="calc-box">'+rr.lg+'</div>':'';
-      scH+='<div class="sc-row"><div class="sc-meta"><span class="sc-name">'+rr.lbl+fl+'</span><span class="sc-cat">'+rr.cat+'</span></div><span class="sc-raw">'+rr.raw+'</span><div class="sc-bw"><div class="sc-bg"><div class="sc-fill" style="width:'+(rr.sc/5*100)+'%;background:'+SCB[rr.sc]+'"></div></div><div class="sc-pct">'+tl+' peer level</div>'+cl+'</div><span class="sc-num" style="color:'+SC[rr.sc]+'">'+rr.sc+'</span><span class="sc-word" style="color:'+SC[rr.sc]+'">'+SW[rr.sc]+'</span></div>';
+      var expId='sc-exp-'+i;
+      var action=(METRIC_ACTIONS&&METRIC_ACTIONS[rr.lbl])?METRIC_ACTIONS[rr.lbl][rr.sc]:'';
+      scH+='<div class="sc-metric-card" id="sc-card-'+i+'" onclick="_togMetric(this,\''+expId+'\')">'
+        +'<div class="sc-row">'
+        +'<div class="sc-meta"><span class="sc-name">'+rr.lbl+fl+'</span><span class="sc-cat">'+rr.cat+'</span></div>'
+        +'<span class="sc-raw">'+rr.raw+'</span>'
+        +'<div class="sc-bw"><div class="sc-bg"><div class="sc-fill" style="width:'+(rr.sc/5*100)+'%;background:'+SCB[rr.sc]+'"></div></div>'
+        +'<div class="sc-pct">'+PCTL[rr.sc]+' vs peers</div>'
+        +'</div>'
+        +'<span class="sc-num" style="color:'+SC[rr.sc]+'">'+rr.sc+'</span>'
+        +'<span class="sc-word" style="color:'+SC[rr.sc]+'">'+SW[rr.sc]+'</span>'
+        +'<span class="sc-expand-icon">&#8250;</span>'
+        +'</div>'
+        +'<div class="sc-expand-panel" id="'+expId+'">'
+        +'<div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-bottom:8px">'
+        +'<span class="sc-expand-stat" style="background:'+SCB[rr.sc]+'22;color:'+SCB[rr.sc]+';border:1px solid '+SCB[rr.sc]+'44">'+SW[rr.sc]+'</span>'
+        +'<span class="sc-expand-stat" style="background:var(--dk4);color:var(--sb);border:1px solid var(--bd)">&#128200; '+PCTL[rr.sc]+'</span>'
+        +'</div>'
+        +(action?'<div style="font-size:12px;color:var(--sb);line-height:1.65;padding:9px 12px;background:var(--dk4);border-radius:4px;border-left:2px solid '+SCB[rr.sc]+';margin-bottom:6px">'+action+'</div>':'')
+        +(rr.lg?'<div style="font-size:11px;color:var(--mt);line-height:1.6;padding:8px 10px;background:var(--dk3);border-radius:3px;border:1px solid var(--bd);margin-top:2px">'+rr.lg+'</div>':'')
+        +'</div>'
+        +'</div>';
     }
   }
 
@@ -1549,31 +1667,53 @@ function build(vj,bj,rsi,s5,s10,gps){
   var apeMeta  = getAPELabel(apeScore);
   var apeType  = getAthleteType(vp, hp, rs, ac, mv, gv);
 
-  var apeGlow = apeScore >= 80 ? ';box-shadow:0 0 0 1px '+apeMeta.color+'33,0 4px 24px '+apeMeta.color+'18' : apeScore >= 65 ? ';box-shadow:0 0 0 1px '+apeMeta.color+'22,0 2px 14px '+apeMeta.color+'10' : '';
+  // Position score: average of position-priority metrics, 0–100
+  var posScore = null;
+  if(ctx2 && ctx2.pri && ctx2.pri.length) {
+    var _sm = {vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,gv:gv,ft:ft};
+    var _pm = ctx2.pri.map(function(k){return _sm[k]!=null?_sm[k]:null;}).filter(function(x){return x!==null;});
+    if(_pm.length) posScore = Math.round(_pm.reduce(function(a,b){return a+b;},0)/_pm.length*20);
+  }
+
+  // APE ring: circumference = 2π×54 ≈ 339
+  var _C = 339;
+  var apeGlowStyle = apeScore >= 80
+    ? 'box-shadow:0 0 0 1px '+apeMeta.color+'33,0 6px 28px '+apeMeta.color+'20;'
+    : apeScore >= 65 ? 'box-shadow:0 0 0 1px '+apeMeta.color+'22,0 3px 16px '+apeMeta.color+'12;' : '';
+
   var apeCard = apeScore !== null
-    ? '<div class="card" style="border-top:3px solid '+apeMeta.color+';padding:20px 22px'+apeGlow+'">'
-      + '<div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:14px">'
-      + '<div style="text-align:center;flex-shrink:0;min-width:88px;background:'+apeMeta.color+'0D;border:1px solid '+apeMeta.color+'33;border-radius:8px;padding:12px 14px">'
-      + '<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:'+apeMeta.color+';margin-bottom:4px">APE Score</div>'
-      + '<div style="font-family:Rajdhani,sans-serif;font-size:68px;font-weight:700;color:'+apeMeta.color+';line-height:1">'+apeScore+'</div>'
-      + '<div style="font-size:10px;color:var(--mt);margin-top:2px;letter-spacing:.06em">/ 100</div>'
+    ? '<div class="card" style="border-top:3px solid '+apeMeta.color+';padding:20px 22px;'+apeGlowStyle+'">'
+      + '<div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap;margin-bottom:16px">'
+      // SVG ring
+      + '<div class="ape-ring-wrap">'
+      + '<svg class="ape-ring-svg" width="120" height="120" viewBox="0 0 120 120">'
+      + '<circle class="ape-ring-track" cx="60" cy="60" r="54"/>'
+      + '<circle id="ape-ring-fill" class="ape-ring-fill" cx="60" cy="60" r="54"'
+      + ' stroke="'+apeMeta.color+'" stroke-dasharray="'+_C+'" stroke-dashoffset="'+_C+'"/>'
+      + '</svg>'
+      + '<div class="ape-ring-center">'
+      + '<div class="ape-ring-num" id="ape-ring-num" style="color:'+apeMeta.color+'">0</div>'
+      + '<div class="ape-ring-sub" style="color:'+apeMeta.color+'">APE</div>'
       + '</div>'
+      + '</div>'
+      // Info panel
       + '<div style="flex:1;min-width:140px">'
-      + '<div style="font-family:Rajdhani,sans-serif;font-size:24px;font-weight:700;color:#fff;letter-spacing:.02em;margin-bottom:4px">'+apeMeta.label+'</div>'
-      + '<div style="font-size:13px;color:var(--sb);line-height:1.6;margin-bottom:10px">'+apeMeta.sub+'</div>'
-      + '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'
-      + (apeMeta.pct ? '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:'+apeMeta.color+'18;color:'+apeMeta.color+';border:1px solid '+apeMeta.color+'44;font-weight:600">&#128200; '+apeMeta.pct+' vs '+tl+'</span>' : '')
-      + (apeType ? '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:'+apeType.color+'18;color:'+apeType.color+';border:1px solid '+apeType.color+'44;font-weight:600">'+apeType.label+'</span>' : '')
+      + '<div style="font-family:Rajdhani,sans-serif;font-size:26px;font-weight:700;color:#fff;letter-spacing:.02em;margin-bottom:4px">'+apeMeta.label+'</div>'
+      + '<div style="font-size:13px;color:var(--sb);line-height:1.55;margin-bottom:12px">'+apeMeta.sub+'</div>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:6px">'
+      + (apeMeta.pct ? '<span class="ape-badge" style="background:'+apeMeta.color+'18;color:'+apeMeta.color+';border:1px solid '+apeMeta.color+'44">&#128200; '+apeMeta.pct+' vs '+tl+'</span>' : '')
+      + (apeType ? '<span class="ape-badge" style="background:'+apeType.color+'18;color:'+apeType.color+';border:1px solid '+apeType.color+'44">'+apeType.label+'</span>' : '')
       + '</div>'
-      + (apeType ? '<div style="font-size:12px;color:var(--mt);margin-top:6px;line-height:1.5">'+apeType.desc+'</div>' : '')
+      + (posScore !== null ? '<div style="font-size:11px;color:var(--mt);margin-bottom:5px">Position score: <strong style="color:var(--tx)">'+posScore+'</strong><span style="color:var(--mt)"> / 100 ('+esc(ctx2.pri.map(function(k){return METRIC_NAMES[k]||k;}).join(', '))+')</span></div>' : '')
+      + (apeType ? '<div style="font-size:12px;color:var(--mt);line-height:1.5">'+apeType.desc+'</div>' : '')
       + '</div>'
       + '</div>'
-      + '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--bd)">'
-      + '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(31,158,112,.15);color:#5DCAA5;border:1px solid rgba(31,158,112,.25)">80+ Elite</span>'
-      + '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(93,202,165,.1);color:#5DCAA5;border:1px solid rgba(93,202,165,.2)">65–79 Above Avg</span>'
-      + '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(107,154,42,.12);color:#97C459;border:1px solid rgba(107,154,42,.25)">50–64 Solid</span>'
-      + '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(186,117,23,.15);color:#EF9F27;border:1px solid rgba(186,117,23,.25)">35–49 Developing</span>'
-      + '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(201,59,59,.1);color:#F09595;border:1px solid rgba(201,59,59,.2)">&lt;35 Needs Work</span>'
+      + '<div style="display:flex;gap:5px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--bd)">'
+      + '<span class="ape-range-chip" style="background:rgba(31,158,112,.15);color:#5DCAA5;border:1px solid rgba(31,158,112,.25)">80+ Elite</span>'
+      + '<span class="ape-range-chip" style="background:rgba(93,202,165,.1);color:#5DCAA5;border:1px solid rgba(93,202,165,.2)">65&#8211;79 Above Avg</span>'
+      + '<span class="ape-range-chip" style="background:rgba(107,154,42,.12);color:#97C459;border:1px solid rgba(107,154,42,.25)">50&#8211;64 Solid</span>'
+      + '<span class="ape-range-chip" style="background:rgba(186,117,23,.15);color:#EF9F27;border:1px solid rgba(186,117,23,.25)">35&#8211;49 Developing</span>'
+      + '<span class="ape-range-chip" style="background:rgba(201,59,59,.1);color:#F09595;border:1px solid rgba(201,59,59,.2)">&lt;35 Needs Work</span>'
       + '</div>'
       + '</div>'
     : '';
@@ -1691,6 +1831,24 @@ function build(vj,bj,rsi,s5,s10,gps){
 
   // Render progress chart once the DOM is updated
   setTimeout(function(){ renderProgressChart('vj'); }, 50);
+
+  // Animate APE ring + number counter after DOM update
+  if(apeScore !== null) {
+    setTimeout(function(){
+      var ring=el('ape-ring-fill'), numEl=el('ape-ring-num');
+      if(!ring||!numEl) return;
+      var C=339, target=Math.round(C*(1-apeScore/100)), dur=1100, start=null;
+      function _step(ts){
+        if(!start)start=ts;
+        var p=Math.min((ts-start)/dur,1), e=1-Math.pow(1-p,3);
+        ring.style.strokeDashoffset=Math.round(C-(C-target)*e);
+        numEl.textContent=Math.round(apeScore*e);
+        if(p<1)requestAnimationFrame(_step);
+        else{ring.style.strokeDashoffset=target;numEl.textContent=apeScore;}
+      }
+      requestAnimationFrame(_step);
+    }, 80);
+  }
 }
 
 function pBox(lbl,val){return '<div style="background:var(--dk3);border:1px solid var(--bd);border-radius:4px;padding:8px 10px"><div class="fl" style="margin-bottom:2px">'+lbl+'</div><div style="font-size:13px;color:var(--tx);font-weight:600">'+val+'</div></div>';}
