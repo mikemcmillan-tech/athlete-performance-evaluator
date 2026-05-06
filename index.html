@@ -906,10 +906,11 @@ var SupaDB=(function(){
   var _user=null;
   function uid(){return _user?_user.id:null;}
   function athleteRow(a){
-    return{id:a.id,coach_id:uid(),name:a.name,tier:a.tier,
-      sport:a.sport||null,position:a.position||null,age:a.age||null,
+    return{id:a.id,coach_id:uid(),name:a.name,
+      nk:a.name?a.name.trim().toLowerCase().replace(/\s+/g,' '):null,
+      tier:a.tier||null,sport:a.sport||null,position:a.position||null,age:a.age||null,
       team_id:a.team||null,grad_year:a.gradYear||null,notes:a.notes||null,
-      bodyweight:a.bodyweight||null,height:a.height||null};
+      bodyweight:a.bodyweight||null,training_age:a.trainingAge||null,height:a.height||null};
   }
   function sessRow(s,aid){
     return{id:s.id,coach_id:uid(),athlete_id:aid,
