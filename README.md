@@ -1,42 +1,74 @@
-# athlete-performance-evaluator
-A web-based tool designed to help coaches quickly translate athlete testing data into clear training decisions.
+# APE - Athlete Performance Evaluator
 
-Overview
+APE is a static coach-facing performance evaluation app for turning athlete test data into scores, reports, progress views, exports, and training recommendations.
 
-This tool takes common performance metrics:
-	•	Vertical Jump
-	•	Broad Jump
-	•	RSI (Reactive Strength Index)
-	•	Acceleration (5–10 fly)
-	•	Max Velocity (10–10 fly)
-	•	GPS Max Velocity
+The current production shape is intentionally simple:
 
-And converts them into:
-	•	Athlete profile (Force vs Form deficiency)
-	•	Primary performance limiter
-	•	Training focus
-	•	Simple program structure
+- Static `index.html`
+- Vanilla HTML/CSS/JavaScript
+- Supabase Auth + Postgres sync
+- GitHub Pages hosting today
+- Vercel-ready static deployment path later
 
-Purpose
+## Current Capabilities
 
-The goal is to make the evaluation process:
-	•	Faster
-	•	More actionable
-	•	Easier to apply in real-time training environments
+- Athlete profile creation and editing
+- Team management
+- Evaluation scoring across jump, sprint, RSI, GPS, and force-transfer metrics
+- Raw APE score preservation
+- Position-adjusted score as a separate additive layer
+- Sport-gated position context to avoid ambiguous matches such as football guard vs basketball guard
+- Athlete history and progress graphs
+- Premium-style client reports
+- Suggested program generation
+- Excel exports
+- Coach settings and report branding
+- Supabase email/password auth and coach-scoped data sync
 
-Features
-	•	Clean UI for quick data entry
-	•	Automated scoring system (1–5 scale)
-	•	Deficiency-based classification
-	•	Visual performance breakdown
-	•	Coaching-friendly output
+## Core Files
 
-Future Improvements
-	•	Athlete tracking dashboard
-	•	Program builder integration
-	•	Exportable reports (PDF)
-	•	Movement assessment integration
+- `index.html` - complete static app
+- `BENCHMARK_NOTES.md` - benchmark assumptions, scoring context, and validation roadmap
+- `supabase/migrations/` - Supabase schema migrations
+- `.env.example` - environment variable reference for future build/deploy targets
+- `DEPLOYMENT_CHECKLIST.md` - release checks for GitHub Pages and future Vercel deployment
+- `CHANGELOG.md` - project change history
 
-Author
+## Development
 
-Mike McMillan
+No build step is required.
+
+Open `index.html` directly in a browser, or serve the folder with any static file server when testing CDN scripts, fonts, auth redirects, or deployment behavior.
+
+Suggested sanity checks before committing:
+
+```powershell
+node -e "const fs=require('fs'); const html=fs.readFileSync('index.html','utf8'); const m=html.match(/<script>([\s\S]*?)<\/script>/); if(!m) throw new Error('No inline script'); new Function(m[1]); console.log('inline script parses');"
+git diff --check
+git status --short
+```
+
+## Supabase
+
+The browser app uses the public Supabase anon key. Data isolation must be enforced with Row Level Security policies, not key secrecy.
+
+Important rules:
+
+- Never expose a service role key in the browser.
+- Keep migrations in `supabase/migrations/`.
+- Ensure client upsert fields match migration column names.
+- Run RLS checks before production release.
+
+## Product Direction
+
+APE is moving toward a polished coach SaaS MVP while preserving the existing scoring engine.
+
+Near-term priorities:
+
+- Repo hygiene and deployment readiness
+- Position-aware scoring hardening
+- Premium dashboard and report presentation
+- Coach/Admin workflow polish
+- Future Athlete Viewer and Parent Viewer roles
+
+Athlete and Parent viewers should eventually see progress, reports, graphs, and strengths/weaknesses. They should not see coach notes, programming, or internal scoring logic.

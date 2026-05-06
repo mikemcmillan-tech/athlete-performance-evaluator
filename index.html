@@ -110,7 +110,7 @@ body{font-family:'Barlow',sans-serif;background:var(--dk);color:var(--tx);min-he
 .hint{font-size:11px;color:var(--mt);margin-top:5px;line-height:1.55}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 
-input[type=text],input[type=number],select{
+input[type=text],input[type=email],input[type=password],input[type=number],select{
   width:100%;background:var(--dk3);border:1px solid var(--bd);
   border-radius:var(--radius-sm);color:var(--tx);font-family:'Barlow',sans-serif;
   font-size:14px;padding:10px 14px;outline:none;transition:border-color .2s,box-shadow .2s;
@@ -758,17 +758,46 @@ select option{background:var(--dk3)}
 //   6. Team schema: { id, name, color, created }
 var DB = (function(){
   var K = 'ape_v1';
+  function isUuid(id){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(id||''));}
+  function uid(){
+    if(window.crypto&&window.crypto.randomUUID)return window.crypto.randomUUID();
+    return'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,function(c){
+      var r=Math.random()*16|0,v=c==='x'?r:(r&3|8);return v.toString(16);
+    });
+  }
+  function migrateIds(data){
+    var changed=false,teamMap={};
+    if(!data.t)data.t={};
+    var newTeams={};
+    Object.keys(data.t).forEach(function(oldId){
+      var t=data.t[oldId];if(!t)return;
+      var newId=isUuid(t.id)?t.id:uid();teamMap[oldId]=newId;t.id=newId;
+      newTeams[newId]=t;if(newId!==oldId)changed=true;
+    });
+    data.t=newTeams;
+    var newAthletes={};
+    Object.keys(data.a||{}).forEach(function(oldId){
+      var a=data.a[oldId];if(!a)return;
+      var newId=isUuid(a.id)?a.id:uid();a.id=newId;
+      if(a.team&&teamMap[a.team]){a.team=teamMap[a.team];changed=true;}
+      (a.s||[]).forEach(function(s){if(s&&!isUuid(s.id)){s.id=uid();changed=true;}});
+      newAthletes[newId]=a;if(newId!==oldId)changed=true;
+    });
+    data.a=newAthletes;
+    if(data.v!==3){data.v=3;changed=true;}
+    return changed;
+  }
   // r() auto-migrates v1→v2: adds t:{} for teams on first read
   function r(){
     try{
       var d=localStorage.getItem(K);
       var data=d?JSON.parse(d):{v:2,a:{},t:{}};
       if(!data.t){data.t={};data.v=2;try{localStorage.setItem(K,JSON.stringify(data));}catch(e){}}
+      if(migrateIds(data)){try{localStorage.setItem(K,JSON.stringify(data));}catch(e){}}
       return data;
     }catch(e){return{v:2,a:{},t:{}};}
   }
   function w(d){try{localStorage.setItem(K,JSON.stringify(d));return true;}catch(e){return false;}}
-  function uid(p){return p+'_'+Date.now()+'_'+Math.floor(Math.random()*9999);}
   function nk(s){return s.trim().toLowerCase().replace(/\s+/g,' ');}
   function td(){return new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});}
   function list(d){return Object.keys(d.a).map(function(k){return d.a[k];});}
@@ -797,7 +826,7 @@ var DB = (function(){
       var d=r(),a=d.a[aid];if(!a)return null;
       var s={id:uid('s'),ts:Date.now(),date:td()};
       for(var k in data)if(data.hasOwnProperty(k))s[k]=data[k];
-      a.s.push(s);w(d);return s;
+      a.s.push(s);w(d);_cloudSyncSoon();return s;
     },
     // Update raw + computed values on an existing session (for session editing)
     updateSession: function(aid,sid,updates){
@@ -805,14 +834,14 @@ var DB = (function(){
       for(var i=0;i<a.s.length;i++){
         if(a.s[i].id===sid){
           for(var k in updates)if(updates.hasOwnProperty(k))a.s[i][k]=updates[k];
-          return w(d);
+          var ok=w(d);if(ok)_cloudSyncSoon();return ok;
         }
       }
       return false;
     },
     saveNote: function(aid,sid,note){
       var d=r(),a=d.a[aid];if(!a)return false;
-      for(var i=0;i<a.s.length;i++)if(a.s[i].id===sid){a.s[i].note=note;return w(d);}
+      for(var i=0;i<a.s.length;i++)if(a.s[i].id===sid){a.s[i].note=note;var ok=w(d);if(ok)_cloudSyncSoon();return ok;}
       return false;
     },
     last: function(aid){var a=r().a[aid];if(!a||!a.s.length)return null;return a.s[a.s.length-1];},
@@ -836,7 +865,7 @@ var DB = (function(){
             if(notes)d.a[a.id].notes=notes;
             if(bodyweight)d.a[a.id].bodyweight=bodyweight;
             if(height)d.a[a.id].height=height;
-            w(d);a=d.a[a.id];
+            w(d);a=d.a[a.id];_cloudSyncSoon();
           }
         }
         // Store session — apeScore saved so exports don't need to recompute
@@ -845,8 +874,8 @@ var DB = (function(){
           defType:comp.defType,focus:comp.focus,cnt:comp.cnt,
           apeScore:comp.apeScore,note:''
         });
-        if(s&&typeof _S!=='undefined'){_S.aid=a.id;_S.sid=s.id;}
-        return{a:a,s:s};
+      if(s&&typeof _S!=='undefined'){_S.aid=a.id;_S.sid=s.id;}
+      return{a:a,s:s};
       }catch(e){console.warn('DB.auto:',e);return null;}
     },
     del: function(aid,sid){
@@ -854,6 +883,8 @@ var DB = (function(){
       if(sid){var a=d.a[aid];if(a)a.s=a.s.filter(function(s){return s.id!==sid;});}
       else{delete d.a[aid];}
       w(d);
+      if(sid)_cloudDelete('sessions',sid);
+      else _cloudDelete('athletes',aid);
     },
     updateAthlete: function(aid,name,newTier,sport,position,age,team,gradYear,notes,bodyweight,height){
       var d=r(),a=d.a[aid];if(!a)return false;
@@ -861,7 +892,7 @@ var DB = (function(){
       a.sport=sport||'';a.position=position||'';a.age=age||null;
       a.team=team||'';a.gradYear=gradYear||null;a.notes=notes||'';
       a.bodyweight=bodyweight||null;a.height=height||'';
-      return w(d);
+      var ok=w(d);if(ok)_cloudSyncSoon();return ok;
     },
 
     // ── Teams CRUD ────────────────────────────────────────────────────────────
@@ -873,12 +904,12 @@ var DB = (function(){
       var d=r();if(!d.t)d.t={};
       var id=uid('t');
       d.t[id]={id:id,name:name.trim(),color:color||'#F5881F',created:Date.now()};
-      w(d);return d.t[id];
+      w(d);_cloudSyncSoon();return d.t[id];
     },
     updateTeam: function(tid,name,color){
       var d=r();if(!d.t||!d.t[tid])return false;
       d.t[tid].name=name.trim();if(color)d.t[tid].color=color;
-      return w(d);
+      var ok=w(d);if(ok)_cloudSyncSoon();return ok;
     },
     saveSettings: function(s){try{localStorage.setItem('ape_settings',JSON.stringify(s));}catch(e){}},
     loadSettings: function(){try{var s=localStorage.getItem('ape_settings');return s?JSON.parse(s):{};}catch(e){return{};}},
@@ -887,7 +918,7 @@ var DB = (function(){
       delete d.t[tid];
       // Unassign all athletes from deleted team
       Object.keys(d.a).forEach(function(k){if(d.a[k].team===tid)d.a[k].team='';});
-      w(d);
+      w(d);_cloudDelete('teams',tid);_cloudSyncSoon();
     }
   };
 })();
@@ -900,6 +931,21 @@ function _supaClient(){
   if(!window._sc)window._sc=window.supabase.createClient(SUPA_URL,SUPA_KEY);
   return window._sc;
 }
+function _cloudSyncSoon(){
+  if(typeof SupaDB==='undefined'||!SupaDB.getUser||!SupaDB.getUser())return;
+  clearTimeout(window._cloudSyncTimer);
+  window._cloudSyncTimer=setTimeout(function(){
+    try{SupaDB.syncAll();}catch(e){console.warn('[Supabase] sync failed:',e);}
+  },250);
+}
+function _cloudDelete(table,id){
+  try{
+    if(typeof SupaDB==='undefined'||!SupaDB.getUser||!SupaDB.getUser()||!_supaClient()||!id)return;
+    _supaClient().from(table).delete().eq('id',id).then(function(r){
+      if(r&&r.error)console.warn('[Supabase] delete '+table+' failed:',r.error.message||r.error);
+    });
+  }catch(e){console.warn('[Supabase] delete '+table+' failed:',e);}
+}
 
 // ─── SupaDB — dual-write wrapper ──────────────────────────────────────────────
 var SupaDB=(function(){
@@ -907,6 +953,7 @@ var SupaDB=(function(){
   function uid(){return _user?_user.id:null;}
   function athleteRow(a){
     return{id:a.id,coach_id:uid(),name:a.name,tier:a.tier,
+      nk:(a.nk||a.name||'').trim().toLowerCase().replace(/\s+/g,' '),
       sport:a.sport||null,position:a.position||null,age:a.age||null,
       team_id:a.team||null,grad_year:a.gradYear||null,notes:a.notes||null,
       bodyweight:a.bodyweight||null,height:a.height||null};
@@ -1139,44 +1186,187 @@ var DC=['','#C93B3B','#BA7517','#6B9A2A','#1F9E70','#0F7A54'];
 // Each entry: keys to match (position + sport lowercased), priority metrics,
 // short coach note, and which metric the position lives or dies by.
 var SPORT_CTX=[
-  // Football — skill
-  {keys:['wide receiver','wr','receiver'],   pri:['ac','mv'],       gate:'ac', note:'WR: Speed is the position. Acceleration and max velocity are the only numbers that matter to a scout.'},
-  {keys:['cornerback','corner','cb','safety','db','defensive back'],pri:['ac','mv','rs'],gate:'ac',note:'DB: Mirror-speed position. Acceleration and reactive strength determine whether you can stay on receivers.'},
-  {keys:['running back','rb'],               pri:['ac','vp','ft'],  gate:'ac', note:'RB: Explosive first step into power. Acceleration drives everything, but force transfer closes the gap.'},
-  {keys:['tight end','te'],                  pri:['vp','ac','ft'],  gate:'vp', note:'TE: Power-speed hybrid. Vertical jump and first step are the combo scouts look for.'},
-  {keys:['linebacker','lb'],                 pri:['ac','vp','rs'],  gate:'ac', note:'LB: Sideline-to-sideline speed + physical power. First step quickness and jump scores both matter.'},
-  {keys:['quarterback','qb'],                pri:['ac','rs'],       gate:'ac', note:'QB: Pocket mobility and reactive ability. First-step quickness separates mobile from immobile.'},
-  {keys:['offensive lineman','offensive line','ol','guard','tackle','center','ot','og'], pri:['vp','hp'],gate:'vp',note:'OL: Power is the job. Vertical and broad jump scores predict your ability to move defenders — higher is faster.'},
-  {keys:['defensive lineman','defensive end','dl','de','dt','edge'],pri:['vp','ac','rs'],gate:'ac',note:'DL/Edge: First step and explosive power. Get-off speed is the most valuable thing a D-lineman has.'},
-  // Soccer
-  {keys:['forward','striker','winger','attacker'],pri:['ac','mv','ft'],gate:'ac',note:'Forward/Winger: Explosive speed and force transfer for goal-scoring runs. Acceleration is your weapon.'},
-  {keys:['midfielder','mid','cm','cdm','box-to-box'],pri:['mv','rs','gps'],gate:'gps',note:'Midfielder: Max velocity and GPS speed over repeated sprints. This is the most physically demanding position on the pitch.'},
-  {keys:['defender','centre back','center back','fullback','full back'],pri:['ac','rs'],gate:'ac',note:'Defender: Recovery speed is everything. First-step quickness and reactive strength determine whether you get beaten.'},
-  {keys:['goalkeeper','keeper','gk'],         pri:['vp','rs'],       gate:'vp', note:'Goalkeeper: Explosive lateral power and reactive strength for saves. Jump scores directly translate to shot-stopping.'},
-  // Basketball
-  {keys:['point guard','pg'],                 pri:['ac','ft','rs'],  gate:'ac', note:'PG: First-step quickness and change-of-direction speed. Force transfer from power into movement is the key quality.'},
-  {keys:['shooting guard','sg'],              pri:['ac','mv','ft'],  gate:'ac', note:'SG: Speed off the catch and explosiveness off the dribble. Acceleration and max velocity.'},
-  {keys:['small forward','sf'],               pri:['vp','ac','ft'],  gate:'ac', note:'SF: The athletic swing position. Power and speed both matter equally — you need both sides of the profile.'},
-  {keys:['power forward','pf'],               pri:['vp','hp','rs'],  gate:'vp', note:'PF: Power production and reactive ability. Jump scores and RSI directly translate to rebounding and shot-blocking.'},
-  {keys:['center','big man'],                 pri:['vp','hp'],       gate:'vp', note:'Center: Raw power and force production. Vertical and broad jump predict your ability to create and finish around the rim.'},
-  // Track
-  {keys:['sprinter','100m','200m','400m'],    pri:['ac','mv'],       gate:'mv', note:'Sprinter: Pure speed. Acceleration through max velocity — every tenth of a second is a place finish.'},
-  {keys:['jumper','long jump','triple jump','high jump'],pri:['vp','hp','rs'],gate:'vp',note:'Jumper: Power and reactive strength drive competition performance. Jump scores and RSI are your competition predictors.'},
-  {keys:['thrower','shot put','discus','javelin','hammer'],pri:['vp','hp'],gate:'vp',note:'Thrower: Rotational and linear power. Broad and vertical jump scores predict implement velocity.'},
-  // Baseball / Softball
-  {keys:['outfielder','center field','cf','rf','lf'],pri:['ac','mv'],gate:'ac',note:'Outfielder: Route running speed and first-step quickness to cover gaps.'},
-  {keys:['shortstop','second base','infielder','ss','2b'],pri:['ac','rs'],gate:'ac',note:'Infielder: Quick-twitch first step and reactive ability for range.'},
-  {keys:['pitcher'],                          pri:['vp','hp'],       gate:'vp', note:'Pitcher: Lower-body power drives mound velocity. Jump scores are the best predictor of fastball speed available without a radar gun.'},
-  {keys:['catcher'],                          pri:['rs','ac'],       gate:'rs', note:'Catcher: Reactive strength and short-area quickness for blocks and throws.'},
+  // ── Football ──
+  {sport:'football',keys:['wide receiver','wr','receiver'],           pri:['ac','mv'],      gate:'ac', note:'WR: Speed is the position. Acceleration and max velocity are the only numbers that matter to a scout.'},
+  {sport:'football',keys:['cornerback','corner','cb','safety','db','defensive back','fs','ss'], pri:['ac','mv','rs'],gate:'ac',note:'DB: Mirror-speed position. Acceleration and reactive strength determine whether you can stay on receivers.'},
+  {sport:'football',keys:['running back','rb'],                        pri:['ac','vp','ft'], gate:'ac', note:'RB: Explosive first step into power. Acceleration drives everything, but force transfer closes the gap.'},
+  {sport:'football',keys:['tight end','te'],                           pri:['vp','ac','ft'], gate:'vp', note:'TE: Power-speed hybrid. Vertical jump and first step are the combo scouts look for.'},
+  {sport:'football',keys:['linebacker','lb'],                          pri:['ac','vp','rs'], gate:'ac', note:'LB: Sideline-to-sideline speed + physical power. First step quickness and jump scores both matter.'},
+  {sport:'football',keys:['quarterback','qb'],                         pri:['ac','rs'],      gate:'ac', note:'QB: Pocket mobility and reactive ability. First-step quickness separates mobile from immobile.'},
+  {sport:'football',keys:['offensive lineman','offensive line','ol','offensive guard','offensive tackle','ot','og','center'],pri:['vp','hp'],gate:'vp',note:'OL: Power is the job. Vertical and broad jump scores predict your ability to move defenders — higher is faster.'},
+  {sport:'football',keys:['defensive lineman','defensive end','defensive tackle','dl','de','dt','edge'],pri:['vp','ac','rs'],gate:'ac',note:'DL/Edge: First step and explosive power. Get-off speed is the most valuable thing a D-lineman has.'},
+  // ── Soccer ──
+  {sport:'soccer',  keys:['forward','striker','winger','attacker'],    pri:['ac','mv','ft'], gate:'ac', note:'Forward/Winger: Explosive speed and force transfer for goal-scoring runs. Acceleration is your weapon.'},
+  {sport:'soccer',  keys:['midfielder','mid','cm','cdm','box-to-box'], pri:['mv','rs','gps'],gate:'gps',note:'Midfielder: Max velocity and GPS speed over repeated sprints. This is the most physically demanding position on the pitch.'},
+  {sport:'soccer',  keys:['defender','centre back','center back','fullback','full back'],pri:['ac','rs'],gate:'ac',note:'Defender: Recovery speed is everything. First-step quickness and reactive strength determine whether you get beaten.'},
+  {sport:'soccer',  keys:['goalkeeper','keeper','gk'],                 pri:['vp','rs'],      gate:'vp', note:'Goalkeeper: Explosive lateral power and reactive strength for saves. Jump scores directly translate to shot-stopping.'},
+  // ── Basketball ──
+  {sport:'basketball',keys:['point guard','pg'],                       pri:['ac','ft','rs'], gate:'ac', note:'PG: First-step quickness and change-of-direction speed. Force transfer from power into movement is the key quality.'},
+  {sport:'basketball',keys:['shooting guard','sg','two guard'],        pri:['ac','mv','ft'], gate:'ac', note:'SG: Speed and explosiveness off the dribble. Acceleration and max velocity.'},
+  {sport:'basketball',keys:['small forward','sf','wing'],              pri:['vp','ac','ft'], gate:'ac', note:'SF: The athletic swing position. Power and speed both matter equally — you need both sides of the profile.'},
+  {sport:'basketball',keys:['power forward','pf','stretch four'],      pri:['vp','hp','rs'], gate:'vp', note:'PF: Power production and reactive ability. Jump scores and RSI directly translate to rebounding and shot-blocking.'},
+  {sport:'basketball',keys:['center','big man','five'],                pri:['vp','hp'],      gate:'vp', note:'Center: Raw power and force production. Vertical and broad jump predict your ability to create and finish around the rim.'},
+  // ── Track & Field ──
+  {sport:'track',   keys:['sprinter','100m','200m','400m','sprint'],   pri:['ac','mv'],      gate:'mv', note:'Sprinter: Pure speed. Acceleration through max velocity — every tenth of a second is a place finish.'},
+  {sport:'track',   keys:['jumper','long jump','triple jump','high jump','pole vault'],pri:['vp','hp','rs'],gate:'vp',note:'Jumper: Power and reactive strength drive competition performance. Jump scores and RSI are your competition predictors.'},
+  {sport:'track',   keys:['thrower','shot put','discus','javelin','hammer'],pri:['vp','hp'], gate:'vp', note:'Thrower: Rotational and linear power. Broad and vertical jump scores predict implement velocity.'},
+  // ── Baseball / Softball ──
+  {sport:'baseball',keys:['outfielder','center field','cf','rf','lf','outfield'],pri:['ac','mv'],gate:'ac',note:'Outfielder: Route running speed and first-step quickness to cover gaps.'},
+  {sport:'baseball',keys:['shortstop','second base','infielder','ss','2b','third base','3b'],pri:['ac','rs'],gate:'ac',note:'Infielder: Quick-twitch first step and reactive ability for range.'},
+  {sport:'baseball',keys:['pitcher','starting pitcher','relief pitcher','sp','rp'],pri:['vp','hp'],gate:'vp',note:'Pitcher: Lower-body power drives mound velocity. Jump scores are the best predictor of fastball speed available without a radar gun.'},
+  {sport:'baseball',keys:['catcher','backstop'],                       pri:['rs','ac'],      gate:'rs', note:'Catcher: Reactive strength and short-area quickness for blocks and throws.'},
 ];
+// getSportCtx — sport-gated position matching.
+// Determines sport first from the sport argument, then only matches SPORT_CTX entries
+// for that sport. Prevents cross-sport substring collisions (basketball 'guard' != OL 'guard').
 function getSportCtx(sport,pos){
-  var q=((pos||'')+' '+(sport||'')).toLowerCase().trim();
-  if(!q)return null;
+  var s=(sport||'').toLowerCase().trim();
+  var p=(pos||'').toLowerCase().trim();
+  if(!p&&!s)return null;
+  // Resolve sport tag
+  var sportTag=null;
+  if(/football/.test(s))sportTag='football';
+  else if(/soccer/.test(s))sportTag='soccer';
+  else if(/basketball/.test(s))sportTag='basketball';
+  else if(/track|field/.test(s))sportTag='track';
+  else if(/baseball|softball/.test(s))sportTag='baseball';
+  // Phase 1: sport-gated — only search entries belonging to resolved sport
+  if(sportTag){
+    for(var i=0;i<SPORT_CTX.length;i++){
+      var sc=SPORT_CTX[i];
+      if(sc.sport!==sportTag)continue;
+      for(var j=0;j<sc.keys.length;j++){
+        if(p===sc.keys[j]||p.indexOf(sc.keys[j])!==-1||sc.keys[j].indexOf(p)!==-1)return sc;
+      }
+    }
+    return null; // known sport but no position match
+  }
+  // Phase 2: unknown sport — full query string match (less precise, avoids false positives)
+  var q=(p+' '+s).trim();
   for(var i=0;i<SPORT_CTX.length;i++){
-    var sc=SPORT_CTX[i];
-    for(var j=0;j<sc.keys.length;j++){if(q.indexOf(sc.keys[j])!==-1)return sc;}
+    var sc2=SPORT_CTX[i];
+    for(var j=0;j<sc2.keys.length;j++){
+      if(q.indexOf(sc2.keys[j])!==-1)return sc2;
+    }
   }
   return null;
+}
+
+// ─── POSITION-AWARE SCORING LAYER ─────────────────────────────────────────────
+// POS_GROUPS: 6 athletic archetypes with position-specific metric weights.
+// Weights are multiplied against raw 1-5 scores when computing adjusted APE.
+// Raw scores and raw APE are never modified — adjusted score is additive.
+var POS_GROUPS={
+  SPEED_SKILL:   {label:'Speed-Skill',   desc:'Speed is the primary position quality',      wt:{ac:1.8,mv:1.8,ft:1.4,vp:1.1,hp:1.1,rs:1.0,gps:1.3}},
+  POWER_SPEED:   {label:'Power-Speed',   desc:'Power and speed are equally weighted',        wt:{ac:1.5,mv:1.3,vp:1.5,hp:1.4,ft:1.3,rs:1.1,gps:1.1}},
+  POWER_DOM:     {label:'Power',         desc:'Force production is the primary quality',     wt:{vp:1.8,hp:1.8,rs:1.3,ft:1.2,ac:1.0,mv:0.8,gps:0.8}},
+  REACTIVE:      {label:'Reactive',      desc:'Reactive strength and short-area quickness',  wt:{rs:1.8,ac:1.6,ft:1.3,vp:1.2,hp:1.1,mv:1.0,gps:1.0}},
+  ENDURANCE_SPD: {label:'Endurance-Speed',desc:'Repeated sprint ability and GPS output',    wt:{gps:1.8,mv:1.5,rs:1.4,ac:1.3,ft:1.1,vp:1.0,hp:1.0}},
+  GENERAL:       {label:'General',       desc:'Balanced athletic profile',                   wt:{ac:1.3,vp:1.3,hp:1.2,rs:1.1,mv:1.2,ft:1.1,gps:1.1}}
+};
+// POSITION_MAP: maps sport → position keyword → POS_GROUP key.
+// Sport-first structure prevents cross-sport collisions.
+var POSITION_MAP={
+  football:{
+    'wr':'SPEED_SKILL','wide receiver':'SPEED_SKILL','receiver':'SPEED_SKILL',
+    'db':'SPEED_SKILL','cb':'SPEED_SKILL','cornerback':'SPEED_SKILL','corner':'SPEED_SKILL',
+    'safety':'SPEED_SKILL','fs':'SPEED_SKILL','ss':'SPEED_SKILL','defensive back':'SPEED_SKILL',
+    'rb':'POWER_SPEED','running back':'POWER_SPEED',
+    'te':'POWER_SPEED','tight end':'POWER_SPEED',
+    'lb':'POWER_SPEED','linebacker':'POWER_SPEED',
+    'de':'POWER_SPEED','defensive end':'POWER_SPEED','edge':'POWER_SPEED',
+    'qb':'REACTIVE','quarterback':'REACTIVE',
+    'ol':'POWER_DOM','ot':'POWER_DOM','og':'POWER_DOM',
+    'offensive lineman':'POWER_DOM','offensive line':'POWER_DOM',
+    'offensive guard':'POWER_DOM','offensive tackle':'POWER_DOM',
+    'center':'POWER_DOM','dt':'POWER_DOM','defensive tackle':'POWER_DOM',
+    'dl':'POWER_DOM','defensive lineman':'POWER_DOM'
+  },
+  soccer:{
+    'forward':'SPEED_SKILL','striker':'SPEED_SKILL','winger':'SPEED_SKILL','attacker':'SPEED_SKILL',
+    'midfielder':'ENDURANCE_SPD','mid':'ENDURANCE_SPD','cm':'ENDURANCE_SPD','cdm':'ENDURANCE_SPD',
+    'defender':'REACTIVE','cb':'REACTIVE','centre back':'REACTIVE','center back':'REACTIVE',
+    'fullback':'REACTIVE','full back':'REACTIVE',
+    'goalkeeper':'REACTIVE','gk':'REACTIVE','keeper':'REACTIVE'
+  },
+  basketball:{
+    'pg':'REACTIVE','point guard':'REACTIVE',
+    'sg':'SPEED_SKILL','shooting guard':'SPEED_SKILL','two guard':'SPEED_SKILL',
+    'guard':'REACTIVE',
+    'sf':'POWER_SPEED','small forward':'POWER_SPEED','wing':'POWER_SPEED',
+    'pf':'POWER_DOM','power forward':'POWER_DOM',
+    'center':'POWER_DOM','big man':'POWER_DOM','five':'POWER_DOM',
+    'forward':'POWER_SPEED'
+  },
+  track:{
+    'sprinter':'SPEED_SKILL','sprint':'SPEED_SKILL','100m':'SPEED_SKILL','200m':'SPEED_SKILL','400m':'SPEED_SKILL',
+    'jumper':'POWER_SPEED','long jump':'POWER_SPEED','triple jump':'POWER_SPEED','high jump':'POWER_SPEED',
+    'thrower':'POWER_DOM','shot put':'POWER_DOM','discus':'POWER_DOM','javelin':'POWER_DOM','hammer':'POWER_DOM'
+  },
+  baseball:{
+    'outfield':'SPEED_SKILL','outfielder':'SPEED_SKILL','cf':'SPEED_SKILL','rf':'SPEED_SKILL','lf':'SPEED_SKILL',
+    'shortstop':'REACTIVE','ss':'REACTIVE','infield':'REACTIVE','infielder':'REACTIVE','2b':'REACTIVE','3b':'REACTIVE',
+    'pitcher':'POWER_DOM','catcher':'REACTIVE'
+  }
+};
+// resolvePosGroup(sport, pos) → POS_GROUP key or null.
+// Sport-first: determines sport category, then looks up position within that sport's map.
+// Falls back to scanning all sports if sport is unknown.
+function resolvePosGroup(sport,pos){
+  var s=(sport||'').toLowerCase().trim();
+  var p=(pos||'').toLowerCase().trim();
+  if(!p)return null;
+  var sportTag=null;
+  if(/football/.test(s))sportTag='football';
+  else if(/soccer/.test(s))sportTag='soccer';
+  else if(/basketball/.test(s))sportTag='basketball';
+  else if(/track|field/.test(s))sportTag='track';
+  else if(/baseball|softball/.test(s))sportTag='baseball';
+  if(sportTag){
+    var sm=POSITION_MAP[sportTag];
+    if(!sm)return null;
+    // Exact match first
+    if(sm[p])return sm[p];
+    // Substring match within sport map
+    for(var key in sm){
+      if(sm.hasOwnProperty(key)&&(p.indexOf(key)!==-1||key.indexOf(p)!==-1))return sm[key];
+    }
+    return null;
+  }
+  // Unknown sport — scan all maps
+  for(var sp in POSITION_MAP){
+    if(!POSITION_MAP.hasOwnProperty(sp))continue;
+    var m=POSITION_MAP[sp];
+    if(m[p])return m[p];
+    for(var k in m){if(m.hasOwnProperty(k)&&(p.indexOf(k)!==-1||k.indexOf(p)!==-1))return m[k];}
+  }
+  return null;
+}
+// computeAdjustedScores(rawScores, posGroupKey) → {ape, groupKey, groupMeta, topMetrics}
+// Applies position-specific weights to raw 1-5 scores to compute an adjusted APE.
+// Raw scores are unchanged. Adjusted APE reflects what matters most for the position.
+function computeAdjustedScores(rawScores,posGroupKey){
+  if(!posGroupKey||!POS_GROUPS[posGroupKey])return null;
+  var pg=POS_GROUPS[posGroupKey];
+  var wt=pg.wt;
+  var total=0,weightSum=0;
+  var metricWeights=[];
+  var keyMap={vp:'vp',hp:'hp',rs:'rs',ac:'ac',mv:'mv',gps:'gps',gv:'gps',ft:'ft'};
+  for(var k in rawScores){
+    if(!rawScores.hasOwnProperty(k))continue;
+    var v=rawScores[k];
+    if(v===null||v===undefined||isNaN(v))continue;
+    var wKey=keyMap[k]||k;
+    var w=wt[wKey]||1.0;
+    total+=v*w;
+    weightSum+=w;
+    metricWeights.push({key:wKey,score:v,weight:w});
+  }
+  if(!weightSum)return null;
+  var adjAPE=Math.round((total/weightSum)*20);
+  // Sort by weight descending to show what this position cares most about
+  metricWeights.sort(function(a,b){return b.weight-a.weight;});
+  return{ape:adjAPE,groupKey:posGroupKey,groupMeta:pg,topMetrics:metricWeights};
 }
 // Returns priority label for a metric key
 var METRIC_NAMES={vp:'Vertical Power',hp:'Horizontal Power',rs:'Reactive Strength',ac:'Acceleration',mv:'Max Velocity',gps:'GPS Speed',gv:'GPS Speed',ft:'Force Transfer'};
@@ -1597,6 +1787,61 @@ function build(vj,bj,rsi,s5,s10,gps){
       + insightHTML + '</div>';
   }
 
+
+  // ── Position-Adjusted companion card ────────────────────────────────────────
+  var _posCard='';
+  if(_adjResult){
+    var _pg=_adjResult.groupMeta;
+    var _adjMeta=getAPELabel(_adjResult.ape);
+    var _rawMeta=getAPELabel(apeScore);
+    var _diff=_adjResult.ape-apeScore;
+    var _diffStr=_diff>0?'+'+_diff:String(_diff);
+    var _diffColor=_diff>2?'var(--s4b)':_diff<-2?'var(--s1b)':'var(--mt)';
+    _posCard+='<div class="card" style="border-left:3px solid var(--sb)">';
+    _posCard+='<div class="card-title" style="color:var(--sb)">&#9671; Position-Adjusted Score';
+    _posCard+='<span style="font-size:9px;font-weight:500;color:var(--mt);text-transform:none;letter-spacing:0;margin-left:8px">Raw score unchanged — weights shifted for position</span></div>';
+    // Group + score row
+    _posCard+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:14px">';
+    _posCard+='<div>';
+    _posCard+='<div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sb);margin-bottom:3px">Group: '+esc(_pg.label)+'</div>';
+    _posCard+='<div style="font-size:12px;color:var(--mt);line-height:1.5">'+esc(_pg.desc)+'</div>';
+    _posCard+='</div>';
+    _posCard+='<div style="display:flex;gap:18px;align-items:center;flex-shrink:0">';
+    _posCard+='<div style="text-align:center">';
+    _posCard+='<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mt);margin-bottom:2px">Raw APE</div>';
+    _posCard+='<div style="font-family:Rajdhani,sans-serif;font-size:28px;font-weight:700;color:'+(_rawMeta?_rawMeta.color:'var(--tx)')+'">'+apeScore+'</div>';
+    _posCard+='</div>';
+    _posCard+='<div style="font-size:20px;color:var(--mt)">&#8594;</div>';
+    _posCard+='<div style="text-align:center">';
+    _posCard+='<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sb);margin-bottom:2px">Pos-Adjusted</div>';
+    _posCard+='<div style="font-family:Rajdhani,sans-serif;font-size:28px;font-weight:700;color:'+_adjMeta.color+'">'+_adjResult.ape+'</div>';
+    _posCard+='<div style="font-size:10px;font-weight:700;color:'+_diffColor+'">'+_diffStr+' pts</div>';
+    _posCard+='</div>';
+    _posCard+='</div>';
+    _posCard+='</div>';
+    // Weight breakdown — top 4 metrics
+    var _topN=Math.min(4,_adjResult.topMetrics.length);
+    _posCard+='<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mt);margin-bottom:8px">Weight Distribution for This Position</div>';
+    _posCard+='<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:12px">';
+    var _maxW=_adjResult.topMetrics.length?_adjResult.topMetrics[0].weight:1.8;
+    for(var _wi=0;_wi<_adjResult.topMetrics.length;_wi++){
+      var _wm=_adjResult.topMetrics[_wi];
+      var _wPct=Math.round((_wm.weight/_maxW)*100);
+      var _wCol=_wm.weight>=1.5?'var(--or)':_wm.weight>=1.2?'var(--sb)':'var(--mt)';
+      _posCard+='<div style="display:flex;align-items:center;gap:8px">';
+      _posCard+='<div style="font-size:11px;color:var(--tx);width:130px;flex-shrink:0">'+esc(METRIC_NAMES[_wm.key]||_wm.key)+'</div>';
+      _posCard+='<div style="flex:1;height:4px;background:var(--dk4);border-radius:2px"><div style="width:'+_wPct+'%;height:4px;background:'+_wCol+';border-radius:2px"></div></div>';
+      _posCard+='<div style="font-size:10px;font-weight:700;color:'+_wCol+';width:32px;text-align:right;flex-shrink:0">'+_wm.weight.toFixed(1)+'&times;</div>';
+      _posCard+='<div style="font-size:11px;color:var(--mt);width:14px;text-align:right;flex-shrink:0">'+(_wm.score!=null?_wm.score:'—')+'</div>';
+      _posCard+='</div>';
+    }
+    _posCard+='</div>';
+    _posCard+='<div style="font-size:11px;color:var(--mt);line-height:1.55;padding:8px 10px;background:var(--dk3);border-radius:4px">';
+    _posCard+='Raw APE uses universal weights across all positions. This score re-weights the same raw numbers to reflect what actually matters for '+esc(position||'this position')+'. The raw score on your report is unchanged.';
+    _posCard+='</div>';
+    _posCard+='</div>';
+  }
+
   el('rc').innerHTML=
     '<div class="conf"><span class="conf-lbl">Data Confidence</span><div class="conf-dots">'+dots+'</div><span class="conf-txt">'+cLvl+' · '+cnt+'/6 metrics</span></div>'
     + apeCard
@@ -1621,6 +1866,7 @@ function build(vj,bj,rsi,s5,s10,gps){
     +'<div class="sw-c w"><div class="sw-t" style="display:flex;align-items:center;justify-content:space-between">&#9660; Priority Areas'+(wks.length?'<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:10px;background:rgba(201,59,59,.2);color:#F09595">'+wks.length+'</span>':'')+'</div>'+wkH+'</div>'
     +'</div>'
     +'<div class="card"><div class="card-title">Performance Scores — '+tl+' Benchmarks</div>'+scH+'</div>'
+    +_posCard
     +'<div class="card" style="border-top:2px solid var(--or)"><div class="card-title">Deficiency Profile</div>'
       +'<div style="background:var(--dk3);border:1px solid var(--bd);border-radius:6px;padding:14px 16px">'
         +'<div class="fl" style="margin-bottom:4px">'+dLab+'</div>'
@@ -1678,6 +1924,9 @@ function build(vj,bj,rsi,s5,s10,gps){
     +'</div>';
 
   _S={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,ft:ft,tier:tier,name:name,sport:sport,position:position,age:age,team:team,gradYear:gradYear,notes:notes,bodyweight:bodyweight,height:height,defType:dT,defLabel:dLab,defLimiter:dLim,defExplain:dExp,rawVJ:vj,rawBJ:bj,rawRSI:rsi,rawF5:s5,rawF10:s10};
+  // Position-aware adjusted score — computed once here, used in companion card
+  var _posGroupKey=resolvePosGroup(sport,position);
+  var _adjResult=computeAdjustedScores({vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gv,ft:ft},_posGroupKey);
 
   DB.auto(name,tier,
     {vj:vj,bj:bj,rsi:rsi,f5:s5,f10:s10,gps:gps},
@@ -2671,6 +2920,9 @@ function buildReport(S){
 
   // Sport context
   var ctx=getSportCtx(S.sport,S.position);
+  // Position-adjusted score (additive — raw never modified)
+  var posGroupKey=resolvePosGroup(S.sport,S.position);
+  var adjResult=apeScore!=null?computeAdjustedScores({vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,gps:gps,ft:ft},posGroupKey):null;
 
   // Deficiency language
   var dh,de,fp,fs,tm;
@@ -2748,6 +3000,47 @@ function buildReport(S){
       +'</div>';
   }
 
+  // ── Position-Adjusted Score section ────────────────────────────────────────
+  if(adjResult&&apeScore!=null){
+    var adjMeta=getAPELabel(adjResult.ape);
+    var rawMeta=getAPELabel(apeScore);
+    var diff=adjResult.ape-apeScore;
+    var diffStr=diff>0?'+'+diff:String(diff);
+    var diffCol=diff>2?'#1F9E70':diff<-2?'#C93B3B':'#888';
+    var pg2=adjResult.groupMeta;
+    o+='<div style="padding:18px 28px;border-bottom:1px solid #E8E8E8;background:#F7FAFF">';
+    o+='<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#3A7BD5;margin-bottom:10px">Position-Adjusted Score</div>';
+    // Score comparison row
+    o+='<div style="display:flex;align-items:center;gap:0;margin-bottom:14px;flex-wrap:wrap;gap:12px">';
+    // Raw APE block
+    o+='<div style="text-align:center;padding:12px 18px;background:#fff;border:1px solid #E0E8F4;border-radius:5px">';
+    o+='<div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#999;margin-bottom:3px">Raw APE</div>';
+    o+='<div style="font-family:Rajdhani,sans-serif;font-size:42px;font-weight:700;color:'+(rawMeta?rawMeta.color:'#111')+';line-height:1">'+Math.round(apeScore)+'</div>';
+    o+='<div style="font-size:10px;color:#999;margin-top:2px">'+(rawMeta?rawMeta.label:'')+'</div>';
+    o+='</div>';
+    // Arrow
+    o+='<div style="font-size:20px;color:#BCC;padding:0 6px">&#8594;</div>';
+    // Adjusted APE block
+    o+='<div style="text-align:center;padding:12px 18px;background:#fff;border:1px solid #3A7BD533;border-radius:5px;border-left:3px solid #3A7BD5">';
+    o+='<div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#3A7BD5;margin-bottom:3px">'+esc(pg2.label)+' Adjusted</div>';
+    o+='<div style="font-family:Rajdhani,sans-serif;font-size:42px;font-weight:700;color:'+adjMeta.color+';line-height:1">'+adjResult.ape+'</div>';
+    o+='<div style="font-size:11px;font-weight:700;color:'+diffCol+';margin-top:2px">'+diffStr+' vs raw</div>';
+    o+='</div>';
+    // Group desc
+    o+='<div style="flex:1;min-width:160px;padding:12px 14px;background:#fff;border:1px solid #E0E8F4;border-radius:5px">';
+    o+='<div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#3A7BD5;margin-bottom:4px">Position Group</div>';
+    o+='<div style="font-size:13px;font-weight:700;color:#222;margin-bottom:3px">'+esc(pg2.label)+'</div>';
+    o+='<div style="font-size:11px;color:#666;line-height:1.5">'+esc(pg2.desc)+'</div>';
+    o+='</div>';
+    o+='</div>';
+    // Explanation line
+    o+='<div style="font-size:12px;color:#666;line-height:1.6;padding:10px 12px;background:#fff;border-radius:4px;border-left:3px solid #3A7BD544">';
+    o+='The raw APE score uses the same weights for every athlete. The position-adjusted score re-weights the same test results to reflect what matters most for ';
+    o+=esc(S.position||'this position')+'. Both scores come from the same data — no new tests required.';
+    o+='</div>';
+    o+='</div>';
+  }
+
   // ── Performance scores ──────────────────────────────────────────────────
   o+='<div style="padding:22px 28px 10px">'
     +'<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#999;margin-bottom:14px;padding-bottom:8px;border-bottom:2px solid #EEEEEE">Performance Scores — '+tl+' Benchmarks</div>';
@@ -2813,6 +3106,54 @@ function buildReport(S){
       +'</div></div>'
       +(tm?'<div style="font-size:13px;color:#444;line-height:1.7;padding:13px 15px;background:#F8F8F8;border-radius:4px;border-left:3px solid '+or+'">'+esc(tm)+'</div>':'')
       +'</div>';
+  }
+
+  // ── Training priorities (position-weighted gap analysis) ───────────────────
+  if(adjResult&&adjResult.topMetrics&&adjResult.topMetrics.length){
+    // Build priority list: weight × (5 - score) = urgency. Higher = train this first.
+    var trainPri=[];
+    var metLabelMap={vp:'Vertical Power',hp:'Horizontal Power',rs:'Reactive Strength',ac:'Acceleration',mv:'Max Velocity',gps:'GPS Speed',ft:'Force Transfer'};
+    var metCatMap={vp:'Vertical Jump',hp:'Broad Jump',rs:'RSI',ac:'5–10 Fly',mv:'10–10 Fly',gps:'GPS Max Vel',ft:'Derived'};
+    for(var tp=0;tp<adjResult.topMetrics.length;tp++){
+      var tm2=adjResult.topMetrics[tp];
+      if(tm2.score===null||tm2.score===undefined)continue;
+      var gap=5-tm2.score;
+      var urgency=tm2.weight*gap;
+      trainPri.push({key:tm2.key,score:tm2.score,weight:tm2.weight,urgency:urgency,
+        label:metLabelMap[tm2.key]||tm2.key,cat:metCatMap[tm2.key]||''});
+    }
+    trainPri.sort(function(a,b){return b.urgency-a.urgency;});
+    var topPri=trainPri.slice(0,3);
+    if(topPri.length){
+      var priColors=['#C93B3B','#BA7517','#1F9E70'];
+      var priRank=['1st Priority','2nd Priority','3rd Priority'];
+      o+='<div style="padding:18px 28px 22px;border-top:1px solid #EEE">';
+      o+='<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#999;margin-bottom:4px;padding-bottom:8px;border-bottom:1px solid #EEE">Training Priorities — '+esc((adjResult.groupMeta.label||'Position'))+' Profile</div>';
+      o+='<div style="font-size:12px;color:#666;margin-bottom:12px;line-height:1.5">Ranked by position weight × score gap. High weight + low score = train this first.</div>';
+      o+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">';
+      for(var pi=0;pi<topPri.length;pi++){
+        var pr=topPri[pi];
+        var pc=priColors[pi]||'#888';
+        var sc2=pr.score;
+        var lbl2=CLB[sc2]||'';
+        var col2=lc(sc2);
+        var insight=metricInsight(pr.key,sc2,null);
+        o+='<div style="padding:13px 14px;background:#FAFAFA;border:1px solid #E8E8E8;border-radius:5px;border-top:3px solid '+pc+'">';
+        o+='<div style="font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:'+pc+';margin-bottom:4px">'+priRank[pi]+'</div>';
+        o+='<div style="font-size:13px;font-weight:700;color:#222;margin-bottom:2px">'+esc(pr.label)+'</div>';
+        o+='<div style="font-size:10px;color:#999;margin-bottom:8px">'+esc(pr.cat)+'</div>';
+        o+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+        o+='<span style="font-size:13px;font-weight:700;color:'+col2+'">'+lbl2+'</span>';
+        o+='<span style="font-size:11px;color:#999">'+sc2+'/5 &nbsp;·&nbsp; '+pr.weight.toFixed(1)+'× wt</span>';
+        o+='</div>';
+        if(insight){
+          o+='<div style="font-size:11px;color:#555;line-height:1.55;border-top:1px solid #EEE;padding-top:8px">'+esc(insight)+'</div>';
+        }
+        o+='</div>';
+      }
+      o+='</div>';
+      o+='</div>';
+    }
   }
 
   // ── Footer ───────────────────────────────────────────────────────────────
@@ -3948,4 +4289,11 @@ goDash();
     <div class="field"><label>Tagline <span style="font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--mt)">(optional)</span></label><input type="text" id="set-tagline" placeholder="e.g. Train Smart. Perform Better." autocomplete="off"></div>
     <div class="field"><label>Contact / Website <span style="font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--mt)">(optional)</span></label><input type="text" id="set-contact" placeholder="e.g. newathlete.com" autocomplete="off"></div>
     <div style="display:flex;gap:10px;margin-top:6px">
-      <button class="btn-p" style="flex:1" onclick="saveSettings()">&#10003; Save Setting
+      <button class="btn-p" style="flex:1" onclick="saveSettings()">&#10003; Save Settings</button>
+      <button class="btn-s" style="flex:none" onclick="closeSettings()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
