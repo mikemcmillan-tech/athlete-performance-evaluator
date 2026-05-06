@@ -29,6 +29,92 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Barlow',sans-serif;background:var(--dk);color:var(--tx);min-height:100vh;line-height:1.6;font-size:15px;-webkit-font-smoothing:antialiased}
 
+/* Landing / Login */
+.app-shell{display:none}
+.app-shell.active{display:block;animation:fu .24s ease}
+.landing-screen{
+  min-height:100vh;position:relative;overflow:hidden;display:none;padding:28px;
+  background:
+    radial-gradient(circle at 18% 16%,rgba(245,136,31,.24),transparent 26%),
+    radial-gradient(circle at 84% 20%,rgba(31,158,112,.16),transparent 25%),
+    linear-gradient(140deg,#070B10 0%,#0B1017 48%,#111922 100%);
+}
+.landing-screen.active{display:block}
+.landing-screen::before{
+  content:'';position:absolute;inset:-20%;opacity:.22;
+  background-image:
+    linear-gradient(rgba(127,160,184,.18) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(127,160,184,.18) 1px,transparent 1px);
+  background-size:72px 72px;transform:perspective(680px) rotateX(58deg) translateY(-90px);
+  animation:landingGrid 14s linear infinite;pointer-events:none;
+}
+.landing-screen::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(7,11,16,.18),rgba(7,11,16,.88));
+  pointer-events:none;
+}
+@keyframes landingGrid{from{background-position:0 0,0 0}to{background-position:0 72px,72px 0}}
+.landing-shell{position:relative;z-index:1;max-width:1180px;margin:0 auto;min-height:calc(100vh - 56px);display:flex;flex-direction:column}
+.landing-nav{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:54px}
+.landing-brand{display:flex;align-items:center;gap:14px}
+.landing-logo{
+  width:58px;height:58px;border-radius:14px;display:grid;place-items:center;position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--or),#F0B04A 48%,#141C24 49%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.08),0 18px 38px rgba(245,136,31,.22);
+}
+.landing-logo::before{content:'';position:absolute;width:34px;height:34px;border:3px solid rgba(255,255,255,.92);border-bottom-color:transparent;border-left-color:transparent;transform:rotate(-45deg) translate(1px,-1px)}
+.landing-logo span{position:relative;z-index:1;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;letter-spacing:.08em;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+.landing-brand-title{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;line-height:1}
+.landing-brand-sub{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--or);margin-top:4px}
+.landing-nav-note{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--sb);border:1px solid rgba(127,160,184,.24);border-radius:999px;padding:8px 13px;background:rgba(19,26,33,.42)}
+.landing-main{display:flex;flex-direction:column;gap:30px;align-items:center;text-align:center;flex:1;justify-content:center}
+.landing-copy{max-width:760px}
+.landing-kicker{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--or);margin-bottom:16px}
+.landing-title{font-family:'Rajdhani',sans-serif;font-size:72px;font-weight:700;line-height:.94;letter-spacing:0;text-transform:uppercase;color:#fff;max-width:720px}
+.landing-title em{font-style:normal;color:var(--or);text-shadow:0 0 36px rgba(245,136,31,.28)}
+.landing-text{font-size:18px;color:#AFC3D2;line-height:1.58;max-width:610px;margin:22px auto 0}
+.landing-proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:34px auto 0;max-width:620px}
+.proof-item{border:1px solid rgba(127,160,184,.18);background:rgba(19,26,33,.5);border-radius:var(--radius);padding:13px 14px;backdrop-filter:blur(10px);transition:transform .2s,border-color .2s,background .2s}
+.proof-item:hover{transform:translateY(-3px);border-color:rgba(245,136,31,.38);background:rgba(26,35,44,.74)}
+.proof-num{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;color:#fff;line-height:1}
+.proof-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sb);margin-top:5px}
+.login-card{
+  width:100%;max-width:430px;text-align:left;
+  background:linear-gradient(180deg,rgba(26,35,44,.76),rgba(11,16,23,.88));
+  border:1px solid rgba(127,160,184,.26);border-radius:18px;padding:26px;
+  box-shadow:0 24px 70px rgba(0,0,0,.44),0 0 0 1px rgba(255,255,255,.04) inset;
+  backdrop-filter:blur(20px);position:relative;overflow:hidden;
+}
+.login-card::before{content:'';position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,var(--or),rgba(31,158,112,.95),transparent)}
+.login-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px}
+.login-title{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff;line-height:1}
+.login-sub{font-size:12px;color:var(--sb);margin-top:6px;line-height:1.5}
+.role-chip{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--or);background:var(--or-glow);border:1px solid rgba(245,136,31,.28);border-radius:999px;padding:6px 9px;white-space:nowrap}
+.landing-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;padding:5px;background:rgba(7,11,16,.38);border:1px solid rgba(127,160,184,.14);border-radius:12px}
+.landing-tab{border:none;border-radius:8px;background:transparent;color:var(--mt);font-family:'Rajdhani',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:10px;cursor:pointer;transition:all .18s}
+.landing-tab.act{background:var(--or);color:#fff;box-shadow:0 10px 22px rgba(245,136,31,.22)}
+.landing-panel{display:none}
+.landing-panel.act{display:block;animation:fu .18s ease}
+.landing-actions{display:flex;gap:10px;align-items:center;margin-top:10px}
+.landing-actions .btn-p,.landing-actions .btn-s{flex:1}
+.landing-link-row{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-top:13px;font-size:12px}
+.landing-link{background:none;border:none;color:var(--sb);font:inherit;cursor:pointer;padding:0;text-decoration:none}
+.landing-link:hover{color:var(--or)}
+.landing-demo{width:100%;margin-top:12px}
+.role-note{font-size:11px;color:var(--mt);line-height:1.55;margin-top:16px;padding-top:14px;border-top:1px solid rgba(127,160,184,.14)}
+.feature-preview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:34px}
+.feature-card{
+  min-height:112px;border:1px solid rgba(127,160,184,.18);border-radius:var(--radius);
+  background:linear-gradient(180deg,rgba(19,26,33,.7),rgba(11,16,23,.68));padding:15px;
+  position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;
+}
+.feature-card::before{content:'';position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,var(--or),transparent);opacity:.65}
+.feature-card:hover{transform:translateY(-4px);border-color:rgba(245,136,31,.36);box-shadow:0 14px 30px rgba(0,0,0,.26)}
+.feature-ico{font-size:20px;color:var(--or);line-height:1;margin-bottom:12px}
+.feature-title{font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;line-height:1.1}
+.feature-copy{font-size:11px;color:var(--mt);line-height:1.45;margin-top:6px}
+.landing-error{display:none;font-size:12px;color:var(--s1b);background:rgba(201,59,59,.11);border:1px solid rgba(201,59,59,.32);border-radius:var(--radius-sm);padding:9px 11px;margin-bottom:14px;line-height:1.5}
+
 /* ══════════════════════════════════════════════════
    HEADER
    ══════════════════════════════════════════════════ */
@@ -448,7 +534,26 @@ select option{background:var(--dk3)}
 /* ══════════════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════════════ */
+@media(max-width:900px){
+  .landing-title{font-size:58px}
+  .feature-preview{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
 @media(max-width:600px){
+  .landing-screen{padding:18px 14px}
+  .landing-shell{min-height:calc(100vh - 36px)}
+  .landing-nav{margin-bottom:32px;align-items:flex-start}
+  .landing-nav-note{display:none}
+  .landing-logo{width:50px;height:50px;border-radius:12px}
+  .landing-brand-title{font-size:18px}
+  .landing-main{gap:28px;justify-content:flex-start;text-align:left}
+  .landing-title{font-size:42px;line-height:.98}
+  .landing-text{font-size:15px;margin-top:16px}
+  .landing-proof{grid-template-columns:1fr 1fr;gap:9px;margin-top:22px}
+  .proof-item{padding:11px 12px}
+  .login-card{padding:20px;border-radius:14px}
+  .login-card-head{flex-direction:column;gap:10px;margin-bottom:17px}
+  .feature-preview{grid-template-columns:1fr;gap:10px;margin-top:24px}
+  .feature-card{min-height:0}
   .hdr-in{height:54px;padding:0 16px;gap:10px}
   .hdr-title{font-size:15px}
   .hdr-nav{gap:4px}
@@ -475,6 +580,9 @@ select option{background:var(--dk3)}
   .filter-sel{min-width:0;flex:1}
 }
 @media(max-width:400px){
+  .landing-proof{grid-template-columns:1fr}
+  .landing-actions{flex-direction:column}
+  .landing-actions .btn-p,.landing-actions .btn-s{width:100%}
   .tier-grid{grid-template-columns:1fr 1fr}
   .g2{grid-template-columns:1fr}
   .hdr-sub{display:none}
@@ -540,6 +648,86 @@ select option{background:var(--dk3)}
 </head>
 <body>
 
+<section class="landing-screen active" id="landing-screen" aria-label="APE coach login">
+  <div class="landing-shell">
+    <div class="landing-nav">
+      <div class="landing-brand">
+        <div class="landing-logo" aria-label="APE logo placeholder"><span>APE</span></div>
+        <div>
+          <div class="landing-brand-title">Athlete Performance Evaluator</div>
+          <div class="landing-brand-sub">Peak Performance System</div>
+        </div>
+      </div>
+      <div class="landing-nav-note">Coach SaaS MVP</div>
+    </div>
+
+    <div class="landing-main">
+      <div class="landing-copy">
+        <div class="landing-kicker">Performance data that coaches can act on</div>
+        <h1 class="landing-title">Turn Athlete Testing Into <em>Actionable Coaching Decisions</em></h1>
+        <p class="landing-text">APE helps coaches evaluate athletes, track progress, and generate actionable performance insights from testing data that would otherwise sit in a spreadsheet.</p>
+        <div class="landing-proof">
+          <div class="proof-item"><div class="proof-num">01</div><div class="proof-lbl">Evaluate</div></div>
+          <div class="proof-item"><div class="proof-num">02</div><div class="proof-lbl">Interpret</div></div>
+          <div class="proof-item"><div class="proof-num">03</div><div class="proof-lbl">Coach</div></div>
+        </div>
+      </div>
+
+      <div class="login-card">
+        <div class="login-card-head">
+          <div>
+            <div class="login-title">Coach Access</div>
+            <div class="login-sub">Sign in or create your coach profile to open the dashboard.</div>
+          </div>
+          <div class="role-chip">Coach/Admin</div>
+        </div>
+
+        <div class="landing-tabs">
+          <button class="landing-tab act" id="landing-tab-signin" onclick="switchLandingAuth('signin')">Sign In</button>
+          <button class="landing-tab" id="landing-tab-signup" onclick="switchLandingAuth('signup')">Create Account</button>
+        </div>
+
+        <div id="landing-auth-err" class="landing-error"></div>
+
+        <div class="landing-panel act" id="landing-panel-signin">
+          <div class="field"><label>Email</label><input type="email" id="landing-email-si" placeholder="coach@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')handleLandingSignin()"></div>
+          <div class="field"><label>Password</label><input type="password" id="landing-pass-si" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')handleLandingSignin()"></div>
+          <div class="landing-actions">
+            <button class="btn-p" id="landing-btn-si" onclick="handleLandingSignin()">Sign In</button>
+            <button class="btn-s" onclick="switchLandingAuth('signup')">Create Coach Account</button>
+          </div>
+          <div class="landing-link-row">
+            <button class="landing-link" onclick="handlePasswordReset()">Forgot password?</button>
+            <button class="landing-link" onclick="startDemoCoach()">Continue as Demo Coach</button>
+          </div>
+        </div>
+
+        <div class="landing-panel" id="landing-panel-signup">
+          <div class="field"><label>Create Coach Profile</label><input type="text" id="landing-coach-name" placeholder="Coach or facility name" autocomplete="organization"></div>
+          <div class="field"><label>Email</label><input type="email" id="landing-email-su" placeholder="coach@email.com" autocomplete="email"></div>
+          <div class="field"><label>Password</label><input type="password" id="landing-pass-su" placeholder="Min. 6 characters" autocomplete="new-password" onkeydown="if(event.key==='Enter')handleLandingSignup()"></div>
+          <div class="landing-actions">
+            <button class="btn-p" id="landing-btn-su" onclick="handleLandingSignup()">Create Account</button>
+            <button class="btn-s" onclick="switchLandingAuth('signin')">Sign In</button>
+          </div>
+          <button class="btn-s landing-demo" onclick="startDemoCoach()">Continue as Demo Coach</button>
+        </div>
+
+        <div class="role-note">Coach/Admin can create athletes, create teams, run evaluations, export reports, and track progress. Athlete and parent viewer roles are reserved for a future release.</div>
+      </div>
+    </div>
+
+    <div class="feature-preview">
+      <div class="feature-card"><div class="feature-ico">&#9632;</div><div class="feature-title">Athlete Reports</div><div class="feature-copy">Client-ready summaries with strengths, limiters, and next steps.</div></div>
+      <div class="feature-card"><div class="feature-ico">&#9670;</div><div class="feature-title">Position-Aware Scoring</div><div class="feature-copy">Sport context keeps roles like guard clear across sports.</div></div>
+      <div class="feature-card"><div class="feature-ico">&#8599;</div><div class="feature-title">Progress Tracking</div><div class="feature-copy">Retest history and graphs show what is actually changing.</div></div>
+      <div class="feature-card"><div class="feature-ico">&#9679;</div><div class="feature-title">Team Dashboards</div><div class="feature-copy">Filter rosters by team, sport, and athlete level.</div></div>
+      <div class="feature-card"><div class="feature-ico">&#9650;</div><div class="feature-title">Training Focus</div><div class="feature-copy">Suggested focus areas turn metrics into coaching priorities.</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="app-shell" id="app-shell">
 <div class="hdr">
   <div class="hdr-in">
     <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1MiIgaGVpZ2h0PSI1MiIgdmlld0JveD0iMCAwIDUyIDUyIj48cmVjdCB3aWR0aD0iNTIiIGhlaWdodD0iNTIiIHJ4PSI1IiBmaWxsPSIjRjU4ODFGIi8+PHRleHQgeD0iMjYiIHk9IjM1IiBmb250LWZhbWlseT0iQXJpYWwsc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZm9udC13ZWlnaHQ9IjcwMCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9IjEiPkFQRTwvdGV4dD48L3N2Zz4=" alt="APE" class="hdr-logo">
@@ -548,7 +736,7 @@ select option{background:var(--dk3)}
       <div class="hdr-sub">Sports Performance Assessment</div>
     </div>
     <div class="hdr-nav">
-      <button class="nav-btn" id="nav-dash" onclick="goDash()">Athletes</button>
+      <button class="nav-btn" id="nav-dash" onclick="goDash()">Dashboard</button>
       <button class="nav-btn" id="nav-teams" onclick="buildTeams()">Teams</button>
       <button class="auth-pill" id="auth-pill" onclick="openAuth()"><span class="auth-dot"></span><span id="auth-pill-label">Sign In</span></button>
       <div style="width:1px;height:22px;background:var(--bd);flex-shrink:0"></div>
@@ -757,6 +945,7 @@ select option{background:var(--dk3)}
   </div>
 
   <div class="page" id="page6"><div id="hist-out"></div></div>
+</div>
 </div>
 
 <script>
@@ -1066,6 +1255,49 @@ var SupaDB=(function(){
 })();
 
 // ─── AUTH FUNCTIONS ───────────────────────────────────────────────────────────
+var ACCOUNT_ROLES={
+  coach_admin:{key:'coach_admin',label:'Coach/Admin',can:['athletes','teams','evaluations','reports','exports','progress','programming','coach_notes']},
+  athlete_viewer:{key:'athlete_viewer',label:'Athlete Viewer',future:true,can:['progress','reports','graphs','strengths_weaknesses'],cannot:['programming','coach_notes','internal_logic']},
+  parent_viewer:{key:'parent_viewer',label:'Parent Viewer',future:true,can:['progress','reports','graphs','strengths_weaknesses'],cannot:['programming','coach_notes','internal_logic']}
+};
+function showLanding(){
+  var l=el('landing-screen'),a=el('app-shell');
+  if(l)l.classList.add('active');
+  if(a)a.classList.remove('active');
+}
+function enterCoachApp(){
+  var l=el('landing-screen'),a=el('app-shell');
+  if(l)l.classList.remove('active');
+  if(a)a.classList.add('active');
+  buildDash();
+  go(0);
+}
+function switchLandingAuth(tab){
+  var si=tab==='signin';
+  var tsi=el('landing-tab-signin'),tsu=el('landing-tab-signup');
+  var psi=el('landing-panel-signin'),psu=el('landing-panel-signup');
+  if(tsi)tsi.classList.toggle('act',si);
+  if(tsu)tsu.classList.toggle('act',!si);
+  if(psi)psi.classList.toggle('act',si);
+  if(psu)psu.classList.toggle('act',!si);
+  _landingShowErr('');
+}
+function _landingShowErr(msg){
+  var e=el('landing-auth-err');
+  if(!e)return;
+  e.textContent=msg||'';
+  e.style.display=msg?'block':'none';
+}
+function _setBtnLoading(btn,label){
+  if(!btn)return null;
+  var old=btn.textContent;
+  btn.disabled=true;
+  btn.textContent=label;
+  return old;
+}
+function _resetBtn(btn,label){
+  if(btn){btn.disabled=false;btn.textContent=label;}
+}
 function openAuth(){
   var u=SupaDB.getUser();
   if(u){
@@ -1108,6 +1340,18 @@ function handleSignin(){
     _authOnSuccess(r.data.user,false);
   }).catch(function(e){if(btn){btn.disabled=false;btn.textContent='Sign In';}_authShowErr(e.message||'Sign in failed.');});
 }
+function handleLandingSignin(){
+  var email=el('landing-email-si')?el('landing-email-si').value.trim():'';
+  var pass=el('landing-pass-si')?el('landing-pass-si').value:'';
+  if(!email||!pass){_landingShowErr('Enter your email and password.');return;}
+  var supa=_supaClient();if(!supa){_landingShowErr('Supabase not available.');return;}
+  var btn=el('landing-btn-si'),old=_setBtnLoading(btn,'Signing in...');
+  supa.auth.signInWithPassword({email:email,password:pass}).then(function(r){
+    _resetBtn(btn,old||'Sign In');
+    if(r.error){_landingShowErr(r.error.message);return;}
+    _authOnSuccess(r.data.user,false);
+  }).catch(function(e){_resetBtn(btn,old||'Sign In');_landingShowErr(e.message||'Sign in failed.');});
+}
 function handleSignup(){
   var email=el('auth-email-su')?el('auth-email-su').value.trim():'';
   var pass=el('auth-pass-su')?el('auth-pass-su').value:'';
@@ -1123,21 +1367,65 @@ function handleSignup(){
     _authOnSuccess(r.data.user,true);
   }).catch(function(e){if(btn){btn.disabled=false;btn.textContent='Create Account';}_authShowErr(e.message||'Sign up failed.');});
 }
+function handleLandingSignup(){
+  var coachName=el('landing-coach-name')?el('landing-coach-name').value.trim():'';
+  var email=el('landing-email-su')?el('landing-email-su').value.trim():'';
+  var pass=el('landing-pass-su')?el('landing-pass-su').value:'';
+  if(!coachName){_landingShowErr('Enter a coach or facility name.');return;}
+  if(!email||!pass){_landingShowErr('Enter your email and password.');return;}
+  if(pass.length<6){_landingShowErr('Password must be at least 6 characters.');return;}
+  var supa=_supaClient();if(!supa){_landingShowErr('Supabase not available.');return;}
+  var btn=el('landing-btn-su'),old=_setBtnLoading(btn,'Creating account...');
+  supa.auth.signUp({email:email,password:pass,options:{data:{role:'coach_admin',coach_profile:coachName}}}).then(function(r){
+    _resetBtn(btn,old||'Create Account');
+    if(r.error){_landingShowErr(r.error.message);return;}
+    if(!r.data.user){_landingShowErr('Account created. Check your email to confirm your sign in.');return;}
+    _authOnSuccess(r.data.user,true,coachName);
+  }).catch(function(e){_resetBtn(btn,old||'Create Account');_landingShowErr(e.message||'Sign up failed.');});
+}
+function handlePasswordReset(){
+  var email=(el('landing-email-si')&&el('landing-email-si').value.trim())||(el('landing-email-su')&&el('landing-email-su').value.trim())||'';
+  if(!email){_landingShowErr('Enter your email first, then request a reset link.');return;}
+  var supa=_supaClient();if(!supa){_landingShowErr('Supabase not available.');return;}
+  supa.auth.resetPasswordForEmail(email).then(function(r){
+    if(r.error){_landingShowErr(r.error.message);return;}
+    _landingShowErr('');
+    _toast('Password reset email sent.','#1e6f3e');
+  }).catch(function(e){_landingShowErr(e.message||'Password reset failed.');});
+}
+function startDemoCoach(){
+  window._apeDemoCoach=true;
+  SupaDB.setUser(null);
+  _authUpdatePill(null);
+  enterCoachApp();
+  _toast('Demo coach mode. Data stays on this device.','#444');
+}
 function handleSignout(){
   var supa=_supaClient();
   if(supa)supa.auth.signOut().then(function(){});
   SupaDB.setUser(null);
+  window._apeDemoCoach=false;
   _authUpdatePill(null);
+  showLanding();
   _toast('Signed out','#444');
 }
-function _authOnSuccess(user,isNew){
+function _authOnSuccess(user,isNew,coachName){
+  if(!user){_landingShowErr('Check your email to confirm your account, then sign in.');return;}
   SupaDB.setUser(user);
   _authUpdatePill(user);
   closeAuth();
+  if(coachName){
+    var cfg=DB.loadSettings();
+    if(!cfg.coachName&&!cfg.gymName){
+      DB.saveSettings({coachName:coachName,gymName:coachName,tagline:cfg.tagline||'',contact:cfg.contact||''});
+    }
+  }
+  enterCoachApp();
   setTimeout(function(){
     var localAthletes=DB.getAll();
     if(localAthletes.length>0){
       SupaDB.syncAll().then(function(){
+        buildDash();
         _toast('Synced '+localAthletes.length+' athlete'+(localAthletes.length!==1?'s':'')+'!','#1e6f3e');
       }).catch(function(e){_cloudSyncFailed(e);});
     }else{
@@ -3409,7 +3697,7 @@ function buildDash(){
 
   // Title + action buttons
   h+='<div class="dash-hero">'
-    +'<div><div class="pg-title">Athletes</div><div class="pg-sub">'+totalAth+' saved profile'+(totalAth!==1?'s':'')+' &middot; '+testsMonth+' test'+(testsMonth!==1?'s':'')+' this month</div></div>'
+    +'<div><div class="pg-title">Coach Dashboard</div><div class="pg-sub">'+totalAth+' saved athlete profile'+(totalAth!==1?'s':'')+' &middot; '+testsMonth+' test'+(testsMonth!==1?'s':'')+' this month</div></div>'
     +'<div class="dash-actions">'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildLeaderboard()">&#127942; Leaderboard</button>'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildTeamStats()">&#128202; Team Stats</button>'
@@ -4262,11 +4550,15 @@ refreshTeamSelect('');
         var u=r.data.session.user;
         SupaDB.setUser(u);
         _authUpdatePill(u);
+        enterCoachApp();
+      }else{
+        showLanding();
       }
-    });
+    }).catch(function(){showLanding();});
+  }else{
+    showLanding();
   }
 })();
-goDash();
 </script>
 
 <!-- ── Auth Modal ── -->
