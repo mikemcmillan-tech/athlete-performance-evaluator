@@ -1583,6 +1583,14 @@ var SW=['','Below Avg','Average','Solid','Strong','Elite'];
 var SC=['','#C93B3B','#BA7517','#6B9A2A','#1F9E70','#0F7A54'];
 var SCB=['','#F09595','#EF9F27','#97C459','#5DCAA5','#40C99A'];
 var PCTL=['','Bottom 20%','20th–40th','40th–60th','70th–85th','Top 10%'];
+// RSI benchmarks by tier. Thresholds calibrated to training-population distributions.
+// t1=Below Avg ceiling, t2=Solid floor, t3=Strong floor, t4=Elite floor
+var RSI_BENCH={
+  youth:  {t1:0.9, t2:1.3, t3:1.8, t4:2.3},
+  hs:     {t1:1.1, t2:1.5, t3:2.0, t4:2.5},
+  college:{t1:1.3, t2:1.8, t3:2.3, t4:2.8},
+  pro:    {t1:1.5, t2:2.0, t3:2.5, t4:3.0}
+};
 var TM={youth:{label:'Youth (U14)',c:'#6B9A2A'},hs:{label:'High School',c:'#BA7517'},college:{label:'College',c:'#1F9E70'},pro:{label:'Pro / Elite',c:'#F5881F'}};
 var DC=['','#C93B3B','#BA7517','#6B9A2A','#1F9E70','#0F7A54'];
 
@@ -1782,7 +1790,7 @@ function gn(id){var v=parseFloat(el(id).value);return(isNaN(v)||v<=0)?null:v;}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function avg(a){var n=a.filter(function(x){return x!==null&&x!==undefined&&!isNaN(x);});if(!n.length)return null;return n.reduce(function(a,b){return a+b;},0)/n.length;}
 function scv(v,b,lb){if(lb)return v<=b[4]?5:v<=b[3]?4:v<=b[2]?3:v<=b[1]?2:1;return v>=b[4]?5:v>=b[3]?4:v>=b[2]?3:v>=b[1]?2:1;}
-function sRSI(r){return r>=3?5:r>=2.5?4:r>=2?3:r>=1.5?2:1;}
+function sRSI(r,tier){var b=RSI_BENCH[tier]||RSI_BENCH.hs;return r>=b.t4?5:r>=b.t3?4:r>=b.t2?3:r>=b.t1?2:1;}
 function normalize505Score(v){if(typeof _combineNum==='function')return _combineNum(v);var n=parseFloat(v);return isNaN(n)?null:n;}
 function calculateCODscore(v,level){var b=(BENCH[level]||BENCH.hs).pro_agility_5_10_5;return v!==null&&v!==undefined?scv(v,b,true):null;}
 function get505BenchmarkTier(v,level){var sc=calculateCODscore(v,level);return sc?SW[sc]:'';}
@@ -1805,8 +1813,8 @@ function buildComparisonMode(prev,curr){return buildComp(prev,curr);}
 function buildLeaderboardData(){return DB.getAll().filter(function(a){return a.last;});}
 function exportAthleteData(aid){return exportAthleteXLSX(aid);}
 function exportCombineResults(){return exportCombineEventResults();}
-function lRSI(r){if(r>=3)return 'World class';if(r>=2.5)return 'High';if(r>=2)return 'Well established';if(r>=1.5)return 'Moderate';return 'Low';}
-function cRSI(r){if(r>=3)return 'Elite RSI. Maintain stiffness with low-volume reactive work.';if(r>=2.5)return 'Strong reactive ability. Advanced plyometrics appropriate.';if(r>=2)return 'Well established. Intermediate plyometrics appropriate.';if(r>=1.5)return 'Moderate. Entry-level plyometrics — build toward RSI 2.0+ first.';return 'Low. Pre-plyometric only. Pogo progressions and landing mechanics before any loading.';}
+function lRSI(r,tier){var b=RSI_BENCH[tier]||RSI_BENCH.hs;if(r>=b.t4)return 'World class';if(r>=b.t3)return 'High';if(r>=b.t2)return 'Well established';if(r>=b.t1)return 'Moderate';return 'Low';}
+function cRSI(r,tier){var b=RSI_BENCH[tier]||RSI_BENCH.hs;var tl2=(tier&&TIERS[tier])||'this level';if(r>=b.t4)return 'Elite RSI for '+tl2+'. Maintain stiffness with low-volume reactive work.';if(r>=b.t3)return 'Strong reactive ability. Advanced plyometrics appropriate.';if(r>=b.t2)return 'Well established. Intermediate plyometrics appropriate.';if(r>=b.t1)return 'Moderate. Entry-level plyometrics — build toward RSI '+b.t2+' first.';return 'Low. Pre-plyometric only. Pogo progressions and landing mechanics before any loading.';}
 
 // ─── NAVIGATION ───────────────────────────────────────────────────────────────
 function go(n){
@@ -1930,7 +1938,7 @@ function previewRosterImport(rows,fileName){rows=rows||_combineState.rawRows||[]
 function confirmRosterImport(){var rows=_combineState.rows||[];if(!rows.length){alert('Upload a roster first.');return;}var modeEl=el('combine-duplicate-mode'),mode=modeEl?modeEl.value:'skip',created=0,updated=0,skipped=0;var existing=_combineExistingByKey();rows.forEach(function(r){if(r.invalid||r.needsTeam||(r.fileDuplicate&&mode!=='import')){skipped++;return;}var team=_combineEnsureTeam(r.teamName),teamId=team?team.id:'',key=_combineKey(r.name,r.levelLabel||r.tier,r.teamName),dup=existing[key]||null,extra={club:r.club,levelLabel:r.levelLabel,athleteEmail:r.athleteEmail,parentEmail:r.parentEmail};if(dup&&mode==='skip'){skipped++;return;}if(dup&&mode==='update'){DB.updateAthlete(dup.id,r.name||dup.name,r.tier||dup.tier,r.sport||dup.sport,r.position||dup.position,r.age||dup.age,teamId||dup.team,r.gradYear||dup.gradYear,r.notes||dup.notes,r.bodyweight||dup.bodyweight,r.height||dup.height,extra);updated++;return;}DB.create(r.name,r.tier,r.sport,r.position,r.age,teamId,r.gradYear,r.notes,r.bodyweight,r.height,extra);created++;});_cloudSyncSoon();_toast('Roster import: '+created+' created, '+updated+' updated, '+skipped+' skipped.','#1e6f3e');buildCombineMode();var msg=el('combine-import-result');if(msg)msg.innerHTML='<span class="combine-chip good">'+created+' created</span> <span class="combine-chip good">'+updated+' updated</span> <span class="combine-chip warn">'+skipped+' skipped</span>';}
 function _combineMetricSpecs(){return[{k:'vj',label:'Vertical Jump',short:'VJ',step:'0.1'},{k:'bj',label:'Broad Jump',short:'BJ',step:'0.01'},{k:'rsi',label:'RSI',short:'RSI',step:'0.01'},{k:'f5',label:'5-10 Fly',short:'5-10',step:'0.01'},{k:'f10',label:'10-10 Fly',short:'10-10',step:'0.01'},{k:'pro_agility_5_10_5',label:'5-10-5 Pro Agility',short:'5-10-5',step:'0.01'},{k:'gps',label:'GPS Max Velocity',short:'GPS',step:'0.1'}];}
 function _combineStationMetrics(){var st=_combineState.station||'full',all=_combineMetricSpecs();if(st==='power')return all.filter(function(m){return m.k==='vj'||m.k==='bj'||m.k==='rsi';});if(st==='speed')return all.filter(function(m){return m.k==='f5'||m.k==='f10'||m.k==='gps';});if(st==='agility')return all.filter(function(m){return m.k==='pro_agility_5_10_5';});return all;}
-function _combineComputeSession(a,raw){var t=a.tier||'hs',b=BENCH[t]||BENCH.hs;var vp=raw.vj!==null?scv(raw.vj,b.vj,false):null,hp=raw.bj!==null?scv(raw.bj,b.bj,false):null,rs=raw.rsi!==null?sRSI(raw.rsi):null,ac=raw.f5!==null?scv(raw.f5,b.f5,true):null,mv=raw.f10!==null?scv(raw.f10,b.f10,true):null,cod=raw.pro_agility_5_10_5!==null?calculateCODscore(raw.pro_agility_5_10_5,t):null,gv=raw.gps!==null?scv(raw.gps,b.gps,false):null;var pa=avg([vp,hp]),sa=avg([ac,mv,gv]),ft=null;if(pa!==null&&sa!==null){var off=sa-pa;ft=off>=1.5?5:off>=0.5?4:off>=-1.0?3:2;if(pa<3&&sa<3)ft=2;}var dp=[vp,hp].filter(function(x){return x!==null;}),ds=[ac,mv,gv,cod].filter(function(x){return x!==null;});var dpa=dp.length?dp.reduce(function(x,y){return x+y;},0)/dp.length:null,dsa=ds.length?ds.reduce(function(x,y){return x+y;},0)/ds.length:null,defType='Incomplete Data',focus='Not enough metrics';if(dpa!==null&&dsa!==null){if(dpa<3&&dsa>=3){defType='Force Deficient';focus='Force production';}else if(dsa<3&&dpa>=3){defType='Form Deficient';focus='Sprint mechanics';}else if(dpa<3&&dsa<3){defType='Mixed Deficiency';focus='General athletic development';}else{defType='Well Developed';focus='Refinement';}}var bkt='base';if(rs!==null&&rs<=2)bkt=1;else if(cod!==null&&cod<=2)bkt=6;else if((vp!==null&&vp<=2)||(hp!==null&&hp<=2)){if(rs===null||rs>=3)bkt=2;}else if(ac!==null&&ac<=2&&pa!==null&&pa>=3)bkt=3;else if(((mv!==null&&mv<=2)||(gv!==null&&gv<=2))&&ac!==null&&ac>=3)bkt=4;else if(ft!==null&&ft<=2&&pa!==null&&pa>=4)bkt=5;var BK={1:{n:'Bucket 1 - Reactive Strength',pri:'Reactive strength and stiffness'},2:{n:'Bucket 2 - Force and Power',pri:'Force production'},base:{n:'Bucket 2 - Force and Power (Base Build)',pri:'General force and power base'},3:{n:'Bucket 3 - Acceleration',pri:'First-step speed and short-area acceleration'},4:{n:'Bucket 4 - Max Velocity',pri:'Top-end speed and max velocity mechanics'},5:{n:'Bucket 5 - Force Transfer',pri:'Converting power into movement speed'},6:{n:'Bucket 6 - Change of Direction',pri:'Deceleration and lateral re-acceleration'}};var sc={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gps:gv,ft:ft},ape=calculateAPEscore(sc),adj=computeAdjustedScores(sc,resolvePosGroup(a.sport,a.position));return{raw:raw,sc:sc,bkt:bkt,bktName:BK[bkt].n,defType:defType,focus:BK[bkt].pri||focus,cnt:Object.keys(raw).filter(function(k){return raw[k]!==null;}).length,apeScore:ape,posAdjScore:adj?adj.ape:null};}
+function _combineComputeSession(a,raw){var t=a.tier||'hs',b=BENCH[t]||BENCH.hs;var vp=raw.vj!==null?scv(raw.vj,b.vj,false):null,hp=raw.bj!==null?scv(raw.bj,b.bj,false):null,rs=raw.rsi!==null?sRSI(raw.rsi,t):null,ac=raw.f5!==null?scv(raw.f5,b.f5,true):null,mv=raw.f10!==null?scv(raw.f10,b.f10,true):null,cod=raw.pro_agility_5_10_5!==null?calculateCODscore(raw.pro_agility_5_10_5,t):null,gv=raw.gps!==null?scv(raw.gps,b.gps,false):null;var pa=avg([vp,hp]),sa=avg([ac,mv,gv]),ft=null;if(pa!==null&&sa!==null){var off=sa-pa;ft=off>=1.5?5:off>=0.5?4:off>=-1.0?3:2;if(pa<3&&sa<3)ft=2;}var dp=[vp,hp].filter(function(x){return x!==null;}),ds=[ac,mv,gv,cod].filter(function(x){return x!==null;});var dpa=dp.length?dp.reduce(function(x,y){return x+y;},0)/dp.length:null,dsa=ds.length?ds.reduce(function(x,y){return x+y;},0)/ds.length:null,defType='Incomplete Data',focus='Not enough metrics';if(dpa!==null&&dsa!==null){if(dpa<3&&dsa>=3){defType='Force Deficient';focus='Force production';}else if(dsa<3&&dpa>=3){defType='Form Deficient';focus='Sprint mechanics';}else if(dpa<3&&dsa<3){defType='Mixed Deficiency';focus='General athletic development';}else{defType='Well Developed';focus='Refinement';}}var bkt='base';if(rs!==null&&rs<=2)bkt=1;else if(cod!==null&&cod<=2)bkt=6;else if((vp!==null&&vp<=2)||(hp!==null&&hp<=2)){if(rs===null||rs>=3)bkt=2;}else if(ac!==null&&ac<=2&&pa!==null&&pa>=3)bkt=3;else if(((mv!==null&&mv<=2)||(gv!==null&&gv<=2))&&ac!==null&&ac>=3)bkt=4;else if(ft!==null&&ft<=2&&pa!==null&&pa>=4)bkt=5;var BK={1:{n:'Bucket 1 - Reactive Strength',pri:'Reactive strength and stiffness'},2:{n:'Bucket 2 - Force and Power',pri:'Force production'},base:{n:'Bucket 2 - Force and Power (Base Build)',pri:'General force and power base'},3:{n:'Bucket 3 - Acceleration',pri:'First-step speed and short-area acceleration'},4:{n:'Bucket 4 - Max Velocity',pri:'Top-end speed and max velocity mechanics'},5:{n:'Bucket 5 - Force Transfer',pri:'Converting power into movement speed'},6:{n:'Bucket 6 - Change of Direction',pri:'Deceleration and lateral re-acceleration'}};var sc={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gps:gv,ft:ft},ape=calculateAPEscore(sc),adj=computeAdjustedScores(sc,resolvePosGroup(a.sport,a.position));return{raw:raw,sc:sc,bkt:bkt,bktName:BK[bkt].n,defType:defType,focus:BK[bkt].pri||focus,cnt:Object.keys(raw).filter(function(k){return raw[k]!==null;}).length,apeScore:ape,posAdjScore:adj?adj.ape:null};}
 function buildCombineMode(){go(0);var nd=el('nav-dash'),nt=el('nav-teams');if(nd)nd.classList.remove('act');if(nt)nt.classList.add('act');var cont=el('dash-out');if(!cont)return;var teams=DB.getTeams(),selectedTeam=teams.length?teams[0].id:'',today=new Date().toISOString().slice(0,10);var h='<div class="combine-hero"><div class="combine-kicker">APE Combine</div><div class="pg-title">Bulk Roster Import + Testing Day Mode</div><div class="pg-sub">Athletic Performance Evolution - Evolve the athlete. Built for club teams, camps, combines, and mass testing days.</div></div><div class="combine-grid"><div class="combine-panel"><div class="card-title">Roster Import</div><div class="combine-toolbar"><button class="btn-save-prog" style="padding:10px 14px" onclick="downloadRosterTemplate()">Download Template</button><div class="field"><label>Upload .xlsx or .csv</label><input type="file" id="combine-roster-file" accept=".xlsx,.xls,.csv" onchange="handleRosterUpload(this)"></div></div><div class="g2" style="margin-top:14px"><div class="field"><label>If No Team Column</label><select id="combine-import-team" onchange="previewRosterImport()">'+_combineTeamOptions('',true)+'</select></div><div class="field"><label>Or New Team</label><input type="text" id="combine-import-team-new" placeholder="e.g. 16U Elite" oninput="previewRosterImport()"></div></div><div class="field"><label>Duplicate Handling</label><select id="combine-duplicate-mode"><option value="skip">Skip duplicates</option><option value="update">Update existing profiles</option><option value="import">Import anyway</option></select></div><div id="combine-import-result" class="combine-status"></div><div id="combine-import-preview" class="combine-status">Upload a roster to preview athletes before saving.</div></div><div class="combine-panel"><div class="card-title">Testing Day Setup</div><div class="g2"><div class="field"><label>Team</label><select id="combine-test-team" onchange="buildTestingDayTable()">'+_combineTeamOptions(selectedTeam,true)+'</select></div><div class="field"><label>Combine / Event</label><input type="text" id="combine-event-name" placeholder="Spring Combine"></div><div class="field"><label>Test Date</label><input type="date" id="combine-test-date" value="'+today+'"></div><div class="field"><label>Sport Filter</label><input type="text" id="combine-sport-filter" placeholder="Optional" oninput="buildTestingDayTable()"></div><div class="field"><label>Level Filter</label><input type="text" id="combine-level-filter" placeholder="13U, Varsity, HS..." oninput="buildTestingDayTable()"></div></div><div class="combine-tabs"><button class="combine-tab act" id="combine-tab-full" onclick="_combineState.station=\'full\';buildTestingDayTable()">Full Table</button><button class="combine-tab" id="combine-tab-power" onclick="_combineState.station=\'power\';buildTestingDayTable()">Power Station</button><button class="combine-tab" id="combine-tab-speed" onclick="_combineState.station=\'speed\';buildTestingDayTable()">Speed Station</button></div><div class="btn-row" style="margin-top:10px"><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportLatestTeamResults()">Export Latest Team Results</button><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportTeamHistory()">Export Full Team History</button><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportCombineEventResults()">Export Combine Event</button></div></div></div><div class="combine-panel"><div class="card-title">Testing Day / Combine Mode</div><div id="combine-testing-table" class="combine-status"></div></div>';cont.innerHTML=h;buildTestingDayTable();}
 function _combineFilteredAthletes(){var tid=el('combine-test-team')?el('combine-test-team').value:'',sport=_combineNorm(el('combine-sport-filter')?el('combine-sport-filter').value:''),level=_combineNorm(el('combine-level-filter')?el('combine-level-filter').value:'');return DB.getAll().filter(function(a){if(tid&&a.team!==tid)return false;if(sport&&_combineNorm(a.sport).indexOf(sport)===-1)return false;if(level&&_combineNorm((a.levelLabel||'')+' '+(TIERS[a.tier]||a.tier)).indexOf(level)===-1)return false;return true;}).sort(function(a,b){return a.name.localeCompare(b.name);});}
 function _ensureCombineAgilityTab(){var speed=el('combine-tab-speed');if(speed&&!el('combine-tab-agility')){var btn=document.createElement('button');btn.className='combine-tab';btn.id='combine-tab-agility';btn.textContent='Agility Station';btn.onclick=function(){_combineState.station='agility';buildTestingDayTable();};speed.parentNode.insertBefore(btn,speed.nextSibling);}}
@@ -1984,12 +1992,14 @@ function getAPEScore(scores) {
 }
 
 // Returns label, color, short sentence, and percentile for a given APE Score.
-function getAPELabel(score) {
+// Optional tier makes the percentile peer-group specific (scores are tier-calibrated at metric level).
+function getAPELabel(score, tier) {
   if (score === null) return { label: '', color: 'var(--mt)', sub: '', pct: '' };
-  if (score >= 80) return { label: 'Elite',         color: '#1F9E70', sub: 'High-level profile across available testing.',                    pct: 'Top 5%'    };
-  if (score >= 65) return { label: 'Above Average', color: '#5DCAA5', sub: 'Strong profile with room for targeted gains.',                    pct: 'Top 15%'   };
-  if (score >= 50) return { label: 'Solid',         color: '#6B9A2A', sub: 'Solid foundation with specific gaps to close.',                   pct: 'Top 35%'   };
-  if (score >= 35) return { label: 'Developing',    color: '#BA7517', sub: 'Foundation is building. Key qualities still need development.',   pct: 'Average'   };
+  var tSuffix = (tier && TIERS[tier]) ? ' among ' + TIERS[tier] : '';
+  if (score >= 80) return { label: 'Elite',         color: '#1F9E70', sub: 'High-level profile across available testing.',                    pct: 'Top 5%'  + tSuffix };
+  if (score >= 65) return { label: 'Above Average', color: '#5DCAA5', sub: 'Strong profile with room for targeted gains.',                    pct: 'Top 15%' + tSuffix };
+  if (score >= 50) return { label: 'Solid',         color: '#6B9A2A', sub: 'Solid foundation with specific gaps to close.',                   pct: 'Top 35%' + tSuffix };
+  if (score >= 35) return { label: 'Developing',    color: '#BA7517', sub: 'Foundation is building. Key qualities still need development.',   pct: 'Average' + tSuffix };
   return               { label: 'Needs Work',       color: '#C93B3B', sub: 'Major performance qualities need attention across the board.',    pct: 'Below Avg' };
 }
 
@@ -2103,7 +2113,7 @@ function build(vj,bj,rsi,s5,s10,gps,pa505){
   var hp=null,hpR='',hpL='';
   if(bj!==null){hp=scv(bj,b.bj,false);hpR=bj+' ft';hpL=bj+'ft vs '+tl+' &rarr; <strong>'+SW[hp]+' ('+hp+'/5)</strong><br>Elite&ge;'+b.bj[4]+'ft / Strong '+b.bj[3]+' / Solid '+b.bj[2]+' / Avg '+b.bj[1]+'ft';}
   var rs=null,rsR='',rsL='';
-  if(rsi!==null){rs=sRSI(rsi);rsR=rsi+' RSI';rsL='RSI '+rsi+' &rarr; <strong>'+lRSI(rsi)+'</strong> reactive strength &rarr; Score '+rs+'/5<br>Fixed scale (not tier-benchmarked)<br>'+cRSI(rsi);}
+  if(rsi!==null){rs=sRSI(rsi,tier);rsR=rsi+' RSI';rsL='RSI '+rsi+' &rarr; <strong>'+lRSI(rsi,tier)+'</strong> reactive strength &rarr; Score '+rs+'/5 ('+tl+' benchmark)<br>'+cRSI(rsi,tier);}
   var ac=null,acR='',acL='';
   if(s5!==null){ac=scv(s5,b.f5,true);acR=s5+'s';acL=s5+'s vs '+tl+' (lower=faster) &rarr; <strong>'+SW[ac]+' ('+ac+'/5)</strong><br>Elite&lt;'+b.f5[4]+'s / Strong '+b.f5[4]+'-'+b.f5[3]+'s / Solid '+b.f5[3]+'-'+b.f5[2]+'s / Avg '+b.f5[2]+'-'+b.f5[1]+'s';}
   var mv=null,mvR='',mvL='';
@@ -2204,7 +2214,7 @@ function build(vj,bj,rsi,s5,s10,gps,pa505){
 
   // ── APE Score (uses named helper functions) ───────────────────────────────
   var apeScore = calculateAPEscore({ vp:vp, hp:hp, rs:rs, ac:ac, mv:mv, cod:cod, gv:gv, ft:ft });
-  var apeMeta  = getAPELabel(apeScore);
+  var apeMeta  = getAPELabel(apeScore, tier);
   var apeType  = getAthleteType(vp, hp, rs, ac, mv, gv);
 
   var apeGlow = apeScore >= 80 ? ';box-shadow:0 0 0 1px '+apeMeta.color+'33,0 4px 24px '+apeMeta.color+'18' : apeScore >= 65 ? ';box-shadow:0 0 0 1px '+apeMeta.color+'22,0 2px 14px '+apeMeta.color+'10' : '';
@@ -2261,8 +2271,8 @@ function build(vj,bj,rsi,s5,s10,gps,pa505){
   var _posCard='';
   if(_adjResult){
     var _pg=_adjResult.groupMeta;
-    var _adjMeta=getAPELabel(_adjResult.ape);
-    var _rawMeta=getAPELabel(apeScore);
+    var _adjMeta=getAPELabel(_adjResult.ape, tier);
+    var _rawMeta=getAPELabel(apeScore, tier);
     var _diff=_adjResult.ape-apeScore;
     var _diffStr=_diff>0?'+'+_diff:String(_diff);
     var _diffColor=_diff>2?'var(--s4b)':_diff<-2?'var(--s1b)':'var(--mt)';
@@ -3395,7 +3405,7 @@ function buildReport(S){
   if(apeScore==null&&S.vp!==undefined){
     apeScore=calculateAPEscore({vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gv:gps,ft:ft});
   }
-  var apeMeta=apeScore!=null?getAPELabel(apeScore):null;
+  var apeMeta=apeScore!=null?getAPELabel(apeScore,lv):null;
 
   // Sport context
   var ctx=getSportCtx(S.sport,S.position);
@@ -3483,8 +3493,8 @@ function buildReport(S){
 
   // ── Position-Adjusted Score section ────────────────────────────────────────
   if(adjResult&&apeScore!=null){
-    var adjMeta=getAPELabel(adjResult.ape);
-    var rawMeta=getAPELabel(apeScore);
+    var adjMeta=getAPELabel(adjResult.ape, lv);
+    var rawMeta=getAPELabel(apeScore, lv);
     var diff=adjResult.ape-apeScore;
     var diffStr=diff>0?'+'+diff:String(diff);
     var diffCol=diff>2?'#1F9E70':diff<-2?'#C93B3B':'#888';
@@ -3749,7 +3759,7 @@ function buildLeaderboard(){
     var a=limited[i],last=a.last;
     var val=_getMetricVal(a,_lbState.metric);
     var ape=last.apeScore!=null?last.apeScore:(last.sc?getAPEScore(last.sc):null);
-    var apeMeta=getAPELabel(ape);
+    var apeMeta=getAPELabel(ape, a.tier);
     var tm3=TM[a.tier]||{label:a.tier,c:'#8AAABE'};
     // Resolve team from teamMap by ID — guaranteed ID-only comparison
     var lbTeam=a.team&&teamMap[a.team]?teamMap[a.team]:null;
@@ -3916,7 +3926,7 @@ function buildDash(){
     if(last){var d=Math.round((Date.now()-last.ts)/86400000);dr=d===0?'Today':d===1?'Yesterday':d+' days ago';}
     var bc=last&&last.bkt!==undefined?(bkC[last.bkt]||'var(--or)'):'var(--or)';
     var ape=last?(last.apeScore!=null?last.apeScore:(last.sc?getAPEScore(last.sc):null)):null;
-    var apeMeta=ape!=null?getAPELabel(ape):null;
+    var apeMeta=ape!=null?getAPELabel(ape, a.tier):null;
     var teamTm=a.team&&teamMap[a.team]?teamMap[a.team]:null;
     // Trend: compare last 2 sessions APE scores
     var trendArrow='',trendColor='var(--mt)';
@@ -4269,7 +4279,7 @@ function exportLeaderboardXLSX(){
     if(!a.s.length)return;
     var last=a.s[a.s.length-1],sc=last.sc||{},raw=last.raw||{};
     var ape=last.apeScore!=null?last.apeScore:getAPEScore(sc);
-    var apeMeta=ape!=null?getAPELabel(ape):null;
+    var apeMeta=ape!=null?getAPELabel(ape, a.tier):null;
     rows.push({
       'Athlete':a.name,
       'Team':a.team&&teamMap[a.team]?teamMap[a.team]:'',
