@@ -38,6 +38,9 @@ const sandbox = {
 };
 
 vm.createContext(sandbox);
+const ctxStart = script.indexOf('var SPORT_OPTIONS=');
+const ctxEnd = script.indexOf('// ─── HELPERS', ctxStart);
+vm.runInContext(script.slice(ctxStart, ctxEnd), sandbox);
 [
   'normalizeTimingMethod',
   'renderVerificationBadge',
@@ -71,5 +74,14 @@ assert.equal(sandbox.calculateImprovementPercentage('f5', sessions), 7.7);
 assert.equal(sandbox.validateCoachLogoFile({ type: 'image/png', size: 1024 }).ok, true);
 assert.equal(sandbox.validateCoachLogoFile({ type: 'image/gif', size: 1024 }).ok, false);
 assert.equal(sandbox.validateCoachLogoFile({ type: 'image/jpeg', size: 3 * 1024 * 1024 }).ok, false);
+
+assert.equal(sandbox.resolvePosGroup('Football', 'C'), 'POWER_DOM');
+assert.equal(sandbox.resolvePosGroup('Basketball', 'Guard'), 'REACTIVE');
+assert.notEqual(sandbox.resolvePosGroup('Basketball', 'Guard'), sandbox.resolvePosGroup('Football', 'OL'));
+assert.equal(sandbox.resolvePosGroup('Volleyball', 'Setter'), 'REACTIVE');
+assert.equal(sandbox.resolvePosGroup('Lacrosse', 'Midfield'), 'ENDURANCE_SPD');
+assert.equal(sandbox.resolvePosGroup('Flag Football', 'Center'), 'REACTIVE');
+assert.equal(sandbox.resolvePosGroup('Softball', 'Pitcher'), 'POWER_DOM');
+assert.equal(sandbox.getAthletePositionProfile({ sport: 'Football', position: 'WR' }).positionGroup, 'SPEED_SKILL');
 
 console.log('launch feature tests passed');
