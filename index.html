@@ -1249,18 +1249,19 @@ var SupaDB=(function(){
   var _user=null;
   function uid(){return _user?_user.id:null;}
   function athleteRow(a){
-    return{id:a.id,coach_id:uid(),name:a.name,tier:a.tier,
+    return{id:a.id,user_id:uid(),name:a.name,tier:a.tier,
       nk:(a.nk||a.name||'').trim().toLowerCase().replace(/\s+/g,' '),
       sport:a.sport||null,position:a.position||null,age:a.age||null,
       team_id:a.team||null,grad_year:a.gradYear||null,notes:a.notes||null,
       bodyweight:a.bodyweight||null,height:a.height||null};
   }
   function sessRow(s,aid){
-    return{id:s.id,coach_id:uid(),athlete_id:aid,
-      test_date:new Date(s.ts||Date.now()).toISOString(),
+    var _ts=s.ts||Date.now();
+    return{id:s.id,user_id:uid(),athlete_id:aid,
+      ts:_ts,date_label:new Date(_ts).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
       ape_score:s.apeScore!=null?s.apeScore:null,scores:s.sc||null,raw:s.raw||null,
-      bkt:s.bkt!=null?s.bkt:null,bkt_name:s.bktName||null,def_type:s.defType||null,
-      cnt:s.cnt!=null?s.cnt:null,primary_focus:s.focus||null,session_note:s.note||null};
+      bucket:s.bkt!=null?s.bkt:null,bucket_name:s.bktName||null,deficiency_type:s.defType||null,
+      count_metrics:s.cnt!=null?s.cnt:null,focus:s.focus||null,note:s.note||null};
   }
   return{
     setUser:function(u){_user=u;},
@@ -1271,14 +1272,14 @@ var SupaDB=(function(){
       var writes=[];
       DB.getAll().forEach(function(a){
         writes.push(supa.from('athletes').upsert(athleteRow(a)));
-        (a.s||[]).forEach(function(s){writes.push(supa.from('sessions').upsert(sessRow(s,a.id)));});
+        (a.s||[]).forEach(function(s){writes.push(supa.from('evaluations').upsert(sessRow(s,a.id)));});
       });
       DB.getTeams().forEach(function(t){
-        writes.push(supa.from('teams').upsert({id:t.id,coach_id:uid(),name:t.name,color:t.color}));
+        writes.push(supa.from('teams').upsert({id:t.id,user_id:uid(),name:t.name,color:t.color}));
       });
       var cfg=DB.loadSettings();
       if(cfg&&(cfg.coachName||cfg.gymName)){
-        writes.push(supa.from('coach_settings').upsert({coach_id:uid(),coach_name:cfg.coachName||'',
+        writes.push(supa.from('coach_settings').upsert({user_id:uid(),coach_name:cfg.coachName||'',
           gym_name:cfg.gymName||'',tagline:cfg.tagline||'',contact:cfg.contact||''}));
       }
       if(!writes.length)return Promise.resolve(true);
@@ -1296,17 +1297,17 @@ var SupaDB=(function(){
       function getRaw(){try{var s=localStorage.getItem('ape_v1');return s?JSON.parse(s):{v:2,a:{},t:{}};}catch(e){return{v:2,a:{},t:{}};}}
       function saveRaw(d){try{localStorage.setItem('ape_v1',JSON.stringify(d));}catch(e){}}
       // Step 1: pull teams
-      supa.from('teams').select('*').eq('coach_id',coachId).then(function(r){
+      supa.from('teams').select('*').eq('user_id',coachId).then(function(r){
         var d=getRaw();
         (r.data||[]).forEach(function(t){d.t[t.id]={id:t.id,name:t.name,color:t.color||'#f5881f',created:Date.now()};});
         saveRaw(d);
       });
       // Step 2: pull athletes + sessions
-      supa.from('athletes').select('*').eq('coach_id',coachId).then(function(ra){
+      supa.from('athletes').select('*').eq('user_id',coachId).then(function(ra){
         if(ra.error){if(onDone)onDone(false);return;}
         var athList=ra.data||[];
         if(!athList.length){if(onDone)onDone(true);return;}
-        supa.from('sessions').select('*').eq('coach_id',coachId).then(function(rs){
+        supa.from('evaluations').select('*').eq('user_id',coachId).then(function(rs){
           var sessList=rs.data||[];
           var sessMap={};
           sessList.forEach(function(s){if(!sessMap[s.athlete_id])sessMap[s.athlete_id]=[];sessMap[s.athlete_id].push(s);});
@@ -1318,18 +1319,18 @@ var SupaDB=(function(){
               bodyweight:a.bodyweight||null,height:a.height||'',
               created:a.created_at?new Date(a.created_at).getTime():Date.now(),s:[]};
             (sessMap[a.id]||[]).forEach(function(s){
-              rec.s.push({id:s.id,ts:s.test_date?new Date(s.test_date).getTime():Date.now(),
-                date:s.test_date?new Date(s.test_date).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}):new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
+              rec.s.push({id:s.id,ts:s.ts?Number(s.ts):Date.now(),
+                date:s.date_label||new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
                 apeScore:s.ape_score!=null?s.ape_score:null,sc:s.scores||null,raw:s.raw||{},
-                bkt:s.bkt!=null?s.bkt:null,bktName:s.bkt_name||null,defType:s.def_type||null,
-                cnt:s.cnt!=null?s.cnt:null,focus:s.primary_focus||'',note:s.session_note||''});
+                bkt:s.bucket!=null?s.bucket:null,bktName:s.bucket_name||null,defType:s.deficiency_type||null,
+                cnt:s.count_metrics!=null?s.count_metrics:null,focus:s.focus||'',note:s.note||''});
             });
             rec.s.sort(function(a,b){return(a.ts||0)-(b.ts||0);});
             d.a[a.id]=rec;
           });
           saveRaw(d);
           // Step 3: pull coach settings
-          supa.from('coach_settings').select('*').eq('coach_id',coachId).single()
+          supa.from('coach_settings').select('*').eq('user_id',coachId).single()
             .then(function(rset){
               if(rset.data){
                 DB.saveSettings({coachName:rset.data.coach_name||'',gymName:rset.data.gym_name||'',tagline:rset.data.tagline||'',contact:rset.data.contact||''});
@@ -1551,7 +1552,7 @@ function saveSettings(){
   // Sync to Supabase if signed in
   var u=SupaDB.getUser();
   if(u&&_supaClient()){
-    _supaClient().from('coach_settings').upsert({coach_id:u.id,coach_name:cfg.coachName,
+    _supaClient().from('coach_settings').upsert({user_id:u.id,coach_name:cfg.coachName,
       gym_name:cfg.gymName,tagline:cfg.tagline,contact:cfg.contact}).then(function(){});
   }
   closeSettings();
@@ -4383,7 +4384,7 @@ function doCreateTeam(){
     var t=DB.createTeam(name,color);
     if(SupaDB&&SupaDB.getUser()){
       var supa=_supaClient();
-      if(supa)supa.from('teams').upsert({id:t.id,coach_id:SupaDB.getUser().id,name:t.name,color:t.color}).then(function(){});
+      if(supa)supa.from('teams').upsert({id:t.id,user_id:SupaDB.getUser().id,name:t.name,color:t.color}).then(function(){});
     }
     if(nameEl)nameEl.value='';
     buildTeams();
