@@ -1168,7 +1168,7 @@ var DB = (function(){
       if(sid){var a=d.a[aid];if(a)a.s=a.s.filter(function(s){return s.id!==sid;});}
       else{delete d.a[aid];}
       w(d);
-      if(sid)_cloudDelete('sessions',sid);
+      if(sid)_cloudDelete('evaluations',sid);
       else _cloudDelete('athletes',aid);
     },
     updateAthlete: function(aid,name,newTier,sport,position,age,team,gradYear,notes,bodyweight,height,extra){
@@ -4802,6 +4802,5 @@ refreshTeamSelect('');
 
 </body>
 </html>
-
 
 
