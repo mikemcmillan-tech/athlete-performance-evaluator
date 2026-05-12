@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Athlete Performance Evaluator</title>
+<title>APE — Athlete Performance Evolution</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════
-   APE — Athlete Performance Evaluator  |  Design System
+   APE — Athlete Performance Evolution  |  Design System
    Dark/ice theme — coach dashboard aesthetic
    ═══════════════════════════════════════════════════════════ */
 
@@ -64,8 +64,8 @@ body{font-family:var(--font);background:
 .landing-shell{position:relative;z-index:1;max-width:1180px;margin:0 auto;min-height:calc(100vh - 56px);display:flex;flex-direction:column}
 .landing-nav{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:54px}
 .landing-brand{display:flex;align-items:center;gap:14px}
-.landing-logo{width:92px;height:112px;border-radius:16px;display:grid;place-items:center;overflow:hidden;background:#06070b;border:1px solid var(--bd);box-shadow:0 18px 38px rgba(91,233,255,.13),0 0 0 1px rgba(255,255,255,.04) inset}
-.landing-logo svg{width:72%;height:72%;display:block}
+.landing-logo{display:flex;align-items:center}
+.landing-logo img{height:80px;width:auto;display:block;object-fit:contain}
 .landing-brand-title{font-family:var(--font);font-size:22px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;line-height:1}
 .landing-brand-sub{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--or);margin-top:4px}
 .landing-nav-note{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--sb);border:1px solid rgba(127,160,184,.24);border-radius:999px;padding:8px 13px;background:rgba(19,26,33,.42)}
@@ -128,7 +128,7 @@ body{font-family:var(--font);background:
   position:sticky;top:0;z-index:100;
 }
 .hdr-in{max-width:960px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;gap:16px}
-.hdr-logo{height:42px;width:42px;border-radius:9px;flex-shrink:0;background:#06070b;border:1px solid var(--bd);padding:5px;display:block}
+.hdr-logo{height:44px;width:auto;flex-shrink:0;display:block;object-fit:contain}
 .hdr-mid{flex:1;min-width:0}
 .hdr-title{font-family:var(--font);font-size:19px;font-weight:700;color:#fff;letter-spacing:.08em;text-transform:uppercase;line-height:1}
 .hdr-sub{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--or);font-weight:700;margin-top:2px;opacity:.85}
@@ -584,7 +584,7 @@ select option{background:var(--dk3)}
   .landing-shell{min-height:calc(100vh - 36px)}
   .landing-nav{margin-bottom:32px;align-items:flex-start}
   .landing-nav-note{display:none}
-  .landing-logo{width:50px;height:50px;border-radius:12px}
+  .landing-logo img{height:52px}
   .landing-brand-title{font-size:18px}
   .landing-main{gap:28px;justify-content:flex-start;text-align:left}
   .landing-title{font-size:42px;line-height:.98}
@@ -729,11 +729,7 @@ select option{background:var(--dk3)}
   <div class="landing-shell">
     <div class="landing-nav">
       <div class="landing-brand">
-        <div class="landing-logo" aria-label="APE logo"><svg viewBox="0 0 100 100" style="width:68%;height:68%;color:var(--or)"><use href="#apeLogo"/></svg></div>
-        <div>
-          <div class="landing-brand-title">Athlete Performance Evaluator</div>
-          <div class="landing-brand-sub">Negative Space Performance Evaluation</div>
-        </div>
+        <div class="landing-logo" aria-label="APE logo"><img src="assets/ape-logo-stacked.png" alt="APE — Athlete Performance Evolution"></div>
       </div>
       <div class="landing-nav-note">Coach SaaS MVP</div>
     </div>
@@ -807,11 +803,7 @@ select option{background:var(--dk3)}
 <div class="app-shell" id="app-shell">
 <div class="hdr">
   <div class="hdr-in">
-    <svg class="hdr-logo" viewBox="0 0 100 100" aria-label="APE" style="color:var(--or)"><use href="#apeLogo"/></svg>
-    <div class="hdr-mid">
-      <div class="hdr-title">APE</div>
-      <div class="hdr-sub">Athlete Performance Evaluator</div>
-    </div>
+    <img src="assets/ape-logo-horizontal.png" alt="APE" class="hdr-logo">
     <div class="hdr-nav">
       <button class="nav-btn" id="nav-dash" onclick="goDash()">Dashboard</button>
       <button class="nav-btn" id="nav-teams" onclick="buildTeams()">Teams</button>
@@ -992,7 +984,7 @@ select option{background:var(--dk3)}
       <button class="btn-s" onclick="window.print()">Print / PDF</button>
       <button class="btn-s" style="flex:1" onclick="resetAll()">New Evaluation</button>
     </div>
-    <div class="footer"><div class="footer-txt">Athlete Performance Evaluator · Sports Performance Assessment</div></div>
+    <div class="footer"><div class="footer-txt">Athlete Performance Evolution · Athlete Performance Evolution</div></div>
   </div>
 
   <div class="page" id="page4">
@@ -3391,7 +3383,7 @@ function buildReport(S){
   var or='#F5881F';
   var cfg=DB.loadSettings();
   var coachName=cfg.coachName||'';
-  var gymName=cfg.gymName||'Athlete Performance Evaluator';
+  var gymName=cfg.gymName||'Athlete Performance Evolution';
   var contact=cfg.contact||'';
   var tagline=cfg.tagline||'';
   var dT=S.defType||'Incomplete Data';
@@ -3649,7 +3641,7 @@ function buildReport(S){
     +'<div><div style="font-size:12px;font-weight:700;color:#fff">'+esc(gymName)+(coachName?' &nbsp;·&nbsp; Coach '+esc(coachName):'')+'</div>'
     +(contact?'<div style="font-size:11px;color:#888;margin-top:2px">'+esc(contact)+'</div>':'')
     +'</div>'
-    +'<div style="font-size:11px;color:#666;text-align:right">Athlete Performance Evaluator<br>Powered by APE</div>'
+    +'<div style="font-size:11px;color:#666;text-align:right">Athlete Performance Evolution<br>Powered by APE</div>'
     +'</div>';
 
   o+='</div>';
@@ -4809,4 +4801,6 @@ refreshTeamSelect('');
 
 </body>
 </html>
+
+
 
