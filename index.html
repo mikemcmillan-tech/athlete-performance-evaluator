@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f0a500">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="APE">
+<meta name="description" content="Professional athlete performance evaluation and tracking for coaches.">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <title>APE — Athlete Performance Evolution</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -75,6 +84,8 @@ body{font-family:var(--font);background:
 .landing-title{font-family:var(--font);font-size:72px;font-weight:700;line-height:.94;letter-spacing:0;text-transform:uppercase;color:#fff;max-width:720px}
 .landing-title em{font-style:normal;color:var(--or);text-shadow:0 0 36px rgba(91,233,255,.28)}
 .landing-text{font-size:18px;color:#AFC3D2;line-height:1.58;max-width:610px;margin:22px auto 0}
+.landing-video-wrap{width:100%;max-width:480px;margin:0 auto;border-radius:18px;overflow:hidden;box-shadow:0 0 60px rgba(240,165,0,.22),0 24px 64px rgba(0,0,0,.6);border:1px solid rgba(240,165,0,.18)}
+.landing-video{width:100%;height:auto;display:block;object-fit:cover}
 .landing-proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:34px auto 0;max-width:620px}
 .proof-item{border:1px solid rgba(127,160,184,.18);background:rgba(19,26,33,.5);border-radius:var(--radius);padding:13px 14px;backdrop-filter:blur(10px);transition:transform .2s,border-color .2s,background .2s}
 .proof-item:hover{transform:translateY(-3px);border-color:rgba(91,233,255,.38);background:rgba(22,26,36,.82)}
@@ -767,6 +778,12 @@ select option{background:var(--dk3)}
           <div class="proof-item"><div class="proof-num">02</div><div class="proof-lbl">Interpret</div></div>
           <div class="proof-item"><div class="proof-num">03</div><div class="proof-lbl">Coach</div></div>
         </div>
+      </div>
+
+      <div class="landing-video-wrap">
+        <video class="landing-video" autoplay muted loop playsinline poster="assets/ape-final-logo.png">
+          <source src="assets/ape-logo-reveal.mp4" type="video/mp4">
+        </video>
       </div>
 
       <div class="login-card">
@@ -5466,5 +5483,16 @@ refreshTeamSelect('');
   </div>
 </div>
 
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js').then(function(reg) {
+      console.log('[APE] Service worker registered:', reg.scope);
+    }).catch(function(err) {
+      console.warn('[APE] Service worker error:', err);
+    });
+  });
+}
+</script>
 </body>
 </html>
