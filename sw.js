@@ -1,14 +1,14 @@
-// APE Service Worker — v1
-const CACHE_NAME = 'ape-v1';
+// APE Service Worker - v2
+const CACHE_NAME = 'ape-v2';
 const PRECACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/favicon.ico',
-  '/assets/ape-final-logo.png',
-  '/assets/apple-touch-icon.png',
-  '/assets/icons/icon-192x192.png',
-  '/assets/icons/icon-512x512.png'
+  './',
+  './index.html',
+  './manifest.json',
+  './favicon.ico',
+  './assets/ape-final-logo.png',
+  './assets/apple-touch-icon.png',
+  './assets/icons/icon-192x192.png',
+  './assets/icons/icon-512x512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -28,10 +28,10 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  // Network-first for navigation, cache-first for assets
+  // Network-first for navigation, cache-first for assets.
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match('/index.html'))
+      fetch(event.request).catch(() => caches.match('./index.html'))
     );
   } else {
     event.respondWith(

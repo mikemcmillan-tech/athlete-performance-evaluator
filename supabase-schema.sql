@@ -18,6 +18,8 @@ create table if not exists public.athletes (
   sport text,
   position text,
   age integer,
+  gender text,
+  grade text,
   team_id text,
   grad_year integer,
   notes text,
@@ -42,6 +44,11 @@ create table if not exists public.evaluations (
   count_metrics integer,
   ape_score integer,
   note text,
+  verified boolean default false,
+  timing_method text,
+  verification jsonb default '{}'::jsonb,
+  tester_name text,
+  event_name text,
   created_at timestamptz default now()
 );
 
@@ -51,6 +58,7 @@ create table if not exists public.coach_settings (
   gym_name text,
   tagline text,
   contact text,
+  logo_base64 text,
   settings jsonb default '{}'::jsonb,
   updated_at timestamptz default now()
 );
