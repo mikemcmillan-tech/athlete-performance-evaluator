@@ -49,6 +49,10 @@ vm.runInContext(script.slice(ctxStart, ctxEnd), sandbox);
   'calculatePR',
   'calculateTrendDirection',
   'calculateImprovementPercentage',
+  '_normEmail',
+  'resolveViewerAthletesForEmail',
+  'getLatestSession',
+  'getViewerFocus',
   'validateCoachLogoFile'
 ].forEach((name) => vm.runInContext(extractFunction(name), sandbox));
 
@@ -70,6 +74,22 @@ assert.equal(sandbox.calculateTrendDirection('vj', sessions), 'up');
 assert.equal(sandbox.calculateTrendDirection('f5', sessions), 'up');
 assert.equal(sandbox.calculateImprovementPercentage('vj', sessions), 8.3);
 assert.equal(sandbox.calculateImprovementPercentage('f5', sessions), 7.7);
+
+const viewerAthletes = [
+  { id: 'a1', name: 'A One', athleteEmail: 'athlete@example.com', parentEmail: 'parent@example.com' },
+  { id: 'a2', name: 'A Two', athleteEmail: 'other@example.com', parentEmail: 'parent@example.com' }
+];
+assert.equal(sandbox.resolveViewerAthletesForEmail(viewerAthletes, 'ATHLETE@example.com', 'athlete_viewer').length, 1);
+assert.equal(sandbox.resolveViewerAthletesForEmail(viewerAthletes, 'parent@example.com', 'parent_viewer').length, 2);
+
+const focus = sandbox.getViewerFocus({
+  notes: 'Profile coach note',
+  s: [{ id: 's1', focus: 'Change of Direction', defType: 'Mixed Deficiency', note: 'Session note', sc: { vp: 4, hp: 3, rs: 2, ac: 3, mv: 4, cod: 1, gps: 3 } }]
+});
+assert.equal(focus.primary, 'Change of Direction');
+assert.equal(focus.weakest, 'Change of Direction');
+assert.match(focus.coachNotes, /Session note/);
+assert.match(focus.coachNotes, /Profile coach note/);
 
 assert.equal(sandbox.validateCoachLogoFile({ type: 'image/png', size: 1024 }).ok, true);
 assert.equal(sandbox.validateCoachLogoFile({ type: 'image/gif', size: 1024 }).ok, false);

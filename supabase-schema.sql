@@ -23,6 +23,10 @@ create table if not exists public.athletes (
   team_id text,
   grad_year integer,
   notes text,
+  athlete_email text,
+  parent_email text,
+  club text,
+  level_label text,
   bodyweight numeric,
   training_age numeric,
   created_at_ms bigint,
@@ -85,4 +89,6 @@ for all using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
 
 create index if not exists idx_athletes_user_id on public.athletes(user_id);
+create index if not exists idx_athletes_athlete_email on public.athletes(lower(athlete_email));
+create index if not exists idx_athletes_parent_email on public.athletes(lower(parent_email));
 create index if not exists idx_evaluations_athlete_id on public.evaluations(athlete_id);
