@@ -12,23 +12,23 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<title>APE — Athlete Performance Evolution</title>
+<title>APE — Athlete Performance Evaluator</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 /* ═══════════════════════════════════════════════════════════
-   APE — Athlete Performance Evolution  |  Design System
+   APE — Athlete Performance Evaluator  |  Design System
    Dark/ice theme — coach dashboard aesthetic
    ═══════════════════════════════════════════════════════════ */
 
 /* ── Tokens ── */
 :root{
-  --or:#5be9ff;--or2:#1ab4e8;--or-glow:rgba(91,233,255,.12);
-  --dk:#06070b;--dk2:#0a0c11;--dk3:#0f121a;--dk4:#161a24;--dk5:#1d2230;
-  --bd:rgba(255,255,255,.08);--bd2:rgba(255,255,255,.15);
-  --mt:#5d6577;--tx:#eef1f6;--sb:#97a0b3;
+  --or:#5BE9FF;--or2:#1AB4E8;--or-glow:rgba(91,233,255,.22);
+  --dk:#06070B;--dk2:#0F121A;--dk3:#161A24;--dk4:#1D2230;--dk5:#2A3242;
+  --bd:rgba(255,255,255,0.08);--bd2:rgba(255,255,255,0.05);
+  --mt:#5D6577;--tx:#EEF1F6;--sb:#97A0B3;
   --s1:#ff5470;--s1b:#ffb1be;--s3:#00b97a;--s4:#00f5a0;--s3b:#7effc7;--s4b:#a4ffd5;
   --peak:#f4f6fa;--electric:#0a84ff;
   --radius:12px;--radius-sm:8px;--radius-lg:16px;
@@ -140,9 +140,10 @@ body{font-family:var(--font);background:
   position:sticky;top:0;z-index:100;
 }
 .hdr-in{max-width:1120px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;gap:16px}
-.hdr-logo{height:44px;width:auto;flex-shrink:0;display:block;object-fit:contain}
+.hdr-mark{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--or),var(--electric));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 10px 26px -14px rgba(91,233,255,.7)}
+.hdr-mark span{font-family:Inter,var(--font);font-size:24px;font-weight:900;font-style:italic;color:#fff;line-height:1;transform:skew(-8deg)}
 .hdr-mid{flex:1;min-width:0}
-.hdr-title{font-family:var(--font);font-size:19px;font-weight:700;color:#fff;letter-spacing:.08em;text-transform:uppercase;line-height:1}
+.hdr-title{font-family:var(--font);font-size:17px;font-weight:800;color:#fff;letter-spacing:.08em;text-transform:uppercase;line-height:1}
 .hdr-sub{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--or);font-weight:700;margin-top:2px;opacity:.85}
 .hdr-nav{display:flex;gap:6px;flex-shrink:0;align-items:center}
 .nav-btn{
@@ -592,6 +593,9 @@ select option{background:var(--dk3)}
 /* Empty states */
 .empty-state{text-align:center;padding:56px 24px}
 .empty-ico{font-size:42px;margin-bottom:14px;opacity:.35}
+.empty-ico svg{width:64px;height:64px;stroke:var(--mt);stroke-width:1.5;fill:none;opacity:.9}
+.empty-video-wrap{max-width:480px;margin:0 auto 26px;border-radius:16px;overflow:hidden;box-shadow:0 30px 60px -20px rgba(91,233,255,0.35);border:1px solid rgba(91,233,255,.16);background:var(--dk3)}
+.empty-video-wrap video{display:block;width:100%;height:auto}
 .empty-h{font-family:var(--font);font-size:18px;font-weight:700;color:var(--sb);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
 .empty-p{font-size:13px;color:var(--mt);line-height:1.65;max-width:280px;margin:0 auto 22px}
 
@@ -710,12 +714,16 @@ select option{background:var(--dk3)}
 .lb-val-num{font-family:var(--font);font-size:26px;font-weight:700;line-height:1}
 .lb-ape-sub{font-size:9px;font-weight:700;margin-top:2px}
 
-/* ── Auth Pill ── */
-.auth-pill{display:flex;align-items:center;gap:7px;padding:6px 12px;background:var(--dk3);border:1px solid var(--bd);border-radius:20px;cursor:pointer;transition:all .18s;font-size:12px;color:var(--mt);font-family:var(--font);white-space:nowrap}
-.auth-pill:hover{border-color:var(--sb);color:var(--tx);background:var(--dk4)}
-.auth-pill.signed-in{border-color:var(--or);color:var(--or)}
-.auth-dot{width:7px;height:7px;border-radius:50%;background:var(--mt);flex-shrink:0}
-.auth-pill.signed-in .auth-dot{background:var(--s4)}
+/* ── Profile Dropdown ── */
+.profile-wrap{position:relative;display:flex;align-items:center}
+.profile-btn{display:flex;align-items:center;gap:8px;padding:5px 9px 5px 5px;background:var(--dk3);border:1px solid var(--bd);border-radius:999px;color:var(--sb);cursor:pointer;transition:all .18s;font-size:12px;font-weight:700;font-family:var(--font);white-space:nowrap}
+.profile-btn:hover,.profile-btn.open,.profile-btn.signed-in{border-color:var(--or);color:var(--or);background:var(--dk4)}
+.profile-avatar{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--or),var(--electric));color:#fff;font-size:11px;font-weight:900;letter-spacing:.02em;line-height:1}
+.profile-menu{display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:178px;background:var(--dk2);border:1px solid var(--bd);border-radius:var(--radius-sm);box-shadow:0 18px 44px rgba(0,0,0,.45);padding:7px;z-index:200}
+.profile-menu.open{display:block;animation:fu .16s ease}
+.profile-menu button{width:100%;display:flex;align-items:center;gap:8px;background:transparent;border:none;border-radius:6px;color:var(--sb);font-family:var(--font);font-size:12px;font-weight:700;text-align:left;padding:9px 10px;cursor:pointer}
+.profile-menu button:hover{background:var(--dk4);color:var(--tx)}
+.icon-inline{width:16px;height:16px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:-3px}
 /* ── Auth Modal ── */
 .auth-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center;padding:20px}
 .auth-overlay.open{display:flex;animation:fu .18s ease}
@@ -772,7 +780,7 @@ select option{background:var(--dk3)}
   <div class="landing-shell">
     <div class="landing-nav">
       <div class="landing-brand">
-        <div class="landing-logo" aria-label="APE logo"><img src="assets/ape-logo-stacked.png" alt="APE — Athlete Performance Evolution"></div>
+        <div class="landing-logo" aria-label="APE logo"><img src="assets/ape-logo-stacked.png" alt="APE — Athlete Performance Evaluator"></div>
       </div>
       <div class="landing-nav-note">Coach SaaS MVP</div>
     </div>
@@ -852,14 +860,19 @@ select option{background:var(--dk3)}
 <div class="app-shell" id="app-shell">
 <div class="hdr">
   <div class="hdr-in">
-    <img src="assets/ape-logo-horizontal.png" alt="APE" class="hdr-logo">
+    <div class="hdr-mark" aria-label="APE logo placeholder"><span>A</span></div>
+    <div class="hdr-mid"><div class="hdr-title">APE</div><div class="hdr-sub">SPORTS PERFORMANCE ASSESSMENT</div></div>
     <div class="hdr-nav">
-      <button class="nav-btn" id="nav-dash" onclick="goDash()">Dashboard</button>
+      <button class="nav-btn" id="nav-dash" onclick="goDash()">Athletes</button>
       <button class="nav-btn" id="nav-teams" onclick="buildTeams()">Teams</button>
-      <button class="auth-pill" id="auth-pill" onclick="openAuth()"><span class="auth-dot"></span><span id="auth-pill-label">Sign In</span></button>
-      <div style="width:1px;height:22px;background:var(--bd);flex-shrink:0"></div>
-      <button class="btn-s" style="padding:7px 12px;font-size:12px;flex:none" onclick="openSettings()" title="Coach Settings">&#9881;</button>
-      <button class="btn-p" style="padding:8px 16px;font-size:13px;flex:none;margin-left:2px" onclick="goNew()">+ New Eval</button>
+      <div class="profile-wrap">
+        <button class="profile-btn" id="profile-btn" onclick="toggleProfileMenu(event)" aria-haspopup="menu" aria-expanded="false"><span class="profile-avatar" id="profile-avatar">A</span><span id="auth-pill-label">Sign In</span></button>
+        <div class="profile-menu" id="profile-menu" role="menu">
+          <button type="button" id="profile-auth-action" onclick="profileAuthAction()"><span id="profile-auth-icon"><svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span id="profile-auth-label">Sign In</span></button>
+          <button type="button" onclick="openSettings();closeProfileMenu()"><svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg> Coach Settings</button>
+        </div>
+      </div>
+      <button class="btn-p" style="padding:8px 16px;font-size:13px;flex:none;margin-left:2px" onclick="goNew()"><svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg> New Eval</button>
     </div>
   </div>
 </div>
@@ -1126,7 +1139,7 @@ select option{background:var(--dk3)}
       <button class="btn-s" onclick="window.print()">Print / PDF</button>
       <button class="btn-s" style="flex:1" onclick="resetAll()">New Evaluation</button>
     </div>
-    <div class="footer"><div class="footer-txt">Athlete Performance Evolution · Athlete Performance Evolution</div></div>
+    <div class="footer"><div class="footer-txt">Athlete Performance Evaluator · Athlete Performance Evaluator</div></div>
   </div>
 
   <div class="page" id="page4">
@@ -1348,7 +1361,7 @@ var DB = (function(){
     createTeam: function(name,color){
       var d=r();if(!d.t)d.t={};
       var id=uid('t');
-      d.t[id]={id:id,name:name.trim(),color:color||'#F5881F',created:Date.now()};
+      d.t[id]={id:id,name:name.trim(),color:color||'#5BE9FF',created:Date.now()};
       w(d);_cloudSyncSoon();return d.t[id];
     },
     updateTeam: function(tid,name,color){
@@ -1559,6 +1572,10 @@ function openAuth(){
   _authSwitchTab('signin');
 }
 function closeAuth(){var ov=el('auth-overlay');if(ov)ov.classList.remove('open');}
+function toggleProfileMenu(evt){if(evt)evt.stopPropagation();var m=el('profile-menu'),b=el('profile-btn');if(!m)return;var open=!m.classList.contains('open');m.classList.toggle('open',open);if(b){b.classList.toggle('open',open);b.setAttribute('aria-expanded',open?'true':'false');}}
+function closeProfileMenu(){var m=el('profile-menu'),b=el('profile-btn');if(m)m.classList.remove('open');if(b){b.classList.remove('open');b.setAttribute('aria-expanded','false');}}
+function profileAuthAction(){closeProfileMenu();openAuth();}
+document.addEventListener('click',function(e){var w=document.querySelector('.profile-wrap');if(w&&!w.contains(e.target))closeProfileMenu();});
 function _authSwitchTab(tab){
   var tabs=document.querySelectorAll('.auth-tab');
   tabs.forEach(function(t){t.classList.toggle('act',t.getAttribute('data-tab')===tab);});
@@ -1569,13 +1586,20 @@ function _authSwitchTab(tab){
 }
 function _authShowErr(msg){var e=el('auth-err');if(e){e.textContent=msg;e.style.display='block';}}
 function _authUpdatePill(user){
-  var pill=el('auth-pill'),lbl=el('auth-pill-label');
+  var pill=el('profile-btn'),lbl=el('auth-pill-label'),avatar=el('profile-avatar'),menuLbl=el('profile-auth-label'),menuIco=el('profile-auth-icon');
   if(user){
     if(pill)pill.classList.add('signed-in');
-    if(lbl)lbl.textContent=user.email.split('@')[0];
+    var name=user.email.split('@')[0];
+    if(lbl)lbl.textContent=name;
+    if(avatar)avatar.textContent=(name||'A').slice(0,2).toUpperCase();
+    if(menuLbl)menuLbl.textContent='Sign Out';
+    if(menuIco)menuIco.innerHTML=iconSvg('log-out');
   }else{
     if(pill)pill.classList.remove('signed-in');
     if(lbl)lbl.textContent='Sign In';
+    if(avatar)avatar.textContent='A';
+    if(menuLbl)menuLbl.textContent='Sign In';
+    if(menuIco)menuIco.innerHTML=iconSvg('user');
   }
 }
 function handleSignin(){
@@ -1762,7 +1786,7 @@ var RSI_BENCH={
   college:{t1:1.3, t2:1.8, t3:2.3, t4:2.8},
   pro:    {t1:1.5, t2:2.0, t3:2.5, t4:3.0}
 };
-var TM={youth:{label:'Youth (U14)',c:'#6B9A2A'},hs:{label:'High School',c:'#BA7517'},college:{label:'College',c:'#1F9E70'},pro:{label:'Pro / Elite',c:'#F5881F'}};
+var TM={youth:{label:'Youth (U14)',c:'#6B9A2A'},hs:{label:'High School',c:'#BA7517'},college:{label:'College',c:'#1F9E70'},pro:{label:'Pro / Elite',c:'#5BE9FF'}};
 var DC=['','#C93B3B','#BA7517','#6B9A2A','#1F9E70','#0F7A54'];
 var SPORT_OPTIONS=['Football','Basketball','Baseball','Softball','Volleyball','Track','Lacrosse','Flag Football'];
 var SPORT_POSITIONS={
@@ -2043,6 +2067,20 @@ function getAthletePositionProfile(athleteOrSession){
 function el(id){return document.getElementById(id);}
 function gn(id){var v=parseFloat(el(id).value);return(isNaN(v)||v<=0)?null:v;}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function iconSvg(name){
+  var icons={
+    trophy:'<svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M17 5h3a2 2 0 0 1-2 4h-1"/><path d="M7 5H4a2 2 0 0 0 2 4h1"/></svg>',
+    'bar-chart-3':'<svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>',
+    download:'<svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>',
+    plus:'<svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"/><path d="M5 12h14"/></svg>',
+    'user-plus':'<svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M16 11h6"/></svg>',
+    'settings-2':'<svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>',
+    users:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    user:'<svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>',
+    'log-out':'<svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg>'
+  };
+  return icons[name]||'';
+}
 function avg(a){var n=a.filter(function(x){return x!==null&&x!==undefined&&!isNaN(x);});if(!n.length)return null;return n.reduce(function(a,b){return a+b;},0)/n.length;}
 function scv(v,b,lb){if(lb)return v<=b[4]?5:v<=b[3]?4:v<=b[2]?3:v<=b[1]?2:1;return v>=b[4]?5:v>=b[3]?4:v>=b[2]?3:v>=b[1]?2:1;}
 function sRSI(r,tier){var b=RSI_BENCH[tier]||RSI_BENCH.hs;return r>=b.t4?5:r>=b.t3?4:r>=b.t2?3:r>=b.t1?2:1;}
@@ -2253,7 +2291,7 @@ function handleCoachLogoInput(input){
   uploadCoachLogo(input.files[0]).then(function(){_toast('Logo uploaded. Save settings to sync it.','#1e6f3e');}).catch(function(e){_toast(e.message||'Logo upload failed.','#8A3A2B');});
 }
 function renderReportHeader(coachSettings){
-  var cfg=coachSettings||{},coachName=cfg.coachName||'',gymName=cfg.gymName||'Athlete Performance Evolution',contact=cfg.contact||'',tagline=cfg.tagline||'',logo=cfg.logoBase64||'';
+  var cfg=coachSettings||{},coachName=cfg.coachName||'',gymName=cfg.gymName||'Athlete Performance Evaluator',contact=cfg.contact||'',tagline=cfg.tagline||'',logo=cfg.logoBase64||'';
   if(!logo){
     return '<div style="background:#111;padding:18px 28px;display:flex;justify-content:space-between;align-items:center">'
       +'<div><div style="font-family:Inter,sans-serif;font-size:22px;font-weight:700;color:#fff;letter-spacing:.04em;text-transform:uppercase">'+esc(gymName)+'</div>'
@@ -2406,7 +2444,7 @@ function _combineKey(name,level,teamName){return _combineNorm(name)+'|'+_combine
 function _combineExistingByKey(){var maps=_combineTeamMaps(),out={};DB.getAll().forEach(function(a){var tn=a.team&&maps.byId[a.team]?maps.byId[a.team].name:'';out[_combineKey(a.name,a.levelLabel||a.tier||'',tn)]=a;});return out;}
 function _combineEnsureTeam(name){name=String(name||'').trim();if(!name)return null;var maps=_combineTeamMaps(),existing=maps.byName[_combineNorm(name)];if(existing)return existing;return DB.createTeam(name,'#5be9ff');}
 function _combineCsvDownload(rows,filename){if(!rows.length)return;var headers=Object.keys(rows[0]);var csv=headers.join(',')+'\n'+rows.map(function(r){return headers.map(function(h){var v=String(r[h]===null||r[h]===undefined?'':r[h]);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',');}).join('\n');var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);if(a.parentNode)a.parentNode.removeChild(a);},0);}
-function _combineWriteRows(rows,filename,sheetName){if(!rows.length){alert('No rows to export.');return;}if(typeof XLSX!=='undefined'){var cfg=DB.loadSettings(),wb=XLSX.utils.book_new();var summary=[{'Section':'Coach Branding','Value':cfg.gymName||'Athlete Performance Evolution'},{'Section':'Coach','Value':cfg.coachName||''},{'Section':'Contact','Value':cfg.contact||''},{'Section':'Export Date','Value':new Date().toLocaleDateString('en-US')},{'Section':'Rows','Value':rows.length},{'Section':'Logo','Value':cfg.logoBase64?'Logo included in HTML/PDF reports; XLSX stores branding text only.':''}];XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(summary),'Summary');var ws=XLSX.utils.json_to_sheet(rows);ws['!cols']=Object.keys(rows[0]||{}).map(function(){return{wch:18};});XLSX.utils.book_append_sheet(wb,ws,(sheetName||'Raw Data').substring(0,31));XLSX.writeFile(wb,filename.replace(/\.csv$/i,'.xlsx'));return;}_combineCsvDownload(rows,filename.replace(/\.xlsx$/i,'.csv'));}
+function _combineWriteRows(rows,filename,sheetName){if(!rows.length){alert('No rows to export.');return;}if(typeof XLSX!=='undefined'){var cfg=DB.loadSettings(),wb=XLSX.utils.book_new();var summary=[{'Section':'Coach Branding','Value':cfg.gymName||'Athlete Performance Evaluator'},{'Section':'Coach','Value':cfg.coachName||''},{'Section':'Contact','Value':cfg.contact||''},{'Section':'Export Date','Value':new Date().toLocaleDateString('en-US')},{'Section':'Rows','Value':rows.length},{'Section':'Logo','Value':cfg.logoBase64?'Logo included in HTML/PDF reports; XLSX stores branding text only.':''}];XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(summary),'Summary');var ws=XLSX.utils.json_to_sheet(rows);ws['!cols']=Object.keys(rows[0]||{}).map(function(){return{wch:18};});XLSX.utils.book_append_sheet(wb,ws,(sheetName||'Raw Data').substring(0,31));XLSX.writeFile(wb,filename.replace(/\.csv$/i,'.xlsx'));return;}_combineCsvDownload(rows,filename.replace(/\.xlsx$/i,'.csv'));}
 function downloadRosterTemplate(){_combineWriteRows([{'Athlete Name':'Jordan Smith','Team':'13 Gold','Sport':'Volleyball','Position':'Outside Hitter','Gender':'Female','Grade':'9th','Level':'13U','Age':'13','Grad Year':'2031','Bodyweight':'115','Height':'5-5','Athlete Email':'athlete@example.com','Parent Email':'parent@example.com','Notes':''}],'APE_Roster_Template.xlsx','Roster Template');}
 function parseRosterFile(file){return new Promise(function(resolve,reject){if(!file){resolve([]);return;}if(typeof XLSX==='undefined'){reject(new Error('XLSX library is not loaded.'));return;}var reader=new FileReader();reader.onload=function(e){try{var wb=XLSX.read(e.target.result,{type:'array'}),sheet=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(sheet,{defval:'',raw:false});resolve(rows||[]);}catch(err){reject(err);}};reader.onerror=function(){reject(new Error('Could not read roster file.'));};reader.readAsArrayBuffer(file);});}
 function normalizeRosterRow(src,idx){var first=String(_combineField(src,['First Name','first_name'])||'').trim(),last=String(_combineField(src,['Last Name','last_name'])||'').trim(),full=String(_combineField(src,['Athlete Name','athlete_name','Full Name','full_name','Name'])||'').trim();var name=full||(first||last?[first,last].filter(Boolean).join(' '):''),teamName=String(_combineField(src,['Team','Team Name'])||'').trim(),hadTeam=!!teamName;if(!teamName)teamName=_combineFallbackTeamName();var level=String(_combineField(src,['Level','Tier','Level / Tier','Tier / Level'])||'').trim(),age=_combineNum(_combineField(src,['Age']));return{idx:idx,name:name,nameKey:_combineNorm(name),teamName:teamName,hadTeam:hadTeam,club:String(_combineField(src,['Club','Club Team'])||'').trim(),age:age,gender:String(_combineField(src,['Gender','Sex'])||'').trim(),grade:String(_combineField(src,['Grade','Class'])||'').trim(),gradYear:_combineNum(_combineField(src,['Grad Year','GradYear','Graduation Year'])),sport:String(_combineField(src,['Sport'])||'').trim(),position:String(_combineField(src,['Position','Pos'])||'').trim(),levelLabel:level,tier:_combineTier(level,age),bodyweight:_combineNum(_combineField(src,['Bodyweight','Body Weight','Weight'])),height:String(_combineField(src,['Height'])||'').trim(),athleteEmail:String(_combineField(src,['Athlete Email','AthleteEmail'])||'').trim(),parentEmail:String(_combineField(src,['Parent Email','ParentEmail'])||'').trim(),notes:String(_combineField(src,['Notes','Note'])||'').trim(),invalid:!name};}
@@ -2416,7 +2454,7 @@ function confirmRosterImport(){var rows=_combineState.rows||[];if(!rows.length){
 function _combineMetricSpecs(){return[{k:'vj',label:'Vertical Jump',short:'VJ',step:'0.1'},{k:'bj',label:'Broad Jump',short:'BJ',step:'0.01'},{k:'rsi',label:'RSI',short:'RSI',step:'0.01'},{k:'f5',label:'5-10 Fly',short:'5-10',step:'0.01'},{k:'f10',label:'10-10 Fly',short:'10-10',step:'0.01'},{k:'pro_agility_5_10_5',label:'5-10-5 Pro Agility',short:'5-10-5',step:'0.01'},{k:'gps',label:'GPS Max Velocity',short:'GPS',step:'0.1'}];}
 function _combineStationMetrics(){var st=_combineState.station||'full',all=_combineMetricSpecs();if(st==='power')return all.filter(function(m){return m.k==='vj'||m.k==='bj'||m.k==='rsi';});if(st==='speed')return all.filter(function(m){return m.k==='f5'||m.k==='f10'||m.k==='gps';});if(st==='agility')return all.filter(function(m){return m.k==='pro_agility_5_10_5';});return all;}
 function _combineComputeSession(a,raw){var t=a.tier||'hs',b=BENCH[t]||BENCH.hs;var vp=raw.vj!==null?scv(raw.vj,b.vj,false):null,hp=raw.bj!==null?scv(raw.bj,b.bj,false):null,rs=raw.rsi!==null?sRSI(raw.rsi,t):null,ac=raw.f5!==null?scv(raw.f5,b.f5,true):null,mv=raw.f10!==null?scv(raw.f10,b.f10,true):null,cod=raw.pro_agility_5_10_5!==null?calculateCODscore(raw.pro_agility_5_10_5,t):null,gv=raw.gps!==null?scv(raw.gps,b.gps,false):null;var pa=avg([vp,hp]),sa=avg([ac,mv,gv]),ft=null;if(pa!==null&&sa!==null){var off=sa-pa;ft=off>=1.5?5:off>=0.5?4:off>=-1.0?3:2;if(pa<3&&sa<3)ft=2;}var dp=[vp,hp].filter(function(x){return x!==null;}),ds=[ac,mv,gv,cod].filter(function(x){return x!==null;});var dpa=dp.length?dp.reduce(function(x,y){return x+y;},0)/dp.length:null,dsa=ds.length?ds.reduce(function(x,y){return x+y;},0)/ds.length:null,defType='Incomplete Data',focus='Not enough metrics';if(dpa!==null&&dsa!==null){if(dpa<3&&dsa>=3){defType='Force Deficient';focus='Force production';}else if(dsa<3&&dpa>=3){defType='Form Deficient';focus='Sprint mechanics';}else if(dpa<3&&dsa<3){defType='Mixed Deficiency';focus='General athletic development';}else{defType='Well Developed';focus='Refinement';}}var bkt='base';if(rs!==null&&rs<=2)bkt=1;else if(cod!==null&&cod<=2)bkt=6;else if((vp!==null&&vp<=2)||(hp!==null&&hp<=2)){if(rs===null||rs>=3)bkt=2;}else if(ac!==null&&ac<=2&&pa!==null&&pa>=3)bkt=3;else if(((mv!==null&&mv<=2)||(gv!==null&&gv<=2))&&ac!==null&&ac>=3)bkt=4;else if(ft!==null&&ft<=2&&pa!==null&&pa>=4)bkt=5;var BK={1:{n:'Bucket 1 - Reactive Strength',pri:'Reactive strength and stiffness'},2:{n:'Bucket 2 - Force and Power',pri:'Force production'},base:{n:'Bucket 2 - Force and Power (Base Build)',pri:'General force and power base'},3:{n:'Bucket 3 - Acceleration',pri:'First-step speed and short-area acceleration'},4:{n:'Bucket 4 - Max Velocity',pri:'Top-end speed and max velocity mechanics'},5:{n:'Bucket 5 - Force Transfer',pri:'Converting power into movement speed'},6:{n:'Bucket 6 - Change of Direction',pri:'Deceleration and lateral re-acceleration'}};var sc={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gps:gv,ft:ft},ape=calculateAPEscore(sc),adj=computeAdjustedScores(sc,resolvePosGroup(a.sport,a.position));return{raw:raw,sc:sc,bkt:bkt,bktName:BK[bkt].n,defType:defType,focus:BK[bkt].pri||focus,cnt:Object.keys(raw).filter(function(k){return raw[k]!==null;}).length,apeScore:ape,posAdjScore:adj?adj.ape:null};}
-function buildCombineMode(){go(0);var nd=el('nav-dash'),nt=el('nav-teams');if(nd)nd.classList.remove('act');if(nt)nt.classList.add('act');var cont=el('dash-out');if(!cont)return;var teams=DB.getTeams(),selectedTeam=teams.length?teams[0].id:'',today=new Date().toISOString().slice(0,10);var h='<div class="combine-hero"><div class="combine-kicker">APE Combine</div><div class="pg-title">Bulk Roster Import + Testing Day Mode</div><div class="pg-sub">Athletic Performance Evolution - Evolve the athlete. Built for club teams, camps, combines, and mass testing days.</div></div><div class="combine-grid"><div class="combine-panel"><div class="card-title">Roster Import</div><div class="combine-toolbar"><button class="btn-save-prog" style="padding:10px 14px" onclick="downloadRosterTemplate()">Download Template</button><div class="field"><label>Upload .xlsx or .csv</label><input type="file" id="combine-roster-file" accept=".xlsx,.xls,.csv" onchange="handleRosterUpload(this)"></div></div><div class="g2" style="margin-top:14px"><div class="field"><label>If No Team Column</label><select id="combine-import-team" onchange="previewRosterImport()">'+_combineTeamOptions('',true)+'</select></div><div class="field"><label>Or New Team</label><input type="text" id="combine-import-team-new" placeholder="e.g. 16U Elite" oninput="previewRosterImport()"></div></div><div class="field"><label>Duplicate Handling</label><select id="combine-duplicate-mode"><option value="skip">Skip duplicates</option><option value="update">Update existing profiles</option><option value="import">Import anyway</option></select></div><div id="combine-import-result" class="combine-status"></div><div id="combine-import-preview" class="combine-status">Upload a roster to preview athletes before saving.</div></div><div class="combine-panel"><div class="card-title">Testing Day Setup</div><div class="g2"><div class="field"><label>Team</label><select id="combine-test-team" onchange="buildTestingDayTable()">'+_combineTeamOptions(selectedTeam,true)+'</select></div><div class="field"><label>Combine / Event</label><input type="text" id="combine-event-name" placeholder="Spring Combine"></div><div class="field"><label>Test Date</label><input type="date" id="combine-test-date" value="'+today+'"></div><div class="field"><label>Speed Method</label><select id="combine-speed-verification"><option value="Hand Time">Hand Time</option><option value="Speed Test / Timing Gates">Speed Test / Timing Gates</option></select></div><div class="field"><label>Jump Method</label><select id="combine-jump-verification"><option value="Vertec">Vertec</option><option value="Force Plate">Force Plate</option></select></div><div class="field"><label>Broad Jump Method</label><select id="combine-bj-verification"><option value="Tape Measure">Tape Measure</option><option value="Laser Measure">Laser Measure</option><option value="Force Plate">Force Plate</option></select></div><div class="field"><label>Tester Name</label><input type="text" id="combine-tester-name" placeholder="Optional"></div><label class="verify-toggle-row" style="align-self:end;margin-bottom:8px"><input type="checkbox" id="combine-verified"> Verified Test</label><div class="field"><label>Sport Filter</label><select id="combine-sport-filter" onchange="buildTestingDayTable()"><option value="">All Sports</option>'+SPORT_OPTIONS.map(function(s){return'<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('')+'</select></div><div class="field"><label>Level Filter</label><input type="text" id="combine-level-filter" placeholder="13U, Varsity, HS..." oninput="buildTestingDayTable()"></div><div class="field"><label>Position Filter</label><input type="text" id="combine-position-filter" placeholder="WR, Guard, Setter..." oninput="buildTestingDayTable()"></div><div class="field"><label>Gender Filter</label><select id="combine-gender-filter" onchange="buildTestingDayTable()"><option value="">All</option><option value="Female">Female</option><option value="Male">Male</option><option value="Nonbinary">Nonbinary</option></select></div><div class="field"><label>Grade Filter</label><select id="combine-grade-filter" onchange="buildTestingDayTable()"><option value="">All</option><option value="9th">9th - Freshman</option><option value="10th">10th - Sophomore</option><option value="11th">11th - Junior</option><option value="12th">12th - Senior</option><option value="Freshman">College Freshman</option><option value="Sophomore">College Sophomore</option><option value="Junior">College Junior</option><option value="Senior">College Senior</option><option value="Graduate">Graduate</option><option value="Redshirt">Redshirt</option></select></div></div><div class="combine-tabs"><button class="combine-tab act" id="combine-tab-full" onclick="_combineState.station=\'full\';buildTestingDayTable()">Full Table</button><button class="combine-tab" id="combine-tab-power" onclick="_combineState.station=\'power\';buildTestingDayTable()">Power Station</button><button class="combine-tab" id="combine-tab-speed" onclick="_combineState.station=\'speed\';buildTestingDayTable()">Speed Station</button></div><div class="btn-row" style="margin-top:10px"><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportLatestTeamResults()">Export Latest Team Results</button><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportTeamHistory()">Export Full Team History</button><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportCombineEventResults()">Export Combine Event</button></div></div></div><div class="combine-panel"><div class="card-title">Testing Day / Combine Mode</div><div id="combine-testing-table" class="combine-status"></div></div>';cont.innerHTML=h;buildTestingDayTable();}
+function buildCombineMode(){go(0);var nd=el('nav-dash'),nt=el('nav-teams');if(nd)nd.classList.remove('act');if(nt)nt.classList.add('act');var cont=el('dash-out');if(!cont)return;var teams=DB.getTeams(),selectedTeam=teams.length?teams[0].id:'',today=new Date().toISOString().slice(0,10);var h='<div class="combine-hero"><div class="combine-kicker">APE Combine</div><div class="pg-title">Bulk Roster Import + Testing Day Mode</div><div class="pg-sub">Athlete Performance Evaluator - Evolve the athlete. Built for club teams, camps, combines, and mass testing days.</div></div><div class="combine-grid"><div class="combine-panel"><div class="card-title">Roster Import</div><div class="combine-toolbar"><button class="btn-save-prog" style="padding:10px 14px" onclick="downloadRosterTemplate()">Download Template</button><div class="field"><label>Upload .xlsx or .csv</label><input type="file" id="combine-roster-file" accept=".xlsx,.xls,.csv" onchange="handleRosterUpload(this)"></div></div><div class="g2" style="margin-top:14px"><div class="field"><label>If No Team Column</label><select id="combine-import-team" onchange="previewRosterImport()">'+_combineTeamOptions('',true)+'</select></div><div class="field"><label>Or New Team</label><input type="text" id="combine-import-team-new" placeholder="e.g. 16U Elite" oninput="previewRosterImport()"></div></div><div class="field"><label>Duplicate Handling</label><select id="combine-duplicate-mode"><option value="skip">Skip duplicates</option><option value="update">Update existing profiles</option><option value="import">Import anyway</option></select></div><div id="combine-import-result" class="combine-status"></div><div id="combine-import-preview" class="combine-status">Upload a roster to preview athletes before saving.</div></div><div class="combine-panel"><div class="card-title">Testing Day Setup</div><div class="g2"><div class="field"><label>Team</label><select id="combine-test-team" onchange="buildTestingDayTable()">'+_combineTeamOptions(selectedTeam,true)+'</select></div><div class="field"><label>Combine / Event</label><input type="text" id="combine-event-name" placeholder="Spring Combine"></div><div class="field"><label>Test Date</label><input type="date" id="combine-test-date" value="'+today+'"></div><div class="field"><label>Speed Method</label><select id="combine-speed-verification"><option value="Hand Time">Hand Time</option><option value="Speed Test / Timing Gates">Speed Test / Timing Gates</option></select></div><div class="field"><label>Jump Method</label><select id="combine-jump-verification"><option value="Vertec">Vertec</option><option value="Force Plate">Force Plate</option></select></div><div class="field"><label>Broad Jump Method</label><select id="combine-bj-verification"><option value="Tape Measure">Tape Measure</option><option value="Laser Measure">Laser Measure</option><option value="Force Plate">Force Plate</option></select></div><div class="field"><label>Tester Name</label><input type="text" id="combine-tester-name" placeholder="Optional"></div><label class="verify-toggle-row" style="align-self:end;margin-bottom:8px"><input type="checkbox" id="combine-verified"> Verified Test</label><div class="field"><label>Sport Filter</label><select id="combine-sport-filter" onchange="buildTestingDayTable()"><option value="">All Sports</option>'+SPORT_OPTIONS.map(function(s){return'<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('')+'</select></div><div class="field"><label>Level Filter</label><input type="text" id="combine-level-filter" placeholder="13U, Varsity, HS..." oninput="buildTestingDayTable()"></div><div class="field"><label>Position Filter</label><input type="text" id="combine-position-filter" placeholder="WR, Guard, Setter..." oninput="buildTestingDayTable()"></div><div class="field"><label>Gender Filter</label><select id="combine-gender-filter" onchange="buildTestingDayTable()"><option value="">All</option><option value="Female">Female</option><option value="Male">Male</option><option value="Nonbinary">Nonbinary</option></select></div><div class="field"><label>Grade Filter</label><select id="combine-grade-filter" onchange="buildTestingDayTable()"><option value="">All</option><option value="9th">9th - Freshman</option><option value="10th">10th - Sophomore</option><option value="11th">11th - Junior</option><option value="12th">12th - Senior</option><option value="Freshman">College Freshman</option><option value="Sophomore">College Sophomore</option><option value="Junior">College Junior</option><option value="Senior">College Senior</option><option value="Graduate">Graduate</option><option value="Redshirt">Redshirt</option></select></div></div><div class="combine-tabs"><button class="combine-tab act" id="combine-tab-full" onclick="_combineState.station=\'full\';buildTestingDayTable()">Full Table</button><button class="combine-tab" id="combine-tab-power" onclick="_combineState.station=\'power\';buildTestingDayTable()">Power Station</button><button class="combine-tab" id="combine-tab-speed" onclick="_combineState.station=\'speed\';buildTestingDayTable()">Speed Station</button></div><div class="btn-row" style="margin-top:10px"><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportLatestTeamResults()">Export Latest Team Results</button><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportTeamHistory()">Export Full Team History</button><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportCombineEventResults()">Export Combine Event</button></div></div></div><div class="combine-panel"><div class="card-title">Testing Day / Combine Mode</div><div id="combine-testing-table" class="combine-status"></div></div>';cont.innerHTML=h;buildTestingDayTable();}
 function _combineFilteredAthletes(){var tid=el('combine-test-team')?el('combine-test-team').value:'',sport=_combineNorm(el('combine-sport-filter')?el('combine-sport-filter').value:''),level=_combineNorm(el('combine-level-filter')?el('combine-level-filter').value:''),pos=_combineNorm(el('combine-position-filter')?el('combine-position-filter').value:''),gender=_combineNorm(el('combine-gender-filter')?el('combine-gender-filter').value:''),grade=_combineNorm(el('combine-grade-filter')?el('combine-grade-filter').value:'');return DB.getAll().filter(function(a){if(tid&&a.team!==tid)return false;if(sport&&_combineNorm(a.sport)!==sport)return false;if(level&&_combineNorm((a.levelLabel||'')+' '+(TIERS[a.tier]||a.tier)).indexOf(level)===-1)return false;if(pos&&_combineNorm(a.position)!==pos)return false;if(gender&&_combineNorm(a.gender)!==gender)return false;if(grade&&_combineNorm(a.grade)!==grade)return false;return true;}).sort(function(a,b){return a.name.localeCompare(b.name);});}
 function _ensureCombineAgilityTab(){var speed=el('combine-tab-speed');if(speed&&!el('combine-tab-agility')){var btn=document.createElement('button');btn.className='combine-tab';btn.id='combine-tab-agility';btn.textContent='Agility Station';btn.onclick=function(){_combineState.station='agility';buildTestingDayTable();};speed.parentNode.insertBefore(btn,speed.nextSibling);}}
 function buildTestingDayTable(){_ensureCombineAgilityTab();['full','power','speed','agility'].forEach(function(k){var b=el('combine-tab-'+k);if(b)b.classList.toggle('act',(_combineState.station||'full')===k);});var out=el('combine-testing-table');if(!out)return;var athletes=_combineFilteredAthletes(),metrics=_combineStationMetrics(),maps=_combineTeamMaps(),station=_combineState.station||'full';if(!athletes.length){out.innerHTML='<div class="empty-state"><div class="empty-p">Select a team with athletes to enter testing numbers.</div></div>';return;}var speedM=el('combine-speed-verification')?el('combine-speed-verification').value:'Hand Time',jumpM=el('combine-jump-verification')?el('combine-jump-verification').value:'Vertec',methodLine=station==='power'?'Jump method: '+jumpM:station==='speed'||station==='agility'?'Speed method: '+speedM:'Speed method: '+speedM+' · Jump method: '+jumpM;var h='<div class="combine-status">'+athletes.length+' athlete'+(athletes.length!==1?'s':'')+' loaded. Rows need at least 2 test values to save.<br><strong style="color:var(--sb)">'+esc(methodLine)+'</strong></div><div class="combine-table-wrap" style="margin-top:12px"><table class="combine-table"><thead><tr><th class="combine-sticky">Athlete</th><th>Team</th><th>Level</th><th>Gender</th><th>Grade</th>';metrics.forEach(function(m){h+='<th>'+m.short+'</th>';});h+='<th>Notes</th><th>Status</th></tr></thead><tbody>';athletes.forEach(function(a){var t=a.team&&maps.byId[a.team]?maps.byId[a.team].name:'';h+='<tr id="combine-row-'+a.id+'"><td class="combine-sticky"><strong style="color:#fff">'+esc(a.name)+'</strong></td><td>'+esc(t)+'</td><td>'+esc(a.levelLabel||TIERS[a.tier]||a.tier)+'</td><td>'+esc(a.gender||'')+'</td><td>'+esc(gradeDisplay(a.grade))+'</td>';metrics.forEach(function(m){h+='<td><input class="combine-input" type="number" step="'+m.step+'" id="bulk-'+a.id+'-'+m.k+'" placeholder="'+m.short+'"></td>';});h+='<td><input class="combine-input combine-note" type="text" id="bulk-'+a.id+'-note" placeholder="Optional"></td><td><span class="combine-save-status" id="bulk-'+a.id+'-status">Ready</span></td></tr>';});h+='</tbody></table></div><div class="btn-row"><button class="btn-p" style="padding:11px 18px;font-size:13px" onclick="saveBulkTestingSessions()">Save Valid Sessions</button></div>';out.innerHTML=h;}
@@ -2501,7 +2539,7 @@ function getAthleteType(vp, hp, rs, ac, mv, gv) {
     return { label: 'Reactive', color: '#9B7FE8', desc: 'Exceptional reactive strength and ground contact speed.' };
   // Both qualities highly developed
   if (pa >= 4 && sa >= 4)
-    return { label: 'Explosive', color: '#F5881F', desc: 'Both power and speed qualities are highly developed — a rare combination.' };
+    return { label: 'Explosive', color: '#5BE9FF', desc: 'Both power and speed qualities are highly developed — a rare combination.' };
   // Directional dominance
   var diff = sa - pa;
   if (diff > 1.2) return { label: 'Speed-Dominant', color: '#3BA8D0', desc: 'Sprint speed is ahead of force production. Power is the next unlock.' };
@@ -2640,7 +2678,7 @@ function build(vj,bj,rsi,s5,s10,gps,pa505){
   else if(ft!==null&&ft<=2&&pa!==null&&pa>=4)bkt=5;
 
   var BK={
-    1:{n:'Bucket 1 — Reactive Strength',ico:'&#9889;',c:'#F5881F',pri:'Reactive strength and stiffness',sec:'Landing mechanics and ground contact',w:'RSI is the limiting factor. Build ankle stiffness, landing mechanics, and pogo progressions before any intensive jump or sprint work.',m:['Pogo hops (bilateral then unilateral)','Low hurdle hops — focus on ground contact time','Landing mechanics and deceleration drills','Ankle and calf stiffness work','Depth drops to stick — control before intensity']},
+    1:{n:'Bucket 1 — Reactive Strength',ico:'&#9889;',c:'#5BE9FF',pri:'Reactive strength and stiffness',sec:'Landing mechanics and ground contact',w:'RSI is the limiting factor. Build ankle stiffness, landing mechanics, and pogo progressions before any intensive jump or sprint work.',m:['Pogo hops (bilateral then unilateral)','Low hurdle hops — focus on ground contact time','Landing mechanics and deceleration drills','Ankle and calf stiffness work','Depth drops to stick — control before intensity']},
     2:{n:'Bucket 2 — Force and Power',ico:'&#128170;',c:'#E8A020',pri:'Force production',sec:'Jump output and power expression',w:'Jump scores are below threshold. More raw force needed before speed development sticks. Strength and power first.',m:['Heavy compound lifts (trap bar, squat, hip hinge)','Loaded jump variations (box jump, trap bar jump)','Broad jump and vertical jump progressions','Med ball throws for power expression','Sled pushes for horizontal force']},
     base:{n:'Bucket 2 — Force and Power (Base Build)',ico:'&#127959;',c:'#E8A020',pri:'General force and power base',sec:'Movement quality and capacity',w:'No single dominant gap identified. Building a solid force and power base creates the capacity everything else depends on.',m:['Compound lifting (squat, deadlift, press)','Jump variations for power expression','Med ball throws','Sled exposure','Complete full test battery for more specific programming']},
     3:{n:'Bucket 3 — Acceleration',ico:'&#128640;',c:'#9B7FE8',pri:'First-step speed and short-area acceleration',sec:'Force application angle and start mechanics',w:'Power base is adequate but short-area speed is the gap. Focus on body lean, shin angle, and horizontal force in the first 10 yards.',m:['Resisted sled sprints (10–20% bodyweight)','Falling starts and wall drills','3-point stance starts','Broad jump into sprint (10–15 yds)','Short sprints 5–15 yards with full recovery']},
@@ -2667,7 +2705,7 @@ function build(vj,bj,rsi,s5,s10,gps,pa505){
   var scH='';
   // Position context banner
   if(ctx2){
-    scH+='<div style="background:var(--or-glow);border:1px solid rgba(245,136,31,.3);border-radius:6px;padding:11px 14px;margin-bottom:14px">';
+    scH+='<div style="background:var(--or-glow);border:1px solid rgba(91,233,255,.3);border-radius:6px;padding:11px 14px;margin-bottom:14px">';
     scH+='<div style="font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--or);margin-bottom:4px">Position Profile</div>';
     scH+='<div style="font-size:12px;color:var(--tx);line-height:1.55">'+esc(posProfile.whyItMatters)+'</div>';
     scH+='<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">';
@@ -3018,7 +3056,7 @@ function renderProgressChart(metricKey) {
   }
 
   // Point colors: first point is orange (baseline), rest are green/red/gray
-  var pointColors = ['#F5881F'];
+  var pointColors = ['#5BE9FF'];
   for(var j = 1; j < values.length; j++){
     pointColors.push(dirColor(direction(values[j], values[j-1])));
   }
@@ -3295,7 +3333,7 @@ function renderHistChart(aid, metricKey) {
   }
 
   // Per-point colors: first = orange baseline, rest = green/red/gray
-  var ptColors = ['#F5881F'];
+  var ptColors = ['#5BE9FF'];
   for (var j = 1; j < values.length; j++) {
     ptColors.push(dirCol(dir(values[j], values[j - 1])));
   }
@@ -3703,7 +3741,7 @@ function buildProg(S,days,phase){
           {w:'Week 2',t:'Settle the Schedule',   f:'Confirm session timing around game days. Adjust volume if needed. Quality of movement over quantity every session.'}
         ]
       },
-      { ph:'Phase 2 — Build', wks:'Weeks 3–4', color:'#F5881F',
+      { ph:'Phase 2 — Build', wks:'Weeks 3–4', color:'#5BE9FF',
         goal:'Standard maintenance protocol. Monitor game schedule and athlete response closely.',
         items:[
           {w:'Week 3',t:'Hold Maintenance Load', f:'Full in-season protocol. Monitor athlete response between sessions and games. Protect freshness before competition days.'},
@@ -3727,7 +3765,7 @@ function buildProg(S,days,phase){
           {w:'Week 2',t:'Build Sprint Intensity',f:'Introduce contrast pairings: heavy lift immediately followed by sprint. Strength holds at 80% — shift energy output toward sprint performance.'}
         ]
       },
-      { ph:'Phase 2 — Build', wks:'Weeks 3–4', color:'#F5881F',
+      { ph:'Phase 2 — Build', wks:'Weeks 3–4', color:'#5BE9FF',
         goal:'Express qualities and sharpen speed. Strength becomes secondary.',
         items:[
           {w:'Week 3',t:'Sharpen Sprint Quality',f:'Max-intent fly sprints. Strength drops to 2× per week maintenance. Sprint mechanics must be automatic by now — focus on intent and relaxation.'},
@@ -3837,7 +3875,7 @@ function buildProg(S,days,phase){
     }
     phases6=[
       {ph:'Phase 1 — Foundation',wks:'Weeks 1–2',color:'#5DCAA5',goal:offFdn.goal,items:offFdn.items},
-      {ph:'Phase 2 — Build',     wks:'Weeks 3–4',color:'#F5881F',goal:offBld.goal,items:offBld.items},
+      {ph:'Phase 2 — Build',     wks:'Weeks 3–4',color:'#5BE9FF',goal:offBld.goal,items:offBld.items},
       {ph:'Phase 3 — Peak',      wks:'Weeks 5–6',color:'#9B7FE8',goal:offPeak.goal,items:offPeak.items}
     ];
   }
@@ -3873,10 +3911,10 @@ function buildProg(S,days,phase){
 function buildReport(S){
   var vp=S.vp,hp=S.hp,rs=S.rs,ac=S.ac,mv=S.mv,cod=S.cod,gps=S.gps,ft=S.ft;
   var lv=S.tier,name=S.name||'Athlete',tl=TIERS[lv]||lv;
-  var or='#F5881F';
+  var or='#5BE9FF';
   var cfg=DB.loadSettings();
   var coachName=cfg.coachName||'';
-  var gymName=cfg.gymName||'Athlete Performance Evolution';
+  var gymName=cfg.gymName||'Athlete Performance Evaluator';
   var contact=cfg.contact||'';
   var tagline=cfg.tagline||'';
   var dT=S.defType||'Incomplete Data';
@@ -4149,7 +4187,7 @@ function buildReport(S){
     +'<div><div style="font-size:12px;font-weight:700;color:#fff">'+esc(gymName)+(coachName?' &nbsp;·&nbsp; Coach '+esc(coachName):'')+'</div>'
     +(contact?'<div style="font-size:11px;color:#888;margin-top:2px">'+esc(contact)+'</div>':'')
     +'</div>'
-    +'<div style="font-size:11px;color:#666;text-align:right">Athlete Performance Evolution<br>Powered by APE</div>'
+    +'<div style="font-size:11px;color:#666;text-align:right">Athlete Performance Evaluator<br>Powered by APE</div>'
     +'</div>';
 
   o+='</div>';
@@ -4196,11 +4234,11 @@ function buildLeaderboard(){
 
   var h='<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:11px;margin-bottom:20px">'
     +'<div>'
-      +'<div class="pg-title">&#127942; Leaderboard</div>'
+      +'<div class="pg-title">'+iconSvg('trophy')+' Leaderboard</div>'
       +'<div class="pg-sub">Ranked by selected metric — click any athlete to view history</div>'
     +'</div>'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
-    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="exportLeaderboardXLSX()">&#8681; Excel</button>'
+    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="exportLeaderboardXLSX()">'+iconSvg('download')+' Excel</button>'
     +'<button class="btn-p" style="padding:9px 16px;font-size:13px" onclick="buildDash()">&#8592; Athletes</button>'
     +'</div></div>';
 
@@ -4378,16 +4416,16 @@ function buildDash(){
   h+='<div class="dash-hero">'
     +'<div><div class="pg-title">Coach Dashboard</div><div class="pg-sub">'+totalAth+' saved athlete profile'+(totalAth!==1?'s':'')+' &middot; '+testsMonth+' test'+(testsMonth!==1?'s':'')+' this month</div></div>'
     +'<div class="dash-actions">'
-    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildLeaderboard()">&#127942; Leaderboard</button>'
-    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildTeamStats()">&#128202; Team Stats</button>'
+    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildLeaderboard()">'+iconSvg('trophy')+' Leaderboard</button>'
+    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildTeamStats()">'+iconSvg('bar-chart-3')+' Team Stats</button>'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildCombineMode()">APE Combine</button>'
-    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="exportAllAthletesXLSX()">&#8681; Export All</button>'
-    +'<button class="btn-p" style="padding:9px 16px;font-size:13px;flex:none" onclick="goNew()">+ New Athlete</button>'
+    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="exportAllAthletesXLSX()">'+iconSvg('download')+' Export All</button>'
+    +'<button class="btn-p" style="padding:9px 16px;font-size:13px;flex:none" onclick="goNew()">'+iconSvg('user-plus')+' New Athlete</button>'
     +'</div></div>';
 
   // Empty state
   if(!totalAth){
-    cont.innerHTML=h+'<div class="empty-state"><div class="empty-ico">&#127939;</div><div class="empty-h">No Athletes Yet</div><div class="empty-p">Complete an evaluation and the athlete profile will be saved here automatically.</div><button class="btn-p" style="padding:11px 26px;font-size:15px" onclick="goNew()">Start First Evaluation</button></div>';
+    cont.innerHTML=h+'<div class="empty-state"><div class="empty-video-wrap"><video autoplay muted loop playsinline preload="metadata"><source src="./Logos/[VIDEO_FILENAME.mp4]" type="video/mp4"></video></div><div class="empty-ico">'+iconSvg('users')+'</div><div class="empty-h">No Athletes Yet</div><div class="empty-p">Complete an evaluation and the athlete profile will be saved here automatically.</div><button class="btn-p" style="padding:11px 26px;font-size:15px" onclick="goNew()">Start First Evaluation</button></div>';
     return;
   }
 
@@ -4421,7 +4459,7 @@ function buildDash(){
     h+='<div style="font-size:12px;color:var(--mt);margin-bottom:10px">Showing '+filtered.length+' of '+totalAth+' athletes</div>';
   }
 
-  var bkC={1:'#F5881F',2:'#E8A020',base:'#E8A020',3:'#9B7FE8',4:'#3BA8D0',5:'#3EB890'};
+  var bkC={1:'#5BE9FF',2:'#E8A020',base:'#E8A020',3:'#9B7FE8',4:'#3BA8D0',5:'#3EB890'};
   h+='<div class="dash-grid">';
   for(var i=0;i<filtered.length;i++){
     var a=filtered[i],last=a.last,tm2=TM[a.tier]||{label:a.tier,c:'#8AAABE'};
@@ -4515,7 +4553,7 @@ function buildDash(){
   });
   if(teamGroups.length){
     h+='<div class="card" style="margin-top:22px">'
-      +'<div class="card-title">&#128202; Team Performance Overview</div>'
+      +'<div class="card-title">'+iconSvg('bar-chart-3')+' Team Performance Overview</div>'
       +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">';
     teamGroups.forEach(function(g){
       var apeMeta=g.ape!=null?getAPELabel(g.ape):null;
@@ -4547,7 +4585,7 @@ function buildHist(aid){
   var sessions=DB.history(aid);
   var tm3=TM[a.tier]||{label:a.tier,c:'#8AAABE'};
   var win=sessions.slice(-5);
-  var bkC={1:'#F5881F',2:'#E8A020',base:'#E8A020',3:'#9B7FE8',4:'#3BA8D0',5:'#3EB890'};
+  var bkC={1:'#5BE9FF',2:'#E8A020',base:'#E8A020',3:'#9B7FE8',4:'#3BA8D0',5:'#3EB890'};
 
   // Single team lookup — teamTm3 is used in the header; name/color derived from it
   var teamTm3=null;
@@ -4572,7 +4610,7 @@ function buildHist(aid){
     +(a.sport||a.position||a.age?'&nbsp;&nbsp;':'')
     +sessions.length+' session'+(sessions.length!==1?'s':'')
     +(sessions.length?' &nbsp;·&nbsp; First test '+esc(sessions[0].date||''):'')+'</div></div>'
-    +'<button class="btn-save-prog" style="padding:8px 13px;font-size:12px;flex:none" onclick="exportAthleteXLSX(\''+aid+'\')">&#8681; Export</button>'
+    +'<button class="btn-save-prog" style="padding:8px 13px;font-size:12px;flex:none" onclick="exportAthleteXLSX(\''+aid+'\')">'+iconSvg('download')+' Export</button>'
     +'<button class="btn-p" style="padding:8px 13px;font-size:12px;flex:none" onclick="startTest(\''+aid+'\')">&#9889; New Test</button></div>';
 
   if(!sessions.length){h+='<div class="empty-state"><div class="empty-p">No sessions recorded yet.</div></div>';cont.innerHTML=h;return;}
@@ -4889,7 +4927,7 @@ function buildTeams(){
     +'<div class="field" style="margin-bottom:0"><label>Team Name</label><input type="text" id="new-team-name" placeholder="e.g. Varsity Soccer" autocomplete="off"></div>'
     +'<div class="field" style="margin-bottom:0"><label>Color</label>'
     +'<div style="display:flex;gap:8px;align-items:center">'
-    +'<input type="color" id="new-team-color" value="#F5881F" class="team-color-pick">'
+    +'<input type="color" id="new-team-color" value="#5BE9FF" class="team-color-pick">'
     +'<div style="font-size:12px;color:var(--mt)">Pick a team color</div>'
     +'</div></div>'
     +'</div>'
@@ -4914,7 +4952,7 @@ function buildTeams(){
       +'<div style="font-size:12px;color:var(--mt);margin-top:2px">'+cnt+' athlete'+(cnt!==1?'s':'')+' assigned</div>'
       +'</div>'
       +'<div style="display:flex;gap:7px;flex-shrink:0">'
-      +'<button class="btn-save-prog" style="padding:5px 10px;font-size:11px" onclick="exportTeamXLSX(\''+t.id+'\')">&#8681; Export</button>'
+      +'<button class="btn-save-prog" style="padding:5px 10px;font-size:11px" onclick="exportTeamXLSX(\''+t.id+'\')">'+iconSvg('download')+' Export</button>'
       +'<button class="edit-btn2" style="padding:6px 11px;font-size:12px" onclick="editTeamCard(\''+t.id+'\')">&#9998; Edit</button>'
       +'<button class="del-btn" id="delteam-'+t.id+'" onclick="confirmDelTeam(\''+t.id+'\')">&#128465; Delete</button>'
       +'</div></div>';
@@ -5032,10 +5070,10 @@ function buildTeamStats(){
   var levelOpts='<option value="">All Levels</option>'+[{k:'youth',l:'Youth'},{k:'hs',l:'High School'},{k:'college',l:'College'},{k:'pro',l:'Pro / Elite'}].map(function(x){return'<option value="'+x.k+'"'+(filterLevel===x.k?' selected':'')+'>'+x.l+'</option>';}).join('');
 
   var h='<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:11px;margin-bottom:18px">'
-    +'<div><div class="pg-title">&#128202; Team Analytics</div>'
+    +'<div><div class="pg-title">'+iconSvg('bar-chart-3')+' Team Analytics</div>'
     +'<div class="pg-sub">'+roster.length+' athlete'+(roster.length!==1?'s':'')+' &middot; Most recent session per athlete</div></div>'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
-    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="exportTeamStatsXLSX()">&#8681; Export</button>'
+    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="exportTeamStatsXLSX()">'+iconSvg('download')+' Export</button>'
     +'<button class="btn-p" style="padding:9px 16px;font-size:13px" onclick="buildDash()">&#8592; Athletes</button>'
     +'</div></div>';
 
@@ -5050,7 +5088,7 @@ function buildTeamStats(){
     +'</div>';
 
   if(!roster.length){
-    h+='<div class="empty-state"><div class="empty-ico">&#128202;</div><div class="empty-h">No Data</div><div class="empty-p">No athletes match the current filters, or no evaluations on record yet.</div></div>';
+    h+='<div class="empty-state"><div class="empty-ico">'+iconSvg('bar-chart-3')+'</div><div class="empty-h">No Data</div><div class="empty-p">No athletes match the current filters, or no evaluations on record yet.</div></div>';
     cont.innerHTML=h;return;
   }
 
@@ -5097,7 +5135,7 @@ function buildTeamStats(){
   ];
 
   h+='<div class="card" style="margin-bottom:18px">'
-    +'<div class="card-title" style="margin-bottom:14px">&#127942; Roster Spotlights</div>'
+    +'<div class="card-title" style="margin-bottom:14px">'+iconSvg('trophy')+' Roster Spotlights</div>'
     +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">';
 
   spotlights.forEach(function(sp){
@@ -5198,7 +5236,7 @@ function buildTeamStats(){
         +'<span class="team-dot" style="background:'+g.color+';width:13px;height:13px;flex-shrink:0"></span>'
         +'<div style="font-family:Inter,sans-serif;font-size:18px;font-weight:700;color:#fff">'+esc(g.name)+'</div>'
         +'<div style="font-size:12px;color:var(--mt)">'+g.athletes.length+' athlete'+(g.athletes.length!==1?'s':'')+' with sessions</div>'
-        +(g.tid?'<button class="btn-save-prog" style="padding:5px 10px;font-size:11px;margin-left:auto" onclick="exportTeamXLSX(\''+g.tid+'\')">&#8681; Export</button>':'')
+        +(g.tid?'<button class="btn-save-prog" style="padding:5px 10px;font-size:11px;margin-left:auto" onclick="exportTeamXLSX(\''+g.tid+'\')">'+iconSvg('download')+' Export</button>':'')
         +'</div>'
         +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:8px">';
       METS.forEach(function(m){
@@ -5464,7 +5502,7 @@ refreshTeamSelect('');
 <div class="settings-overlay" id="settings-overlay" onclick="if(event.target===this)closeSettings()">
   <div class="settings-box">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
-      <div style="font-family:var(--font);font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff">&#9881; Coach Settings</div>
+      <div style="font-family:var(--font);font-size:18px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;display:flex;align-items:center;gap:8px"><svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg> Coach Settings</div>
       <button onclick="closeSettings()" style="background:none;border:none;color:var(--mt);font-size:20px;cursor:pointer;line-height:1;padding:0 4px">&times;</button>
     </div>
     <div style="font-size:11px;color:var(--mt);margin-bottom:16px;line-height:1.5">Branding shown on client reports. All fields optional.</div>
