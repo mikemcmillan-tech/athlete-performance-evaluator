@@ -84,6 +84,92 @@ body{font-family:var(--font);background:
 .landing-title{font-family:var(--font);font-size:72px;font-weight:700;line-height:.94;letter-spacing:0;text-transform:uppercase;color:#fff;max-width:720px}
 .landing-title em{font-style:normal;color:var(--or);text-shadow:0 0 36px rgba(91,233,255,.28)}
 .landing-text{font-size:18px;color:#AFC3D2;line-height:1.58;max-width:610px;margin:22px auto 0}
+
+/* ── Athlete Portal ──────────────────────────────────────────────── */
+.athlete-portal{display:none;min-height:100vh;background:var(--bg);flex-direction:column}
+.athlete-portal.active{display:flex}
+.aph{background:rgba(7,11,16,.92);border-bottom:1px solid rgba(127,160,184,.14);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;position:sticky;top:0;z-index:50;backdrop-filter:blur(12px)}
+.aph-brand{display:flex;align-items:center;gap:12px}
+.aph-logo{height:38px;width:auto}
+.aph-badge{font-size:10px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--or);background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.22);border-radius:999px;padding:4px 9px}
+.aph-name{font-size:13px;font-weight:700;color:#fff;letter-spacing:.04em}
+.aph-sub{font-size:11px;color:var(--mt);margin-top:1px}
+.aph-actions{display:flex;align-items:center;gap:10px}
+.ap-body{max-width:820px;margin:0 auto;padding:24px 18px 60px;width:100%;display:flex;flex-direction:column;gap:20px}
+/* Score hero */
+.ap-score-hero{background:linear-gradient(145deg,#0a1a28,#061420);border:1px solid rgba(127,160,184,.18);border-radius:20px;padding:28px 24px;display:flex;align-items:center;gap:24px}
+.ap-score-ring{position:relative;width:110px;height:110px;flex-shrink:0}
+.ap-score-ring svg{width:110px;height:110px;transform:rotate(-90deg)}
+.ap-score-ring-bg{fill:none;stroke:rgba(127,160,184,.14);stroke-width:8}
+.ap-score-ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)}
+.ap-score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.ap-score-val{font-family:var(--font);font-size:32px;font-weight:800;color:#fff}
+.ap-score-max{font-size:11px;color:var(--mt);margin-top:1px}
+.ap-score-info{flex:1;min-width:0}
+.ap-score-label{font-family:var(--font);font-size:26px;font-weight:700;color:#fff;letter-spacing:-.01em}
+.ap-score-pct{font-size:13px;color:var(--or);font-weight:600;margin-top:4px}
+.ap-score-tier{font-size:12px;color:var(--mt);margin-top:6px}
+.ap-score-trend{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:12px;font-weight:600}
+.ap-score-trend.up{color:#1F9E70}
+.ap-score-trend.down{color:#C93B3B}
+.ap-score-trend.same{color:var(--mt)}
+/* Section cards */
+.ap-card{background:rgba(10,26,40,.6);border:1px solid rgba(127,160,184,.14);border-radius:16px;overflow:hidden}
+.ap-card-head{padding:16px 20px 0;display:flex;align-items:center;gap:10px}
+.ap-card-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ap-card-title{font-size:13px;font-weight:700;color:#fff;letter-spacing:.04em;text-transform:uppercase}
+.ap-card-body{padding:16px 20px 20px}
+/* Classification */
+.ap-class-wrap{display:flex;align-items:flex-start;gap:16px;margin-bottom:14px}
+.ap-class-badge{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.ap-class-badge.force{background:rgba(91,122,255,.15);color:#7B9FFF;border:1px solid rgba(91,122,255,.3)}
+.ap-class-badge.form{background:rgba(240,165,0,.12);color:var(--or);border:1px solid rgba(240,165,0,.28)}
+.ap-class-badge.mixed{background:rgba(201,59,59,.12);color:#E87070;border:1px solid rgba(201,59,59,.28)}
+.ap-class-badge.well{background:rgba(31,158,112,.12);color:#3DD68C;border:1px solid rgba(31,158,112,.28)}
+.ap-class-exp{font-size:13px;color:#AFC3D2;line-height:1.6}
+.ap-focus-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.ap-focus-chip{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--electric);background:rgba(30,144,255,.1);border:1px solid rgba(30,144,255,.22);border-radius:999px;padding:5px 12px}
+/* Metrics grid */
+.ap-metrics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px}
+.ap-metric-card{background:rgba(7,11,16,.5);border:1px solid rgba(127,160,184,.12);border-radius:12px;padding:14px 14px 12px}
+.ap-metric-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mt);margin-bottom:8px}
+.ap-metric-score-row{display:flex;align-items:baseline;gap:6px}
+.ap-metric-score{font-family:var(--font);font-size:28px;font-weight:800;color:#fff}
+.ap-metric-max{font-size:11px;color:var(--mt)}
+.ap-metric-bar{height:4px;background:rgba(127,160,184,.14);border-radius:2px;margin:8px 0 6px;overflow:hidden}
+.ap-metric-bar-fill{height:100%;border-radius:2px;transition:width .6s ease}
+.ap-metric-raw{font-size:11px;color:var(--mt)}
+.ap-metric-pct{font-size:11px;font-weight:600}
+/* Coach notes */
+.ap-notes-text{font-size:13px;color:#AFC3D2;line-height:1.7;white-space:pre-wrap}
+.ap-notes-empty{font-size:13px;color:rgba(127,160,184,.45);font-style:italic}
+/* Session history */
+.ap-session-list{display:flex;flex-direction:column;gap:8px}
+.ap-session-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(7,11,16,.4);border:1px solid rgba(127,160,184,.1);border-radius:10px}
+.ap-session-date{font-size:12px;color:var(--mt);min-width:90px}
+.ap-session-score{font-family:var(--font);font-size:22px;font-weight:800;color:#fff}
+.ap-session-class{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;margin-left:auto}
+.ap-session-delta{font-size:12px;font-weight:700;margin-left:8px}
+.ap-session-delta.up{color:#1F9E70}
+.ap-session-delta.dn{color:#C93B3B}
+/* Landing athlete tab */
+.landing-mode-sw{display:flex;gap:6px;margin-bottom:22px;padding:4px;background:rgba(7,11,16,.5);border:1px solid rgba(127,160,184,.14);border-radius:12px}
+.landing-mode-btn{flex:1;border:none;border-radius:8px;background:transparent;color:var(--mt);font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:10px 8px;cursor:pointer;transition:all .18s;line-height:1.2;text-align:center}
+.landing-mode-btn.act{background:rgba(30,144,255,.18);color:var(--electric);border:1px solid rgba(30,144,255,.28)}
+.landing-coach-section{display:none}
+.landing-coach-section.act{display:block}
+.landing-athlete-section{display:none}
+.landing-athlete-section.act{display:block}
+.ap-access-note{font-size:11px;color:var(--mt);line-height:1.6;margin-top:14px;padding-top:12px;border-top:1px solid rgba(127,160,184,.1)}
+/* Share btn */
+.btn-share{border:none;border-radius:8px;background:rgba(30,144,255,.14);color:var(--electric);font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:6px 10px;cursor:pointer;transition:all .18s}
+.btn-share:hover{background:rgba(30,144,255,.26)}
+@media(max-width:600px){
+  .ap-score-hero{flex-direction:column;align-items:flex-start;gap:18px}
+  .ap-metrics-grid{grid-template-columns:1fr 1fr}
+  .aph{flex-wrap:wrap}
+}
+
 .landing-video-wrap{width:100%;max-width:480px;margin:0 auto;border-radius:18px;overflow:hidden;box-shadow:0 0 60px rgba(240,165,0,.22),0 24px 64px rgba(0,0,0,.6);border:1px solid rgba(240,165,0,.18)}
 .landing-video{width:100%;height:auto;display:block;object-fit:cover}
 .landing-proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:34px auto 0;max-width:620px}
@@ -787,13 +873,21 @@ select option{background:var(--dk3)}
       </div>
 
       <div class="login-card">
-        <div class="login-card-head">
-          <div>
-            <div class="login-title">Coach Access</div>
-            <div class="login-sub">Sign in or create your coach profile to open the dashboard.</div>
-          </div>
-          <div class="role-chip">Coach/Admin</div>
+        <!-- Mode switcher -->
+        <div class="landing-mode-sw">
+          <button class="landing-mode-btn act" id="lmode-coach" onclick="switchLandingMode('coach')">&#127919; Coach / Admin</button>
+          <button class="landing-mode-btn" id="lmode-athlete" onclick="switchLandingMode('athlete')">&#127939; Athlete / Parent</button>
         </div>
+
+        <!-- Coach section -->
+        <div class="landing-coach-section act" id="landing-coach-sec">
+          <div class="login-card-head">
+            <div>
+              <div class="login-title">Coach Access</div>
+              <div class="login-sub">Sign in or create your coach profile to open the dashboard.</div>
+            </div>
+            <div class="role-chip">Coach/Admin</div>
+          </div>
 
         <div class="landing-tabs">
           <button class="landing-tab act" id="landing-tab-signin" onclick="switchLandingAuth('signin')">Sign In</button>
@@ -826,7 +920,27 @@ select option{background:var(--dk3)}
           <button class="btn-s landing-demo" onclick="startDemoCoach()">Continue as Demo Coach</button>
         </div>
 
-        <div class="role-note">Coach/Admin can create athletes, create teams, run evaluations, export reports, and track progress. Athlete and parent viewer roles are reserved for a future release.</div>
+        </div><!-- /landing-coach-sec -->
+
+        <!-- Athlete / Parent section -->
+        <div class="landing-athlete-section" id="landing-athlete-sec">
+          <div class="login-card-head">
+            <div>
+              <div class="login-title">Athlete &amp; Parent Access</div>
+              <div class="login-sub">Enter the access code your coach sent you to view progress.</div>
+            </div>
+            <div class="role-chip" style="color:var(--electric);border-color:rgba(30,144,255,.3)">Viewer</div>
+          </div>
+          <div id="landing-athlete-err" class="landing-error"></div>
+          <div class="field">
+            <label>Access Code</label>
+            <input type="text" id="landing-access-code" placeholder="Paste your access code here" autocomplete="off" style="font-family:monospace;letter-spacing:.05em" onkeydown="if(event.key==='Enter')handleAthleteAccess()">
+          </div>
+          <button class="btn-p" style="width:100%;margin-top:4px" onclick="handleAthleteAccess()">View My Progress &#8594;</button>
+          <div class="ap-access-note">Your coach generates an access code from your athlete profile. Each code is unique to you. No account needed &#8212; just paste and go.</div>
+        </div>
+
+        <div class="role-note" id="landing-role-note">Coach/Admin can create athletes, run evaluations, export reports, and track progress.</div>
       </div>
     </div>
 
@@ -4532,6 +4646,7 @@ function buildDash(){
 
 // ─── ATHLETE HISTORY ──────────────────────────────────────────────────────────
 function buildHist(aid){
+  window._histAid=aid; // track current athlete for share
   var cont=el('hist-out');if(!cont)return;
   var a=DB.get(aid);
   if(!a){cont.innerHTML='<div class="pg-sub" style="padding:20px">Athlete not found.</div>';return;}
@@ -4563,6 +4678,7 @@ function buildHist(aid){
     +(a.sport||a.position||a.age?'&nbsp;&nbsp;':'')
     +sessions.length+' session'+(sessions.length!==1?'s':'')
     +(sessions.length?' &nbsp;·&nbsp; First test '+esc(sessions[0].date||''):'')+'</div></div>'
+    +'<button class="btn-share" style="padding:8px 13px;font-size:12px;flex:none" onclick="copyAthleteLink(\''+aid+'\')">&#128279; Share</button>'
     +'<button class="btn-save-prog" style="padding:8px 13px;font-size:12px;flex:none" onclick="exportAthleteXLSX(\''+aid+'\')">&#8681; Export</button>'
     +'<button class="btn-p" style="padding:8px 13px;font-size:12px;flex:none" onclick="startTest(\''+aid+'\')">&#9889; New Test</button></div>';
 
@@ -5394,6 +5510,264 @@ function _clearEditMode(){
   var ct=el('page1-card-title');if(ct)ct.textContent='Athlete Information';
 }
 
+
+// ─── ATHLETE / PARENT PORTAL ─────────────────────────────────────────────────
+
+function switchLandingMode(mode){
+  var cb=el('lmode-coach'),ab=el('lmode-athlete');
+  var cs=el('landing-coach-sec'),as=el('landing-athlete-sec');
+  var rn=el('landing-role-note');
+  if(mode==='coach'){
+    if(cb)cb.classList.add('act');if(ab)ab.classList.remove('act');
+    if(cs)cs.classList.add('act');if(as)as.classList.remove('act');
+    if(rn)rn.style.display='';
+  }else{
+    if(ab)ab.classList.add('act');if(cb)cb.classList.remove('act');
+    if(as)as.classList.add('act');if(cs)cs.classList.remove('act');
+    if(rn)rn.style.display='none';
+    setTimeout(function(){var inp=el('landing-access-code');if(inp)inp.focus();},80);
+  }
+}
+
+// Generate access code for an athlete (coach calls this)
+function generateAthleteCode(athleteId){
+  var a=DB.get(athleteId);
+  if(!a)return null;
+  var cfg=DB.loadSettings();
+  var payload={
+    n:a.name,sport:a.sport||'',pos:a.position||'',tier:a.tier||'hs',
+    age:a.age||'',ht:a.height||'',bw:a.bodyweight||'',gradYear:a.gradYear||'',
+    notes:a.notes||'',
+    coach:cfg.coachName||'',gym:cfg.gymName||'APE',logo:cfg.logoBase64||'',
+    sessions:(a.s||[]).slice(-8).map(function(s){
+      return{date:s.date||'',ape:s.apeScore!=null?s.apeScore:getAPEScore(s.sc||{}),
+        sc:s.sc||{},raw:s.raw||{},defType:s.defType||'',focus:s.focus||'',
+        bktName:s.bktName||'',note:s.note||''};
+    })
+  };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+}
+
+function copyAthleteLink(athleteId){
+  var code=generateAthleteCode(athleteId);
+  if(!code){_toast('No athlete data found.','#8A3A2B');return;}
+  var url=window.location.href.split('?')[0]+'?view='+code;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(url).then(function(){
+      _toast('Athlete access link copied!','#1e6f3e');
+    }).catch(function(){_fallbackCopy(url);});
+  }else{_fallbackCopy(url);}
+}
+function _fallbackCopy(text){
+  var ta=document.createElement('textarea');
+  ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);ta.select();
+  try{document.execCommand('copy');_toast('Link copied!','#1e6f3e');}
+  catch(e){_toast('Copy manually: '+text.substring(0,60)+'...','#444');}
+  document.body.removeChild(ta);
+}
+
+// Handle athlete access code input
+function handleAthleteAccess(){
+  var code=(el('landing-access-code')?el('landing-access-code').value.trim():'');
+  var errEl=el('landing-athlete-err');
+  if(errEl){errEl.style.display='none';errEl.textContent='';}
+  if(!code){
+    if(errEl){errEl.textContent='Paste your access code first.';errEl.style.display='block';}
+    return;
+  }
+  // Strip URL prefix if they pasted the full link
+  var match=code.match(/[?&]view=([^&]+)/);
+  if(match)code=match[1];
+  try{
+    var json=decodeURIComponent(escape(atob(code)));
+    var data=JSON.parse(json);
+    enterAthletePortal(data);
+  }catch(e){
+    if(errEl){errEl.textContent='Invalid code. Ask your coach to generate a new link.';errEl.style.display='block';}
+  }
+}
+
+// Check URL for ?view= param on load
+function _checkAthleteViewParam(){
+  var params=new URLSearchParams(window.location.search);
+  var code=params.get('view');
+  if(!code)return false;
+  try{
+    var json=decodeURIComponent(escape(atob(code)));
+    var data=JSON.parse(json);
+    enterAthletePortal(data);
+    return true;
+  }catch(e){return false;}
+}
+
+function enterAthletePortal(data){
+  // Hide landing, hide app shell
+  var l=el('landing-screen'),a=el('app-shell'),p=el('athlete-portal');
+  if(l)l.classList.remove('active');
+  if(a)a.classList.remove('active');
+  if(p)p.classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+  buildAthletePortal(data);
+}
+
+function closeAthletePortal(){
+  var p=el('athlete-portal');
+  if(p)p.classList.remove('active');
+  showLanding();
+}
+
+function buildAthletePortal(d){
+  // Header
+  var nameEl=el('ap-athlete-name'),coachEl=el('ap-coach-line'),tierEl=el('ap-tier-badge');
+  if(nameEl)nameEl.textContent=d.n||'Athlete';
+  if(coachEl)coachEl.textContent=(d.gym||d.coach)?'Powered by '+(d.gym||d.coach):'';
+  if(tierEl)tierEl.textContent=(TIERS[d.tier]||d.tier||'Athlete').toUpperCase();
+
+  var sessions=d.sessions||[];
+  var last=sessions.length?sessions[sessions.length-1]:null;
+  var prev=sessions.length>1?sessions[sessions.length-2]:null;
+  var apeScore=last?last.ape:null;
+  var apeMeta=getAPELabel(apeScore,d.tier);
+
+  var html='';
+
+  // ── APE Score hero ─────────────────────────────────────────────────────────
+  var scoreColor=apeScore!=null?apeMeta.color:'var(--mt)';
+  var scoreNum=apeScore!=null?Math.round(apeScore):'-';
+  var circumference=Math.round(2*Math.PI*46);
+  var dash=apeScore!=null?Math.round(circumference*(apeScore/100)):0;
+  var delta=null;
+  if(apeScore!=null&&prev&&prev.ape!=null)delta=Math.round((apeScore-prev.ape)*10)/10;
+  var trendHtml='';
+  if(delta!=null){
+    var cls=delta>0?'up':delta<0?'down':'same';
+    var arrow=delta>0?'&#8593;':delta<0?'&#8595;':'&#8212;';
+    trendHtml='<div class="ap-score-trend '+cls+'">'+arrow+' '+(delta>0?'+':'')+delta+' pts from last eval</div>';
+  }
+
+  html+='<div class="ap-score-hero">'
+    +'<div class="ap-score-ring">'
+    +'<svg viewBox="0 0 100 100">'
+    +'<circle class="ap-score-ring-bg" cx="50" cy="50" r="46"/>'
+    +'<circle class="ap-score-ring-fill" cx="50" cy="50" r="46" stroke="'+scoreColor+'" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+(circumference-dash)+'"/>'
+    +'</svg>'
+    +'<div class="ap-score-num"><div class="ap-score-val">'+scoreNum+'</div><div class="ap-score-max">/100</div></div>'
+    +'</div>'
+    +'<div class="ap-score-info">'
+    +'<div class="ap-score-label" style="color:'+scoreColor+'">'+apeMeta.label+'</div>'
+    +(apeMeta.pct?'<div class="ap-score-pct">'+apeMeta.pct+'</div>':'')
+    +'<div class="ap-score-tier">'+(TIERS[d.tier]||d.tier||'')+' level'+(d.sport?' &nbsp;&middot;&nbsp; '+d.sport:'')+(d.pos?' &nbsp;&middot;&nbsp; '+d.pos:'')+'</div>'
+    +trendHtml
+    +'</div>'
+    +'</div>';
+
+  // ── Classification & Focus ─────────────────────────────────────────────────
+  if(last&&last.defType){
+    var defType=last.defType;
+    var defCls=defType==='Force Deficient'?'force':defType==='Form Deficient'?'form':defType==='Mixed Deficiency'?'mixed':defType==='Well Developed'?'well':'';
+    var defExp={
+      'Force Deficient':'Your speed qualities are ahead of your force base. The key to your next level is building raw strength and power — that raises your speed ceiling.',
+      'Form Deficient':'You have solid power, but it's not fully expressing as sprint speed yet. Sprint mechanics and force application are your unlock.',
+      'Mixed Deficiency':'Both power and speed have room to grow. Building a strong foundation now creates bigger gains across every metric.',
+      'Well Developed':'Your power and speed qualities are well matched. Your coach will target the individual weak link to drive your next gain.'
+    }[defType]||'';
+    var focusAreas=last.focus?last.focus.split(','):[];
+    if(last.bktName)focusAreas.unshift(last.bktName.replace(/Bucket \d+ - /,''));
+    html+='<div class="ap-card">'
+      +'<div class="ap-card-head"><div class="ap-card-ico" style="background:rgba(30,144,255,.1)">&#127919;</div><div class="ap-card-title">Classification &amp; Focus</div></div>'
+      +'<div class="ap-card-body">'
+      +'<div class="ap-class-wrap">'
+      +'<div class="ap-class-badge '+defCls+'">'+defType+'</div>'
+      +'<div class="ap-class-exp">'+defExp+'</div>'
+      +'</div>'
+      +(focusAreas.length?'<div class="ap-focus-chips">'+focusAreas.map(function(f){return'<span class="ap-focus-chip">'+esc(f.trim())+'</span>';}).join('')+'</div>':'')
+      +'</div></div>';
+  }
+
+  // ── Metrics breakdown ──────────────────────────────────────────────────────
+  if(last&&last.sc){
+    var sc=last.sc,raw=last.raw||{};
+    var METRIC_DEF=[
+      {key:'vp',label:'Vertical Power',rawKey:'vj',unit:'in',desc:'Vertical jump'},
+      {key:'hp',label:'Horizontal Power',rawKey:'bj',unit:'in',desc:'Broad jump'},
+      {key:'rs',label:'Reactive Strength',rawKey:'rsi',unit:'RSI',desc:'Reactive strength index'},
+      {key:'ac',label:'Acceleration',rawKey:'f5',unit:'s',desc:'5-10 fly sprint'},
+      {key:'mv',label:'Max Velocity',rawKey:'f10',unit:'s',desc:'10-10 fly sprint'},
+      {key:'gps',label:'GPS Velocity',rawKey:'gps',unit:'mph',desc:'Max GPS velocity'},
+      {key:'cod',label:'Change of Direction',rawKey:'pro_agility_5_10_5',unit:'s',desc:'5-10-5 agility'},
+      {key:'ft',label:'Force Transfer',rawKey:null,unit:'',desc:'Power-to-speed conversion'}
+    ];
+    var metricCards='';
+    METRIC_DEF.forEach(function(m){
+      var score=sc[m.key];
+      if(score==null)return;
+      var barColor=score>=4?'#1F9E70':score>=3?'#1E90FF':score>=2?'var(--or)':'#C93B3B';
+      var pctLabels=['','Bottom 20%','Below Avg','Average','Above Avg','Top 10%'];
+      var rawVal=m.rawKey&&raw[m.rawKey]!=null?raw[m.rawKey]:null;
+      metricCards+='<div class="ap-metric-card">'
+        +'<div class="ap-metric-label">'+m.label+'</div>'
+        +'<div class="ap-metric-score-row"><div class="ap-metric-score" style="color:'+barColor+'">'+score+'</div><div class="ap-metric-max">/5</div></div>'
+        +'<div class="ap-metric-bar"><div class="ap-metric-bar-fill" style="width:'+(score/5*100)+'%;background:'+barColor+'"></div></div>'
+        +'<div style="display:flex;justify-content:space-between">'
+        +(rawVal!=null?'<div class="ap-metric-raw">'+rawVal+(m.unit?' '+m.unit:'')+'</div>':'<div></div>')
+        +'<div class="ap-metric-pct" style="color:'+barColor+'">'+(pctLabels[Math.round(score)]||'')+'</div>'
+        +'</div>'
+        +'</div>';
+    });
+    if(metricCards){
+      html+='<div class="ap-card">'
+        +'<div class="ap-card-head"><div class="ap-card-ico" style="background:rgba(240,165,0,.1)">&#128200;</div><div class="ap-card-title">Performance Metrics</div></div>'
+        +'<div class="ap-card-body"><div class="ap-metrics-grid">'+metricCards+'</div></div>'
+        +'</div>';
+    }
+  }
+
+  // ── Coach Notes ────────────────────────────────────────────────────────────
+  var profileNotes=d.notes||'';
+  var sessionNote=last&&last.note?last.note:'';
+  var allNotes=[profileNotes,sessionNote].filter(Boolean).join('\n\n');
+  html+='<div class="ap-card">'
+    +'<div class="ap-card-head"><div class="ap-card-ico" style="background:rgba(91,233,255,.08)">&#128221;</div><div class="ap-card-title">Coach Notes</div></div>'
+    +'<div class="ap-card-body">'
+    +(allNotes
+      ?'<div class="ap-notes-text">'+esc(allNotes)+'</div>'
+      :'<div class="ap-notes-empty">Your coach hasn't added notes yet. Notes will appear here after your next evaluation.</div>')
+    +'</div></div>';
+
+  // ── Session History ────────────────────────────────────────────────────────
+  if(sessions.length){
+    var rows='';
+    var sorted=sessions.slice().reverse();
+    sorted.forEach(function(s,i){
+      var prevS=sorted[i+1];
+      var delta2=prevS&&prevS.ape!=null&&s.ape!=null?Math.round((s.ape-prevS.ape)*10)/10:null;
+      var dM=getAPELabel(s.ape,d.tier);
+      var defCls2=s.defType==='Force Deficient'?'force':s.defType==='Form Deficient'?'form':s.defType==='Mixed Deficiency'?'mixed':s.defType==='Well Developed'?'well':'';
+      var classColors={'force':'rgba(91,122,255,.15)','form':'rgba(240,165,0,.12)','mixed':'rgba(201,59,59,.12)','well':'rgba(31,158,112,.12)'};
+      var classFg={'force':'#7B9FFF','form':'var(--or)','mixed':'#E87070','well':'#3DD68C'};
+      rows+='<div class="ap-session-row">'
+        +'<div class="ap-session-date">'+esc(s.date||'')+'</div>'
+        +'<div class="ap-session-score" style="color:'+dM.color+'">'+Math.round(s.ape||0)+'</div>'
+        +(s.defType?'<div class="ap-session-class" style="background:'+(classColors[defCls2]||'rgba(127,160,184,.1)')+';color:'+(classFg[defCls2]||'var(--mt)')+'">'+esc(s.defType)+'</div>':'')
+        +(delta2!=null?'<div class="ap-session-delta '+(delta2>0?'up':'dn')+'">'+(delta2>0?'+':'')+delta2+'</div>':'')
+        +'</div>';
+    });
+    html+='<div class="ap-card">'
+      +'<div class="ap-card-head"><div class="ap-card-ico" style="background:rgba(31,158,112,.1)">&#128337;</div><div class="ap-card-title">Evaluation History</div></div>'
+      +'<div class="ap-card-body"><div class="ap-session-list">'+rows+'</div></div>'
+      +'</div>';
+  }
+
+  // ── Powered by footer ──────────────────────────────────────────────────────
+  html+='<div style="text-align:center;padding:20px 0 0;font-size:11px;color:rgba(127,160,184,.4)">'
+    +'Powered by APE &mdash; Athlete Performance Evolution'
+    +'</div>';
+
+  var body=el('ap-body');
+  if(body)body.innerHTML=html;
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 // On load: populate team dropdown, then go to dashboard.
 populateSportOptions('');
@@ -5403,7 +5777,9 @@ refreshTeamSelect('');
 (function(){
   var supa=_supaClient();
   if(supa){
-    supa.auth.getSession().then(function(r){
+    // Check for athlete view link first
+  if(_checkAthleteViewParam())return;
+  supa.auth.getSession().then(function(r){
       if(r.data&&r.data.session&&r.data.session.user){
         var u=r.data.session.user;
         SupaDB.setUser(u);
@@ -5414,7 +5790,7 @@ refreshTeamSelect('');
       }
     }).catch(function(){showLanding();});
   }else{
-    showLanding();
+    if(!_checkAthleteViewParam())showLanding();
   }
 })();
 </script>
@@ -5448,6 +5824,26 @@ refreshTeamSelect('');
       <button class="btn-p" id="auth-btn-su" style="width:100%;margin-top:4px" onclick="handleSignup()">Create Account</button>
       <div class="auth-footer">Already have an account? <a href="#" onclick="_authSwitchTab('signin');return false" style="color:var(--or)">Sign in</a></div>
     </div>
+  </div>
+</div>
+
+<!-- ── Athlete / Parent Portal ── -->
+<div class="athlete-portal" id="athlete-portal" aria-label="Athlete progress portal">
+  <div class="aph">
+    <div class="aph-brand">
+      <img src="assets/ape-logo-stacked.png" alt="APE" class="aph-logo">
+      <div>
+        <div class="aph-name" id="ap-athlete-name">Athlete Portal</div>
+        <div class="aph-sub" id="ap-coach-line">Powered by your coach</div>
+      </div>
+    </div>
+    <div class="aph-actions">
+      <div class="aph-badge" id="ap-tier-badge">Loading...</div>
+      <button class="btn-s" style="font-size:11px;padding:6px 12px" onclick="closeAthletePortal()">&#8592; Back</button>
+    </div>
+  </div>
+  <div class="ap-body" id="ap-body">
+    <div style="text-align:center;padding:60px 0;color:var(--mt)">Loading...</div>
   </div>
 </div>
 
