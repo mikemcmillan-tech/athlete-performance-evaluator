@@ -5668,7 +5668,7 @@ function buildAthletePortal(d){
     var defCls=defType==='Force Deficient'?'force':defType==='Form Deficient'?'form':defType==='Mixed Deficiency'?'mixed':defType==='Well Developed'?'well':'';
     var defExp={
       'Force Deficient':'Your speed qualities are ahead of your force base. The key to your next level is building raw strength and power — that raises your speed ceiling.',
-      'Form Deficient':'You have solid power, but it's not fully expressing as sprint speed yet. Sprint mechanics and force application are your unlock.',
+      "Form Deficient":"You have solid power, but it's not fully expressing as sprint speed yet. Sprint mechanics and force application are your unlock.",
       'Mixed Deficiency':'Both power and speed have room to grow. Building a strong foundation now creates bigger gains across every metric.',
       'Well Developed':'Your power and speed qualities are well matched. Your coach will target the individual weak link to drive your next gain.'
     }[defType]||'';
@@ -5732,7 +5732,7 @@ function buildAthletePortal(d){
     +'<div class="ap-card-body">'
     +(allNotes
       ?'<div class="ap-notes-text">'+esc(allNotes)+'</div>'
-      :'<div class="ap-notes-empty">Your coach hasn't added notes yet. Notes will appear here after your next evaluation.</div>')
+      :"<div class=\"ap-notes-empty\">Your coach hasn't added notes yet. Notes will appear here after your next evaluation.</div>")
     +'</div></div>';
 
   // ── Session History ────────────────────────────────────────────────────────
