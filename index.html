@@ -48,49 +48,58 @@ body{font-family:var(--font);background:
 .app-shell{display:none}
 .app-shell.active{display:block;animation:fu .24s ease}
 .landing-screen{
-  min-height:100vh;position:relative;overflow:hidden;display:none;padding:28px;
+  min-height:100vh;position:relative;overflow:hidden;display:none;padding:0;
   background:
-    radial-gradient(1100px 600px at 82% -10%,rgba(91,233,255,.12),transparent 60%),
-    radial-gradient(900px 500px at -10% 25%,rgba(10,132,255,.09),transparent 60%),
-    radial-gradient(700px 400px at 50% 110%,rgba(0,245,160,.05),transparent 60%),
-    linear-gradient(140deg,#06070b 0%,#0a0c11 52%,#0f121a 100%);
+    radial-gradient(ellipse 80% 44% at 50% 0%,rgba(10,132,255,.2),transparent 58%),
+    radial-gradient(900px 540px at 50% 34%,rgba(91,233,255,.08),transparent 65%),
+    linear-gradient(180deg,#000 0%,#06070B 54%,#000 100%);
 }
 .landing-screen.active{display:block}
 .landing-screen::before{
-  content:'';position:absolute;inset:-20%;opacity:.22;
+  content:'';position:absolute;inset:-20%;opacity:.16;
   background-image:
     linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),
     linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
-  background-size:72px 72px;transform:perspective(680px) rotateX(58deg) translateY(-90px);
+  background-size:82px 82px;transform:perspective(720px) rotateX(61deg) translateY(-70px);
   animation:landingGrid 14s linear infinite;pointer-events:none;
 }
 .landing-screen::after{
   content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(7,11,16,.18),rgba(7,11,16,.88));
+  background:
+    radial-gradient(circle at 24% 28%,rgba(91,233,255,.08),transparent 22%),
+    radial-gradient(circle at 72% 20%,rgba(0,245,160,.05),transparent 24%),
+    linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.92));
   pointer-events:none;
 }
 @keyframes landingGrid{from{background-position:0 0,0 0}to{background-position:0 72px,72px 0}}
-.landing-shell{position:relative;z-index:1;max-width:1220px;margin:0 auto;min-height:calc(100vh - 56px);display:flex;flex-direction:column}
-.landing-nav{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:42px}
+.landing-shell{position:relative;z-index:1;max-width:1280px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:92px 28px 36px}
+.landing-nav{position:fixed;top:0;left:0;right:0;z-index:12;display:flex;align-items:center;justify-content:space-between;gap:18px;margin:0;padding:14px max(24px,calc((100vw - 1280px)/2 + 28px));background:rgba(0,0,0,.42);border-bottom:1px solid rgba(255,255,255,.06);backdrop-filter:blur(22px) saturate(130%)}
 .landing-brand{display:flex;align-items:center;gap:14px}
 .landing-logo{display:flex;align-items:center}
-.landing-logo img{height:80px;width:auto;display:block;object-fit:contain}
+.landing-logo img{height:50px;width:auto;display:block;object-fit:contain;filter:drop-shadow(0 0 24px rgba(91,233,255,.22))}
 .landing-brand-title{font-family:var(--font);font-size:22px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;line-height:1}
 .landing-brand-sub{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--or);margin-top:4px}
-.landing-nav-note{font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--sb);border:1px solid rgba(127,160,184,.24);border-radius:999px;padding:8px 13px;background:rgba(19,26,33,.42)}
-.landing-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,430px);grid-template-rows:auto auto;gap:24px 42px;align-items:center;text-align:left;flex:1}
-.landing-copy{max-width:760px}
-.landing-kicker{font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--or);margin-bottom:16px}
-.landing-title{font-family:var(--font);font-size:clamp(48px,6vw,76px);font-weight:800;line-height:.94;letter-spacing:0;text-transform:uppercase;color:#fff;max-width:760px}
-.landing-title em{font-style:normal;color:var(--or);text-shadow:0 0 36px rgba(91,233,255,.28)}
-.landing-text{font-size:18px;color:#AFC3D2;line-height:1.58;max-width:610px;margin:22px 0 0}
-.landing-video-wrap{grid-column:1;width:100%;max-width:420px;margin:0;border-radius:18px;overflow:hidden;box-shadow:0 0 60px rgba(91,233,255,.18),0 24px 64px rgba(0,0,0,.6);border:1px solid rgba(91,233,255,.18)}
+.landing-nav-links{display:flex;align-items:center;gap:28px;margin-left:auto}
+.landing-nav-links a{font-size:12px;font-weight:700;color:#8d96a8;text-decoration:none;transition:color .18s;letter-spacing:.04em}
+.landing-nav-links a:hover{color:#fff}
+.landing-nav-note{font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--sb);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:8px 13px;background:rgba(255,255,255,.035);cursor:pointer;transition:all .18s}
+.landing-nav-note:hover{color:#fff;border-color:rgba(91,233,255,.36);background:rgba(91,233,255,.08)}
+.landing-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,430px);grid-template-rows:auto auto auto;gap:26px 44px;align-items:center;text-align:center;flex:1;padding-top:8px}
+.landing-copy{grid-column:1;max-width:840px;margin:0 auto}
+.landing-kicker{font-size:11px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--or);margin-bottom:16px;text-shadow:0 0 18px rgba(91,233,255,.28)}
+.landing-title{font-family:var(--font);font-size:clamp(52px,7.2vw,92px);font-weight:900;line-height:.9;letter-spacing:-.02em;text-transform:uppercase;color:#fff;max-width:920px;margin:0 auto;background:linear-gradient(180deg,#fff 0%,#dfefff 46%,#60a5fa 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none}
+.landing-title em{font-style:normal;background:linear-gradient(180deg,#ffffff 0%,#5BE9FF 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 26px rgba(91,233,255,.34))}
+.landing-text{font-size:clamp(17px,2vw,22px);color:#a8b2c6;line-height:1.55;max-width:700px;margin:22px auto 0}
+.landing-video-wrap{grid-column:1;width:100%;max-width:430px;margin:0 auto;border-radius:22px;overflow:hidden;box-shadow:0 0 72px rgba(91,233,255,.22),0 34px 90px rgba(0,0,0,.72);border:1px solid rgba(91,233,255,.18);background:#000;position:relative}
+.landing-video-wrap::after{content:'';position:absolute;inset:auto 8% -34px;height:80px;background:rgba(91,233,255,.22);filter:blur(32px);border-radius:50%;pointer-events:none}
 .landing-video{width:100%;height:auto;display:block;object-fit:cover}
-.landing-proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:34px 0 0;max-width:620px}
-.proof-item{border:1px solid rgba(127,160,184,.18);background:rgba(19,26,33,.5);border-radius:var(--radius);padding:13px 14px;backdrop-filter:blur(10px);transition:transform .2s,border-color .2s,background .2s}
-.proof-item:hover{transform:translateY(-3px);border-color:rgba(91,233,255,.38);background:rgba(22,26,36,.82)}
-.proof-num{font-family:var(--font);font-size:24px;font-weight:700;color:#fff;line-height:1}
-.proof-lbl{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--sb);margin-top:5px}
+.landing-proof{grid-column:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:8px auto 0;max-width:760px}
+.proof-item{border:1px solid rgba(91,233,255,.12);background:linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.008));border-radius:16px;padding:16px;backdrop-filter:blur(12px);transition:transform .2s,border-color .2s,background .2s,box-shadow .2s;text-align:left;position:relative;overflow:hidden}
+.proof-item::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(91,233,255,.12),transparent 55%);opacity:0;transition:opacity .2s}
+.proof-item:hover{transform:translateY(-5px);border-color:rgba(91,233,255,.42);background:rgba(255,255,255,.05);box-shadow:0 18px 42px rgba(0,0,0,.34)}
+.proof-item:hover::before{opacity:1}
+.proof-num{position:relative;font-family:var(--font);font-size:24px;font-weight:900;color:#fff;line-height:1}
+.proof-lbl{position:relative;font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--sb);margin-top:6px}
 .login-card{
   grid-column:2;grid-row:1 / span 2;align-self:center;
   width:100%;max-width:430px;text-align:left;
@@ -116,15 +125,16 @@ body{font-family:var(--font);background:
 .landing-link:hover{color:var(--or)}
 .landing-demo{width:100%;margin-top:12px}
 .role-note{font-size:11px;color:var(--mt);line-height:1.55;margin-top:16px;padding-top:14px;border-top:1px solid rgba(127,160,184,.14)}
-.feature-preview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:34px}
+.feature-preview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:40px}
 .feature-card{
-  min-height:112px;border:1px solid rgba(127,160,184,.18);border-radius:var(--radius);
-  background:linear-gradient(180deg,rgba(19,26,33,.7),rgba(11,16,23,.68));padding:15px;
-  position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;
+  min-height:128px;border:1px solid rgba(255,255,255,.1);border-radius:18px;
+  background:linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.006));padding:18px;
+  position:relative;overflow:hidden;transition:transform .24s,border-color .24s,box-shadow .24s,background .24s;
+  backdrop-filter:blur(14px);
 }
-.feature-card::before{content:'';position:absolute;inset:0 0 auto;height:2px;background:linear-gradient(90deg,var(--or),transparent);opacity:.65}
-.feature-card:hover{transform:translateY(-4px);border-color:rgba(91,233,255,.36);box-shadow:0 14px 30px rgba(0,0,0,.26)}
-.feature-ico{font-size:20px;color:var(--or);line-height:1;margin-bottom:12px}
+.feature-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 15% 10%,rgba(91,233,255,.16),transparent 38%);opacity:.75}
+.feature-card:hover{transform:translateY(-6px);border-color:rgba(91,233,255,.42);box-shadow:0 22px 54px rgba(0,0,0,.34),0 0 44px rgba(91,233,255,.08);background:linear-gradient(135deg,rgba(91,233,255,.08),rgba(255,255,255,.012))}
+.feature-ico{position:relative;width:42px;height:42px;border-radius:12px;border:1px solid rgba(91,233,255,.22);background:rgba(91,233,255,.08);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--or);line-height:1;margin-bottom:14px}
 .feature-title{font-family:var(--font);font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;line-height:1.1}
 .feature-copy{font-size:11px;color:var(--mt);line-height:1.45;margin-top:6px}
 .landing-error{display:none;font-size:12px;color:var(--s1b);background:rgba(201,59,59,.11);border:1px solid rgba(201,59,59,.32);border-radius:var(--radius-sm);padding:9px 11px;margin-bottom:14px;line-height:1.5}
@@ -644,6 +654,7 @@ select option{background:var(--dk3)}
    RESPONSIVE
    ══════════════════════════════════════════════════ */
 @media(max-width:900px){
+  .landing-shell{padding-top:86px}
   .landing-main{display:flex;flex-direction:column;gap:28px;align-items:center;text-align:center;justify-content:flex-start}
   .landing-text{margin:22px auto 0}
   .landing-proof{margin:30px auto 0}
@@ -653,10 +664,10 @@ select option{background:var(--dk3)}
   .feature-preview{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media(max-width:600px){
-  .landing-screen{padding:18px 14px}
-  .landing-shell{min-height:calc(100vh - 36px)}
-  .landing-nav{margin-bottom:32px;align-items:flex-start}
-  .landing-nav-note{display:none}
+  .landing-shell{min-height:100vh;padding:78px 14px 24px}
+  .landing-nav{padding:12px 14px;align-items:center}
+  .landing-nav-links{display:none}
+  .landing-nav-note{display:inline-flex;font-size:10px;padding:7px 10px}
   .landing-logo img{height:52px}
   .landing-brand-title{font-size:18px}
   .landing-main{gap:28px;justify-content:flex-start;text-align:left;align-items:stretch}
@@ -810,18 +821,24 @@ select option{background:var(--dk3)}
       <div class="landing-brand">
         <div class="landing-logo" aria-label="APE logo"><img src="assets/ape-logo-stacked.png" alt="APE — Athlete Performance Evaluator"></div>
       </div>
-      <div class="landing-nav-note">Coach SaaS MVP</div>
+      <div class="landing-nav-links" aria-label="Landing navigation">
+        <a href="#landing-metrics">Metrics</a>
+        <a href="#landing-features">Reports</a>
+        <a href="#landing-login">Login</a>
+      </div>
+      <button class="landing-nav-note" onclick="document.getElementById('landing-login').scrollIntoView({behavior:'smooth',block:'center'})">Coach Access</button>
     </div>
 
     <div class="landing-main">
       <div class="landing-copy">
-        <div class="landing-kicker">Performance data that coaches can act on</div>
-        <h1 class="landing-title">Turn Athlete Testing Into <em>Actionable Coaching Decisions</em></h1>
-        <p class="landing-text">APE helps coaches evaluate athletes, track progress, and generate actionable performance insights from testing data that would otherwise sit in a spreadsheet.</p>
+        <div class="landing-kicker">APE Intelligence Platform</div>
+        <h1 class="landing-title">Unlock Athletic <em>Potential</em></h1>
+        <p class="landing-text">Data-driven athletic performance evaluation for coaches, teams, combines, athletes, and parents. Test, interpret, report, and track progress from one premium sports-tech dashboard.</p>
         <div class="landing-proof">
-          <div class="proof-item"><div class="proof-num">01</div><div class="proof-lbl">Evaluate</div></div>
-          <div class="proof-item"><div class="proof-num">02</div><div class="proof-lbl">Interpret</div></div>
-          <div class="proof-item"><div class="proof-num">03</div><div class="proof-lbl">Coach</div></div>
+          <div class="proof-item"><div class="proof-num">01</div><div class="proof-lbl">Test</div></div>
+          <div class="proof-item"><div class="proof-num">02</div><div class="proof-lbl">Score</div></div>
+          <div class="proof-item"><div class="proof-num">03</div><div class="proof-lbl">Report</div></div>
+          <div class="proof-item"><div class="proof-num">04</div><div class="proof-lbl">Evolve</div></div>
         </div>
       </div>
 
@@ -831,7 +848,7 @@ select option{background:var(--dk3)}
         </video>
       </div>
 
-      <div class="login-card">
+      <div class="login-card" id="landing-login">
         <div class="login-card-head">
           <div>
             <div class="login-title" id="landing-access-title">Coach Access</div>
@@ -881,12 +898,12 @@ select option{background:var(--dk3)}
       </div>
     </div>
 
-    <div class="feature-preview">
-      <div class="feature-card"><div class="feature-ico">&#9632;</div><div class="feature-title">Athlete Reports</div><div class="feature-copy">Client-ready summaries with strengths, limiters, and next steps.</div></div>
-      <div class="feature-card"><div class="feature-ico">&#9670;</div><div class="feature-title">Position-Aware Scoring</div><div class="feature-copy">Sport context keeps roles like guard clear across sports.</div></div>
-      <div class="feature-card"><div class="feature-ico">&#8599;</div><div class="feature-title">Progress Tracking</div><div class="feature-copy">Retest history and graphs show what is actually changing.</div></div>
-      <div class="feature-card"><div class="feature-ico">&#9679;</div><div class="feature-title">Team Dashboards</div><div class="feature-copy">Filter rosters by team, sport, and athlete level.</div></div>
-      <div class="feature-card"><div class="feature-ico">&#9650;</div><div class="feature-title">Training Focus</div><div class="feature-copy">Suggested focus areas turn metrics into coaching priorities.</div></div>
+    <div class="feature-preview" id="landing-metrics">
+      <div class="feature-card"><div class="feature-ico">&#9651;</div><div class="feature-title">Vertical Power</div><div class="feature-copy">Explosive jump output benchmarked by athlete level.</div></div>
+      <div class="feature-card"><div class="feature-ico">&#8594;</div><div class="feature-title">Sprint Speed</div><div class="feature-copy">Acceleration, fly times, and GPS max velocity in context.</div></div>
+      <div class="feature-card"><div class="feature-ico">&#8644;</div><div class="feature-title">COD Testing</div><div class="feature-copy">5-10-5 agility captures braking and re-acceleration.</div></div>
+      <div class="feature-card"><div class="feature-ico">&#9711;</div><div class="feature-title">Progress Graphs</div><div class="feature-copy">Athlete and parent views show trends over time.</div></div>
+      <div class="feature-card" id="landing-features"><div class="feature-ico">&#9635;</div><div class="feature-title">Coach Reports</div><div class="feature-copy">Client-ready reports with focus areas and coach notes.</div></div>
     </div>
   </div>
 </section>
