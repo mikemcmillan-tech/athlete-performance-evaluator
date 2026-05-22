@@ -12,7 +12,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<title>APE — Athlete Performance Evaluator</title>
+<title>APE — Athlete Performance Evolution</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -150,8 +150,7 @@ body{font-family:var(--font);background:
   position:sticky;top:0;z-index:100;
 }
 .hdr-in{max-width:1120px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;gap:16px}
-.hdr-mark{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--or),var(--electric));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 10px 26px -14px rgba(91,233,255,.7)}
-.hdr-mark span{font-family:Inter,var(--font);font-size:24px;font-weight:900;font-style:italic;color:#fff;line-height:1;transform:skew(-8deg)}
+.hdr-logo{height:38px;width:auto;display:block;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 0 14px rgba(91,233,255,.28))}
 .hdr-mid{flex:1;min-width:0}
 .hdr-title{font-family:var(--font);font-size:17px;font-weight:800;color:#fff;letter-spacing:.08em;text-transform:uppercase;line-height:1}
 .hdr-sub{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--or);font-weight:700;margin-top:2px;opacity:.85}
@@ -784,37 +783,6 @@ select option{background:var(--dk3)}
 </head>
 <body>
 
-<!-- APE negative-space gorilla mark — hidden SVG defs, used via <use href="#apeLogo"> -->
-<svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
-  <defs>
-    <mask id="apeFaceMask">
-      <rect width="100" height="100" fill="white"/>
-      <!-- brow ridge -->
-      <path d="M22 52 L30 38 L38 50 L46 42 L50 47 L54 42 L62 50 L70 38 L78 52 L72 58 L60 54 L50 58 L40 54 L28 58 Z" fill="black"/>
-      <!-- left cheek -->
-      <path d="M27 61 L44 57 L44 66 L31 69 Z" fill="black"/>
-      <!-- right cheek -->
-      <path d="M73 61 L56 57 L56 66 L69 69 Z" fill="black"/>
-      <!-- nose -->
-      <path d="M46 64 L54 64 L50 72 Z" fill="black"/>
-      <!-- left fist -->
-      <path d="M26 72 L48 72 L48 86 L30 86 Z" fill="black"/>
-      <!-- right fist -->
-      <path d="M74 72 L52 72 L52 86 L70 86 Z" fill="black"/>
-      <!-- left knuckle lines -->
-      <rect x="28" y="75" width="19" height="1.4" fill="white"/>
-      <rect x="28" y="78.5" width="19" height="1.4" fill="white"/>
-      <rect x="28" y="82" width="19" height="1.4" fill="white"/>
-      <!-- right knuckle lines -->
-      <rect x="53" y="75" width="19" height="1.4" fill="white"/>
-      <rect x="53" y="78.5" width="19" height="1.4" fill="white"/>
-      <rect x="53" y="82" width="19" height="1.4" fill="white"/>
-    </mask>
-  </defs>
-  <symbol id="apeLogo" viewBox="0 0 100 100">
-    <path d="M50 5 L94 92 L78 92 L72 82 L28 82 L22 92 L6 92 Z" fill="currentColor" mask="url(#apeFaceMask)"/>
-  </symbol>
-</svg>
 
 <section class="landing-screen active" id="landing-screen" aria-label="APE coach login">
   <div class="landing-shell">
@@ -912,8 +880,8 @@ select option{background:var(--dk3)}
 <div class="app-shell" id="app-shell">
 <div class="hdr">
   <div class="hdr-in">
-    <div class="hdr-mark" aria-label="APE logo placeholder"><span>A</span></div>
-    <div class="hdr-mid"><div class="hdr-title">APE</div><div class="hdr-sub">SPORTS PERFORMANCE ASSESSMENT</div></div>
+    <img src="assets/ape-logo-horizontal.png" class="hdr-logo" alt="APE — Athlete Performance Evolution">
+    <div class="hdr-mid"><div class="hdr-title" style="display:none">APE</div><div class="hdr-sub">ATHLETE PERFORMANCE EVOLUTION</div></div>
     <div class="hdr-nav">
       <button class="nav-btn" id="nav-dash" onclick="goDash()">Athletes</button>
       <button class="nav-btn" id="nav-teams" onclick="buildTeams()">Teams</button>
@@ -2990,31 +2958,61 @@ function build(vj,bj,rsi,s5,s10,gps,pa505){
   var apeMeta  = getAPELabel(apeScore, tier);
   var apeType  = getAthleteType(vp, hp, rs, ac, mv, gv);
 
-  var apeGlow = apeScore >= 80 ? ';box-shadow:0 0 0 1px '+apeMeta.color+'33,0 4px 24px '+apeMeta.color+'18' : apeScore >= 65 ? ';box-shadow:0 0 0 1px '+apeMeta.color+'22,0 2px 14px '+apeMeta.color+'10' : '';
+  // ── SVG ring gauge ────────────────────────────────────────────────────────
+  function _buildApeGauge(score, color) {
+    var cx=100,cy=104,r=78,sw=13;
+    var startDeg=135,totalDeg=270;
+    var startRad=startDeg*Math.PI/180;
+    var fillDeg=Math.min(score/100*totalDeg, 269.9);
+    var fillRad=fillDeg*Math.PI/180;
+    function pt(a){return{x:Math.round((cx+r*Math.cos(a))*10)/10,y:Math.round((cy+r*Math.sin(a))*10)/10};}
+    var s=pt(startRad);
+    var e=pt((startDeg+totalDeg)*Math.PI/180);
+    var f=pt(startRad+fillRad);
+    var lg=fillDeg>180?1:0;
+    var trackD='M '+s.x+' '+s.y+' A '+r+' '+r+' 0 1 1 '+e.x+' '+e.y;
+    var fillD=score<=0?'':('M '+s.x+' '+s.y+' A '+r+' '+r+' 0 '+lg+' 1 '+f.x+' '+f.y);
+    return '<svg viewBox="0 0 200 188" width="200" height="188" style="display:block;overflow:visible" aria-label="APE Score '+score+' out of 100">'
+      +'<defs>'
+      +'<filter id="ape-ring-glow" x="-60%" y="-60%" width="220%" height="220%">'
+      +'<feGaussianBlur stdDeviation="4" result="blur"/>'
+      +'<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>'
+      +'</filter>'
+      +'</defs>'
+      // Track ring (background)
+      +'<path d="'+trackD+'" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="'+sw+'" stroke-linecap="round"/>'
+      // Faint color outline on track
+      +'<path d="'+trackD+'" fill="none" stroke="'+color+'" stroke-width="1.5" stroke-linecap="round" opacity="0.14"/>'
+      // Score fill arc
+      +(fillD?'<path d="'+fillD+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-linecap="round" filter="url(#ape-ring-glow)"/>':'')
+      // Score number
+      +'<text x="100" y="100" text-anchor="middle" dominant-baseline="middle" font-family="Inter,sans-serif" font-size="54" font-weight="700" fill="'+color+'">'+score+'</text>'
+      // /100 label
+      +'<text x="100" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="rgba(255,255,255,0.28)" letter-spacing="2">/100</text>'
+      +'</svg>';
+  }
+
+  var apeGaugeHTML = apeScore !== null ? _buildApeGauge(apeScore, apeMeta.color) : '';
+
   var apeCard = apeScore !== null
-    ? '<div class="card" style="border-top:3px solid '+apeMeta.color+';padding:20px 22px'+apeGlow+'">'
-      + '<div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:14px">'
-      + '<div style="text-align:center;flex-shrink:0;min-width:88px;background:'+apeMeta.color+'0D;border:1px solid '+apeMeta.color+'33;border-radius:8px;padding:12px 14px">'
-      + '<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:'+apeMeta.color+';margin-bottom:4px">APE Score</div>'
-      + '<div style="font-family:Inter,sans-serif;font-size:68px;font-weight:700;color:'+apeMeta.color+';line-height:1">'+apeScore+'</div>'
-      + '<div style="font-size:10px;color:var(--mt);margin-top:2px;letter-spacing:.06em">/ 100</div>'
+    ? '<div class="card" style="padding:26px 22px 20px;border-top:3px solid '+apeMeta.color+';text-align:center;box-shadow:0 0 0 1px '+apeMeta.color+'1A,0 8px 48px '+apeMeta.color+'14">'
+      + '<div style="font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:'+apeMeta.color+';margin-bottom:18px;opacity:.8">APE Intelligence Score</div>'
+      + '<div style="display:flex;flex-direction:column;align-items:center">'
+      + apeGaugeHTML
+      + '<div style="font-family:Inter,sans-serif;font-size:26px;font-weight:700;color:#fff;letter-spacing:.03em;margin-top:10px;line-height:1">'+apeMeta.label+'</div>'
+      + '<div style="font-size:13px;color:var(--sb);line-height:1.55;margin-top:5px;max-width:360px">'+apeMeta.sub+'</div>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px">'
+      + (apeMeta.pct ? '<span style="font-size:11px;padding:4px 12px;border-radius:20px;background:'+apeMeta.color+'18;color:'+apeMeta.color+';border:1px solid '+apeMeta.color+'44;font-weight:700">&#128200; '+apeMeta.pct+' vs '+tl+'</span>' : '')
+      + (apeType ? '<span style="font-size:11px;padding:4px 12px;border-radius:20px;background:'+apeType.color+'18;color:'+apeType.color+';border:1px solid '+apeType.color+'44;font-weight:700">'+apeType.label+'</span>' : '')
       + '</div>'
-      + '<div style="flex:1;min-width:140px">'
-      + '<div style="font-family:Inter,sans-serif;font-size:24px;font-weight:700;color:#fff;letter-spacing:.02em;margin-bottom:4px">'+apeMeta.label+'</div>'
-      + '<div style="font-size:13px;color:var(--sb);line-height:1.6;margin-bottom:10px">'+apeMeta.sub+'</div>'
-      + '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">'
-      + (apeMeta.pct ? '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:'+apeMeta.color+'18;color:'+apeMeta.color+';border:1px solid '+apeMeta.color+'44;font-weight:600">&#128200; '+apeMeta.pct+' vs '+tl+'</span>' : '')
-      + (apeType ? '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:'+apeType.color+'18;color:'+apeType.color+';border:1px solid '+apeType.color+'44;font-weight:600">'+apeType.label+'</span>' : '')
+      + (apeType ? '<div style="font-size:12px;color:var(--mt);margin-top:8px;line-height:1.5;max-width:340px">'+apeType.desc+'</div>' : '')
       + '</div>'
-      + (apeType ? '<div style="font-size:12px;color:var(--mt);margin-top:6px;line-height:1.5">'+apeType.desc+'</div>' : '')
-      + '</div>'
-      + '</div>'
-      + '<div style="display:flex;gap:6px;flex-wrap:wrap;padding-top:12px;border-top:1px solid var(--bd)">'
-      + '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(31,158,112,.15);color:#5DCAA5;border:1px solid rgba(31,158,112,.25)">80+ Elite</span>'
-      + '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(93,202,165,.1);color:#5DCAA5;border:1px solid rgba(93,202,165,.2)">65–79 Above Avg</span>'
-      + '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(107,154,42,.12);color:#97C459;border:1px solid rgba(107,154,42,.25)">50–64 Solid</span>'
-      + '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(186,117,23,.15);color:#EF9F27;border:1px solid rgba(186,117,23,.25)">35–49 Developing</span>'
-      + '<span style="font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(201,59,59,.1);color:#F09595;border:1px solid rgba(201,59,59,.2)">&lt;35 Needs Work</span>'
+      + '<div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;padding-top:14px;border-top:1px solid var(--bd);margin-top:18px">'
+      + '<span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(31,158,112,.15);color:#5DCAA5;border:1px solid rgba(31,158,112,.25)">80+ Elite</span>'
+      + '<span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(93,202,165,.1);color:#5DCAA5;border:1px solid rgba(93,202,165,.2)">65–79 Above Avg</span>'
+      + '<span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(107,154,42,.12);color:#97C459;border:1px solid rgba(107,154,42,.25)">50–64 Solid</span>'
+      + '<span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(186,117,23,.15);color:#EF9F27;border:1px solid rgba(186,117,23,.25)">35–49 Developing</span>'
+      + '<span style="font-size:10px;padding:3px 10px;border-radius:20px;background:rgba(201,59,59,.1);color:#F09595;border:1px solid rgba(201,59,59,.2)">&lt;35 Needs Work</span>'
       + '</div>'
       + '</div>'
     : '';
