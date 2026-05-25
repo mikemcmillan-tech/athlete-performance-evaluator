@@ -554,12 +554,24 @@ select option{background:var(--dk3)}
 .viewer-chart-card{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(15,18,26,.95),rgba(22,26,36,.88));border:1px solid rgba(91,233,255,.12);border-radius:14px;padding:13px;min-width:0;box-shadow:0 0 0 1px rgba(91,233,255,.05) inset,0 14px 32px rgba(0,0,0,.28)}
 .viewer-chart-title{font-family:var(--font);font-size:13px;font-weight:800;text-transform:uppercase;color:#fff;letter-spacing:.04em;margin-bottom:8px}
 .viewer-chart{height:165px;position:relative;z-index:1}
+.analytics-viz-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.analytics-viz-panel{position:relative;overflow:hidden;min-width:0;padding:18px;background:linear-gradient(135deg,rgba(15,18,26,.96),rgba(22,26,36,.88));border:1px solid rgba(91,233,255,.12);border-radius:16px;box-shadow:0 0 0 1px rgba(91,233,255,.04) inset,0 18px 44px rgba(0,0,0,.3)}
+.analytics-viz-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 10% 0%,rgba(91,233,255,.13),transparent 38%);pointer-events:none}
+.analytics-viz-head{position:relative;z-index:1;margin-bottom:12px}
+.analytics-viz-title{font-family:var(--font);font-size:18px;font-weight:800;letter-spacing:.045em;text-transform:uppercase;color:#fff}
+.analytics-viz-sub{font-family:var(--mono);font-size:10px;line-height:1.45;letter-spacing:.06em;text-transform:uppercase;color:var(--mt);margin-top:3px}
+.analytics-viz-chart{height:228px;position:relative;z-index:1}
+.analytics-viz-legend{position:relative;z-index:1;display:flex;gap:16px;flex-wrap:wrap;align-items:center;margin-top:13px;font-family:var(--mono);font-size:10px;color:var(--sb)}
+.analytics-viz-legend span{display:inline-flex;align-items:center;gap:7px}
+.analytics-viz-swatch{display:inline-block;width:19px;height:2px;border-radius:99px}
+.analytics-viz-guide{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:13px;font-family:var(--mono);font-size:9px;letter-spacing:.06em;text-align:center;text-transform:uppercase;color:var(--mt)}
+.analytics-viz-empty{height:100%;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--mt);font-size:12px;line-height:1.55;padding:20px}
 .viewer-empty{background:var(--dk2);border:1px solid var(--bd);border-radius:var(--radius-lg);padding:28px;text-align:center;color:var(--sb);line-height:1.6}
 .viewer-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(91,233,255,.24);background:rgba(91,233,255,.08);color:var(--or);border-radius:999px;padding:5px 10px;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
 .landing-role-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:14px 0 12px;padding:4px;border:1px solid var(--bd);border-radius:10px;background:rgba(255,255,255,.025)}
 .landing-role-tab{border:none;border-radius:7px;background:transparent;color:var(--mt);font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:9px 6px;cursor:pointer;transition:all .18s}
 .landing-role-tab.act{background:rgba(91,233,255,.12);color:var(--or);box-shadow:inset 0 0 0 1px rgba(91,233,255,.28)}
-@media(max-width:760px){.viewer-grid{grid-template-columns:1fr}.viewer-title{font-size:23px}.viewer-card-head{flex-direction:column}.viewer-score{width:100%;text-align:left}.landing-role-tabs{grid-template-columns:1fr}}
+@media(max-width:760px){.viewer-grid{grid-template-columns:1fr}.viewer-title{font-size:23px}.viewer-card-head{flex-direction:column}.viewer-score{width:100%;text-align:left}.landing-role-tabs{grid-template-columns:1fr}.analytics-viz-grid{grid-template-columns:1fr}.analytics-viz-chart{height:214px}}
 .prog-6wk-row{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--bd)}
 .prog-6wk-row:last-child{border-bottom:none}
 .prog-6wk-lbl{flex:0 0 64px;font-family:var(--font);font-size:13px;font-weight:700;color:var(--or);padding-top:1px}
@@ -682,8 +694,13 @@ select option{background:var(--dk3)}
   .feature-card{min-height:0}
   .hdr-in{height:54px;padding:0 16px;gap:10px}
   .hdr-title{font-size:15px}
-  .hdr-nav{gap:4px}
-  .nav-btn{font-size:11px;padding:6px 10px}
+  .hdr-logo{width:62px;height:auto;max-height:32px}
+  .hdr-mid{display:none}
+  .hdr-nav{flex:1;justify-content:flex-end;gap:3px;min-width:0}
+  .nav-btn{font-size:10px;letter-spacing:0;padding:6px 7px}
+  .profile-btn{gap:0;padding:3px}
+  #auth-pill-label{display:none}
+  .hdr-nav>.btn-p{width:auto!important;padding:7px 8px!important;font-size:11px!important;margin-left:0!important;white-space:nowrap}
   .wrap{padding:16px 14px 64px}
   .g2{grid-template-columns:1fr 1fr}
   .tier-grid{grid-template-columns:1fr 1fr;gap:8px}
@@ -5279,6 +5296,108 @@ function doDelTeam(tid){
   refreshTeamSelect('');
 }
 
+// ─── TEAM ANALYTICS VISUALIZATIONS ───────────────────────────────────────────
+// Figma dashboard panels rendered from recorded athlete sessions only.
+var _teamAnalyticsCharts={};
+function _analyticsAvg(values){
+  var nums=(values||[]).filter(function(v){return v!==null&&v!==undefined&&v!==''&&!isNaN(Number(v));}).map(Number);
+  return nums.length?nums.reduce(function(total,v){return total+v;},0)/nums.length:null;
+}
+function _analyticsIndex(session,keys){
+  if(!session||!session.sc)return null;
+  var avg=_analyticsAvg(keys.map(function(key){return session.sc[key];}));
+  return avg===null?null:Math.round(avg*20);
+}
+function _analyticsSessionAPE(session){
+  if(!session)return null;
+  return session.apeScore!=null?Number(session.apeScore):(session.sc?getAPEScore(session.sc):null);
+}
+function _analyticsDateKey(session){
+  if(session&&session.ts){
+    var dt=new Date(session.ts);
+    if(!isNaN(dt.getTime()))return dt.toISOString().slice(0,10);
+  }
+  return String((session&&session.date)||'').trim();
+}
+function _analyticsDateLabel(key){
+  var dt=new Date(key+'T00:00:00');
+  return isNaN(dt.getTime())?key:dt.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+}
+function _teamTrendSeries(roster){
+  var dates={};
+  (roster||[]).forEach(function(athlete){
+    (athlete.s||[]).forEach(function(session){
+      var key=_analyticsDateKey(session);
+      if(!key)return;
+      if(!dates[key])dates[key]={ape:[],power:[],speed:[]};
+      var ape=_analyticsSessionAPE(session);
+      var power=_analyticsIndex(session,['vp','hp','rs']);
+      var speed=_analyticsIndex(session,['ac','mv','cod','gps']);
+      if(ape!==null&&!isNaN(ape))dates[key].ape.push(ape);
+      if(power!==null)dates[key].power.push(power);
+      if(speed!==null)dates[key].speed.push(speed);
+    });
+  });
+  return Object.keys(dates).sort().map(function(key){
+    return{label:_analyticsDateLabel(key),ape:_analyticsAvg(dates[key].ape),power:_analyticsAvg(dates[key].power),speed:_analyticsAvg(dates[key].speed)};
+  });
+}
+var _analyticsQuadrantPlugin={
+  id:'apeAnalyticsQuadrants',
+  beforeDatasetsDraw:function(chart){
+    if(!chart.scales||!chart.scales.x||!chart.scales.y)return;
+    var area=chart.chartArea,ctx=chart.ctx;
+    var x=chart.scales.x.getPixelForValue(60),y=chart.scales.y.getPixelForValue(60);
+    ctx.save();
+    ctx.strokeStyle='rgba(91,233,255,.16)';
+    ctx.setLineDash([4,4]);
+    ctx.beginPath();
+    ctx.moveTo(x,area.top);ctx.lineTo(x,area.bottom);
+    ctx.moveTo(area.left,y);ctx.lineTo(area.right,y);
+    ctx.stroke();
+    ctx.restore();
+  }
+};
+function renderTeamAnalyticsGraphs(roster){
+  if(typeof Chart==='undefined')return;
+  Object.keys(_teamAnalyticsCharts).forEach(function(key){try{_teamAnalyticsCharts[key].destroy();}catch(e){}});
+  _teamAnalyticsCharts={};
+
+  var trendCanvas=el('team-trend-chart'),trendEmpty=el('team-trend-empty'),trend=_teamTrendSeries(roster);
+  if(trendCanvas){
+    if(!trend.length){
+      trendCanvas.style.display='none';
+      if(trendEmpty)trendEmpty.style.display='flex';
+    }else{
+      trendCanvas.style.display='block';
+      if(trendEmpty)trendEmpty.style.display='none';
+      _teamAnalyticsCharts.trend=new Chart(trendCanvas,{type:'line',data:{labels:trend.map(function(p){return p.label;}),datasets:[
+        {label:'APE Score',data:trend.map(function(p){return p.ape;}),borderColor:'#5BE9FF',backgroundColor:'rgba(91,233,255,.08)',borderWidth:2,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:'#5BE9FF',pointBorderColor:'#D9F3FF',tension:.36,fill:true,spanGaps:true},
+        {label:'Power Index',data:trend.map(function(p){return p.power;}),borderColor:'#00F5A0',borderWidth:2,pointRadius:3,pointHoverRadius:5,pointBackgroundColor:'#00F5A0',tension:.36,fill:false,spanGaps:true},
+        {label:'Speed / COD',data:trend.map(function(p){return p.speed;}),borderColor:'#1E90FF',borderWidth:1.75,pointRadius:0,pointHoverRadius:4,borderDash:[5,3],tension:.36,fill:false,spanGaps:true}
+      ]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:650,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:{backgroundColor:'#0F121A',titleColor:'#5BE9FF',bodyColor:'#EEF1F6',borderColor:'rgba(91,233,255,.2)',borderWidth:1,padding:11,titleFont:{family:'JetBrains Mono',size:11,weight:'700'},bodyFont:{family:'JetBrains Mono',size:11},callbacks:{label:function(ctx){return ctx.dataset.label+': '+(ctx.parsed.y===null?'--':Math.round(ctx.parsed.y));}}}},scales:{x:{ticks:{color:'rgba(139,146,168,.72)',font:{size:10,family:'JetBrains Mono'},maxRotation:0,autoSkip:true,maxTicksLimit:7},grid:{display:false},border:{display:false}},y:{min:0,max:100,ticks:{color:'rgba(139,146,168,.72)',font:{size:10,family:'JetBrains Mono'},stepSize:20},grid:{color:'rgba(91,233,255,.05)'},border:{display:false}}}}});
+    }
+  }
+
+  var scatterCanvas=el('team-force-speed-chart'),scatterEmpty=el('team-force-speed-empty');
+  var dots=(roster||[]).map(function(athlete){
+    var session=athlete.last||((athlete.s||[]).length?athlete.s[athlete.s.length-1]:null);
+    var power=_analyticsIndex(session,['vp','hp','rs']),speed=_analyticsIndex(session,['ac','mv','cod','gps']);
+    if(power===null||speed===null)return null;
+    return{x:power,y:speed,name:athlete.name,ape:_analyticsSessionAPE(session)};
+  }).filter(function(point){return point!==null;});
+  if(scatterCanvas){
+    if(!dots.length){
+      scatterCanvas.style.display='none';
+      if(scatterEmpty)scatterEmpty.style.display='flex';
+    }else{
+      scatterCanvas.style.display='block';
+      if(scatterEmpty)scatterEmpty.style.display='none';
+      _teamAnalyticsCharts.scatter=new Chart(scatterCanvas,{type:'scatter',plugins:[_analyticsQuadrantPlugin],data:{datasets:[{label:'Athletes',data:dots,pointRadius:6,pointHoverRadius:8,pointBorderWidth:1.5,pointBackgroundColor:function(ctx){var ape=ctx.raw&&ctx.raw.ape;return ape>=90?'rgba(0,245,160,.28)':ape>=75?'rgba(91,233,255,.3)':'rgba(30,144,255,.28)';},pointBorderColor:function(ctx){var ape=ctx.raw&&ctx.raw.ape;return ape>=90?'#00F5A0':ape>=75?'#5BE9FF':'#1E90FF';}}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:650,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:{backgroundColor:'#0F121A',titleColor:'#5BE9FF',bodyColor:'#EEF1F6',borderColor:'rgba(91,233,255,.2)',borderWidth:1,padding:11,displayColors:false,titleFont:{family:'JetBrains Mono',size:11,weight:'700'},bodyFont:{family:'JetBrains Mono',size:11},callbacks:{title:function(items){return items.length?items[0].raw.name:'';},label:function(ctx){return'Power: '+ctx.raw.x+' | Speed / COD: '+ctx.raw.y+' | APE: '+(ctx.raw.ape==null?'--':Math.round(ctx.raw.ape));}}}},scales:{x:{min:0,max:100,title:{display:true,text:'POWER INDEX',color:'rgba(139,146,168,.6)',font:{size:9,family:'JetBrains Mono'}},ticks:{color:'rgba(139,146,168,.72)',font:{size:10,family:'JetBrains Mono'},stepSize:20},grid:{color:'rgba(91,233,255,.05)'},border:{display:false}},y:{min:0,max:100,title:{display:true,text:'SPEED / COD INDEX',color:'rgba(139,146,168,.6)',font:{size:9,family:'JetBrains Mono'}},ticks:{color:'rgba(139,146,168,.72)',font:{size:10,family:'JetBrains Mono'},stepSize:20},grid:{color:'rgba(91,233,255,.05)'},border:{display:false}}}}});
+    }
+  }
+}
+
 // ─── TEAM STATS ───────────────────────────────────────────────────────────────
 // Dashboard showing per-team averages for all 7 metrics.
 function buildTeamStats(){
@@ -5331,6 +5450,15 @@ function buildTeamStats(){
     h+='<div class="empty-state"><div class="empty-ico">'+iconSvg('bar-chart-3')+'</div><div class="empty-h">No Data</div><div class="empty-p">No athletes match the current filters, or no evaluations on record yet.</div></div>';
     cont.innerHTML=h;return;
   }
+
+  h+='<div class="analytics-viz-grid">'
+    +'<section class="analytics-viz-panel"><div class="analytics-viz-head"><div class="analytics-viz-title">Performance Trends</div><div class="analytics-viz-sub">Recorded evaluations | roster scoring indexes</div></div>'
+    +'<div class="analytics-viz-chart"><canvas id="team-trend-chart"></canvas><div id="team-trend-empty" class="analytics-viz-empty" style="display:none">More recorded sessions are needed to show team trends.</div></div>'
+    +'<div class="analytics-viz-legend"><span><i class="analytics-viz-swatch" style="background:#5BE9FF"></i>APE Score</span><span><i class="analytics-viz-swatch" style="background:#00F5A0"></i>Power Index</span><span><i class="analytics-viz-swatch" style="background:#1E90FF"></i>Speed / COD</span></div></section>'
+    +'<section class="analytics-viz-panel"><div class="analytics-viz-head"><div class="analytics-viz-title">Force-Velocity Profile</div><div class="analytics-viz-sub">Quadrant analysis | latest athlete sessions</div></div>'
+    +'<div class="analytics-viz-chart"><canvas id="team-force-speed-chart"></canvas><div id="team-force-speed-empty" class="analytics-viz-empty" style="display:none">Complete scored sessions to populate this profile.</div></div>'
+    +'<div class="analytics-viz-guide"><span>Force development</span><span>Well developed</span><span>Speed development</span><span>Velocity dominant</span></div></section>'
+    +'</div>';
 
   // ── Helper: get last session raw + score values ──────────────────────────
   function lastVal(a,key){
@@ -5495,6 +5623,7 @@ function buildTeamStats(){
   }
 
   cont.innerHTML=h;
+  setTimeout(function(){renderTeamAnalyticsGraphs(roster);},40);
 }
 
 // ─── TEAM EXPORT ──────────────────────────────────────────────────────────────
