@@ -183,6 +183,31 @@ body{font-family:var(--font);background:
 .ap-session-delta{font-size:12px;font-weight:700;margin-left:8px}
 .ap-session-delta.up{color:#1F9E70}
 .ap-session-delta.dn{color:#C93B3B}
+.ape-radar-card{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(9,20,31,.92),rgba(5,8,13,.96));border:1px solid rgba(91,233,255,.18);border-radius:18px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.34),0 0 44px rgba(91,233,255,.06)}
+.ape-radar-card::before{content:'';position:absolute;inset:-40% -20% auto;height:180px;background:radial-gradient(circle,rgba(91,233,255,.22),transparent 64%);filter:blur(22px);pointer-events:none}
+.ape-radar-profile{display:grid;grid-template-columns:minmax(230px,.95fr) minmax(260px,1fr);gap:18px;align-items:center;margin-bottom:16px}
+.ape-radar-profile-info,.ape-radar-mini-info{position:relative;z-index:1}
+.ape-radar-kicker{font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--or);margin-bottom:7px}
+.ape-radar-name{font-family:var(--font);font-size:28px;font-weight:900;line-height:1;color:#fff;text-transform:uppercase}
+.ape-radar-meta{font-size:12px;color:var(--sb);margin-top:7px}
+.ape-radar-overall{display:inline-flex;align-items:baseline;gap:6px;margin-top:16px;font-family:var(--mono);font-size:42px;font-weight:900;color:var(--or);text-shadow:0 0 28px rgba(91,233,255,.28)}
+.ape-radar-overall span{font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mt)}
+.ape-radar-scores{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ape-radar-score-row{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px 10px}
+.ape-radar-score-label{font-size:9px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--mt);margin-bottom:4px}
+.ape-radar-score-val{font-family:var(--mono);font-size:18px;font-weight:800;color:#fff}
+.ape-radar-svg-wrap{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;min-height:250px}
+.ape-radar-svg{width:100%;max-width:310px;height:auto;overflow:visible;filter:drop-shadow(0 18px 40px rgba(0,0,0,.35))}
+.ape-radar-poly{animation:ape-radar-draw 1.15s cubic-bezier(.16,1,.3,1) both}
+.ape-radar-halo{animation:ape-radar-pulse 1.65s ease-in-out infinite;transform-origin:center}
+@keyframes ape-radar-draw{from{opacity:0;transform:scale(.78)}to{opacity:1;transform:scale(1)}}
+@keyframes ape-radar-pulse{0%,100%{opacity:.18;filter:blur(0)}50%{opacity:.5;filter:blur(1px)}}
+.ape-radar-mini{position:relative;z-index:1;display:grid;grid-template-columns:92px 1fr;gap:13px;align-items:center;background:rgba(91,233,255,.045);border:1px solid rgba(91,233,255,.14);border-radius:14px;padding:12px;margin-bottom:14px}
+.ape-radar-mini .ape-radar-svg-wrap{min-height:92px}
+.ape-radar-mini .ape-radar-svg{max-width:92px}
+.ape-radar-mini-name{font-family:var(--font);font-size:20px;font-weight:900;color:#fff;line-height:1.05;text-transform:uppercase}
+.ape-radar-mini-meta{font-size:11px;color:var(--mt);margin-top:5px}
+.ape-radar-mini-score{margin-top:9px;font-family:var(--mono);font-size:25px;font-weight:900;color:var(--or)}
 .landing-mode-sw{display:flex;gap:6px;margin-bottom:22px;padding:4px;background:rgba(7,11,16,.5);border:1px solid rgba(127,160,184,.14);border-radius:12px}
 .landing-mode-btn{flex:1;border:none;border-radius:8px;background:transparent;color:var(--mt);font-family:var(--font);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:10px 8px;cursor:pointer;transition:all .18s;line-height:1.2;text-align:center}
 .landing-mode-btn.act{background:rgba(30,144,255,.18);color:var(--electric);border:1px solid rgba(30,144,255,.28)}
@@ -199,6 +224,10 @@ body{font-family:var(--font);background:
   .aph{flex-wrap:wrap}
   .aph-brand{width:100%}
   .aph-actions{width:100%;justify-content:space-between}
+  .ape-radar-profile{grid-template-columns:1fr}
+  .ape-radar-svg-wrap{min-height:220px}
+  .ape-radar-scores{grid-template-columns:1fr 1fr}
+  .ape-radar-mini{grid-template-columns:84px 1fr}
 }
 .landing-video{width:100%;height:auto;display:block;object-fit:cover}
 .landing-proof{display:none}
@@ -2653,6 +2682,70 @@ function getLatestSession(a){
   var hist=(a&&a.s)||[];
   return hist.length?hist[hist.length-1]:null;
 }
+function _score5To100(v){
+  if(v===null||v===undefined||isNaN(Number(v)))return null;
+  return Math.max(0,Math.min(100,Math.round(Number(v)*20)));
+}
+function _avgScore100(list){
+  var vals=(list||[]).filter(function(v){return v!==null&&v!==undefined&&!isNaN(Number(v));});
+  if(!vals.length)return 0;
+  return Math.round(vals.reduce(function(a,b){return a+Number(b);},0)/vals.length);
+}
+function mapAthleteToRadarData(a){
+  a=a||{};
+  var s=getLatestSession(a)||{},sc=s.sc||{},ape=s?(s.apeScore!=null?s.apeScore:(s.sc?getAPEScore(s.sc):null)):null;
+  var speed=_avgScore100([_score5To100(sc.ac),_score5To100(sc.mv),_score5To100(sc.gps)]);
+  var strength=_avgScore100([_score5To100(sc.ft),_score5To100(sc.hp)]);
+  var power=_avgScore100([_score5To100(sc.vp),_score5To100(sc.hp)]);
+  var endurance=_avgScore100([_score5To100(sc.gps),_score5To100(sc.mv)]);
+  var agility=_avgScore100([_score5To100(sc.cod)]);
+  var recovery=_avgScore100([_score5To100(sc.vp),_score5To100(sc.hp),_score5To100(sc.rs),_score5To100(sc.ac),_score5To100(sc.mv),_score5To100(sc.cod),_score5To100(sc.gps),_score5To100(sc.ft)]);
+  return{
+    name:a.name||'Athlete',
+    sport:a.sport||'',
+    position:a.position||'',
+    overall:ape!=null?Math.round(ape):0,
+    scores:{speed:speed,strength:strength,power:power,endurance:endurance,agility:agility,recovery:recovery}
+  };
+}
+function _radarPoints(values,cx,cy,r){
+  var total=values.length;
+  return values.map(function(v,i){
+    var angle=(-90+(360/total)*i)*Math.PI/180,rr=r*(Math.max(0,Math.min(100,v))/100);
+    return{x:cx+Math.cos(angle)*rr,y:cy+Math.sin(angle)*rr};
+  });
+}
+function _radarPolygon(points){
+  return points.map(function(p){return p.x.toFixed(2)+','+p.y.toFixed(2);}).join(' ');
+}
+function RadarChart(data,uid,opt){
+  opt=opt||{};data=data||{scores:{}};uid=String(uid||('radar-'+Math.random())).replace(/[^a-zA-Z0-9_-]/g,'');
+  var labels=['speed','strength','power','endurance','agility','recovery'],cx=120,cy=120,r=86,vals=labels.map(function(k){return data.scores&&data.scores[k]!=null?data.scores[k]:0;});
+  var rings=[.25,.5,.75,1].map(function(p){return'<polygon points="'+_radarPolygon(_radarPoints([p*100,p*100,p*100,p*100,p*100,p*100],cx,cy,r))+'" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';}).join('');
+  var axes=labels.map(function(k,i){var p=_radarPoints([100,100,100,100,100,100],cx,cy,r)[i];return'<line x1="'+cx+'" y1="'+cy+'" x2="'+p.x.toFixed(2)+'" y2="'+p.y.toFixed(2)+'" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';}).join('');
+  var labelHtml=labels.map(function(k,i){var p=_radarPoints([116,116,116,116,116,116],cx,cy,r)[i],anchor=p.x<cx-8?'end':p.x>cx+8?'start':'middle';return'<text x="'+p.x.toFixed(2)+'" y="'+p.y.toFixed(2)+'" text-anchor="'+anchor+'" dominant-baseline="middle" fill="#97A0B3" font-size="'+(opt.mini?8:10)+'" font-weight="800" letter-spacing=".08em">'+k.toUpperCase()+'</text>';}).join('');
+  var dataPts=_radarPolygon(_radarPoints(vals,cx,cy,r)),filterId='apeRadarGlow-'+uid,gradId='apeRadarGrad-'+uid;
+  return'<div class="ape-radar-svg-wrap"><svg class="ape-radar-svg" viewBox="0 0 240 240" role="img" aria-label="'+esc(data.name||'Athlete')+' performance radar">'
+    +'<defs><filter id="'+filterId+'" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5" result="blur"/><feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.36 0 0 0 0 0.91 0 0 0 0 1 0 0 0 .75 0"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="'+gradId+'" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5BE9FF" stop-opacity=".56"/><stop offset="100%" stop-color="#0A84FF" stop-opacity=".22"/></linearGradient></defs>'
+    +'<circle class="ape-radar-halo" cx="'+cx+'" cy="'+cy+'" r="92" fill="none" stroke="#5BE9FF" stroke-width="2" opacity=".25"/>'
+    +rings+axes+'<polygon class="ape-radar-poly" points="'+dataPts+'" fill="url(#'+gradId+')" stroke="#5BE9FF" stroke-width="2.5" filter="url(#'+filterId+')"/>'
+    +_radarPoints(vals,cx,cy,r).map(function(p){return'<circle cx="'+p.x.toFixed(2)+'" cy="'+p.y.toFixed(2)+'" r="'+(opt.mini?2.8:4)+'" fill="#EEF1F6" stroke="#5BE9FF" stroke-width="1.5"/>';}).join('')
+    +labelHtml+'</svg></div>';
+}
+function AthleteProfileCard(a,uid){
+  var d=mapAthleteToRadarData(a),labels=['speed','strength','power','endurance','agility','recovery'];
+  return'<div class="ape-radar-card ape-radar-profile">'
+    +'<div class="ape-radar-profile-info"><div class="ape-radar-kicker">Athlete Performance Profile</div><div class="ape-radar-name">'+esc(d.name)+'</div><div class="ape-radar-meta">'+[d.sport,d.position].filter(Boolean).map(esc).join(' / ')+'</div><div class="ape-radar-overall">'+d.overall+'<span>Overall</span></div><div class="ape-radar-scores">'+labels.map(function(k){return'<div class="ape-radar-score-row"><div class="ape-radar-score-label">'+k+'</div><div class="ape-radar-score-val">'+d.scores[k]+'</div></div>';}).join('')+'</div></div>'
+    +RadarChart(d,uid||('profile-'+(a&&a.id||'athlete')),{})
+    +'</div>';
+}
+function AthleteCardMini(a,uid){
+  var d=mapAthleteToRadarData(a);
+  return'<div class="ape-radar-mini">'
+    +RadarChart(d,uid||('mini-'+(a&&a.id||'athlete')),{mini:true})
+    +'<div class="ape-radar-mini-info"><div class="ape-radar-mini-name">'+esc(d.name)+'</div><div class="ape-radar-mini-meta">'+[d.sport,d.position].filter(Boolean).map(esc).join(' / ')+'</div><div class="ape-radar-mini-score">'+d.overall+'<span style="font-family:var(--font);font-size:10px;color:var(--mt);letter-spacing:.12em;text-transform:uppercase;margin-left:5px">APE</span></div></div>'
+    +'</div>';
+}
 function getViewerFocus(a){
   var s=getLatestSession(a),sc=(s&&s.sc)||{},weak=null;
   Object.keys(sc).forEach(function(k){
@@ -2679,6 +2772,7 @@ function buildViewerDashboard(user){
     var s=getLatestSession(a),ape=s?(s.apeScore!=null?s.apeScore:(s.sc?getAPEScore(s.sc):null)):null,meta=ape!=null?getAPELabel(ape,a.tier):null,focus=getViewerFocus(a);
     var team=a.team&&teamMap[a.team]?teamMap[a.team].name:'Unassigned';
     h+='<div class="viewer-card">'
+      +AthleteCardMini(a,'viewer-mini-'+a.id)
       +'<div class="viewer-card-head"><div><div class="viewer-name">'+esc(a.name)+'</div><div class="viewer-meta">'+[team,a.sport,a.position,gradeDisplay(a.grade)].filter(Boolean).map(esc).join(' &middot; ')+'</div></div>'
       +'<div class="viewer-score">'+renderAPEScoreGauge(ape,{className:'gauge-sm',label:false,pill:false,color:ape!=null?getAPEGaugeColor(ape):'var(--or)'})+'</div></div>'
       +'<div class="viewer-focus"><div class="viewer-focus-box"><div class="viewer-label">Primary Focus</div><div class="viewer-value">'+esc(focus.primary)+'</div></div>'
@@ -5084,6 +5178,7 @@ function buildHist(aid){
     +'<button class="btn-share" style="padding:8px 13px;font-size:12px;flex:none" onclick="copyAthleteLink(\''+aid+'\')">&#128279; Share</button>'
     +'<button class="btn-save-prog" style="padding:8px 13px;font-size:12px;flex:none" onclick="exportAthleteXLSX(\''+aid+'\')">&#8681; Export</button>'
     +'<button class="btn-p" style="padding:8px 13px;font-size:12px;flex:none" onclick="startTest(\''+aid+'\')">&#9889; New Test</button></div>';
+  h+=AthleteProfileCard(a,'athlete-profile-'+aid);
 
   if(!sessions.length){h+='<div class="empty-state"><div class="empty-p">No sessions recorded yet.</div></div>';cont.innerHTML=h;return;}
 
