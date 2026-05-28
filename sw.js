@@ -1,5 +1,5 @@
-// APE Service Worker - v4
-const CACHE_NAME = 'ape-v4-agility';
+// APE Service Worker - v5
+const CACHE_NAME = 'ape-v5-gender-benchmarks';
 const PRECACHE = [
   './',
   './index.html',
