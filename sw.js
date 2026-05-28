@@ -1,5 +1,5 @@
-// APE Service Worker - v8
-const CACHE_NAME = 'ape-v8-phase-dropdown';
+// APE Service Worker - v9
+const CACHE_NAME = 'ape-v9-buckets-dialogs';
 const PRECACHE = [
   './',
   './index.html',

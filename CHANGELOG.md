@@ -12,6 +12,7 @@ All notable changes to APE will be documented here.
 - Added migration for athlete `height` field used by the profile UI.
 - Added a structured programs and training groups data model foundation for generated 6-week plans.
 - Added coach-facing Programming tabs, default Schroeder/Ryan Paul bucket templates, group assignment actions, and editable training days.
+- Renamed programming buckets with branded labels and replaced browser prompts with APE-styled dialog panels.
 
 ## Earlier History
 

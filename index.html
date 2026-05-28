@@ -671,10 +671,31 @@ select option{background:var(--dk3)}
 .phase-dropdown-btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(180deg,rgba(91,233,255,.12),rgba(91,233,255,.04));border:1px solid rgba(91,233,255,.34);border-radius:999px;color:var(--or);font-family:var(--font);font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;padding:8px 12px;cursor:pointer;box-shadow:0 0 18px rgba(91,233,255,.1)}
 .phase-dropdown-btn::after{content:'▾';font-size:10px;color:var(--sb);transition:transform .18s}
 .phase-dropdown.open .phase-dropdown-btn::after{transform:rotate(180deg)}
-.phase-dropdown-menu{display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:170px;background:var(--dk2);border:1px solid rgba(91,233,255,.2);border-radius:12px;padding:7px;z-index:980;box-shadow:0 18px 44px rgba(0,0,0,.48)}
+.phase-dropdown-menu{display:none;position:absolute;right:0;top:calc(100% + 8px);min-width:460px;background:#0d1821;border:1px solid rgba(0,229,255,.2);border-radius:14px;padding:10px;z-index:980;box-shadow:0 18px 44px rgba(0,0,0,.48)}
 .phase-dropdown.open .phase-dropdown-menu{display:block}
-.phase-dropdown-menu button{width:100%;display:block;background:transparent;border:none;border-radius:8px;color:var(--sb);font-family:var(--font);font-size:12px;font-weight:800;text-align:left;text-transform:uppercase;letter-spacing:.06em;padding:9px 10px;cursor:pointer}
-.phase-dropdown-menu button:hover,.phase-dropdown-menu button.act{background:rgba(91,233,255,.1);color:var(--or)}
+.phase-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.phase-card{background:#081320;border:1px solid rgba(0,229,255,.18);border-radius:10px;color:rgba(255,255,255,.72);font-family:var(--font);text-align:left;padding:11px;cursor:pointer;transition:all .16s}
+.phase-card:hover,.phase-card.act{border-color:#00e5ff;background:rgba(0,229,255,.1);color:#fff;box-shadow:0 0 18px rgba(0,229,255,.14)}
+.phase-card-title{font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:#00e5ff;margin-bottom:5px}
+.phase-card-copy{font-size:11px;line-height:1.35;color:rgba(255,255,255,.68)}
+.ape-dialog-overlay{display:none;position:fixed;inset:0;z-index:1400;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:18px}
+.ape-dialog-overlay.open{display:flex}
+.ape-dialog{width:min(540px,100%);background:#0d1821;border:1px solid rgba(0,229,255,.2);border-radius:14px;box-shadow:0 24px 90px rgba(0,0,0,.62);overflow:hidden}
+.ape-dialog-head{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#0a1520;border-bottom:1px solid rgba(0,229,255,.15);padding:14px 18px}
+.ape-dialog-head .card-title{color:#00e5ff!important;font-weight:900;letter-spacing:2px;text-transform:uppercase}
+.ape-dialog-title{color:#00e5ff;font-family:var(--font);font-size:14px;font-weight:900;letter-spacing:2px;text-transform:uppercase}
+.ape-dialog-close{background:transparent;border:none;color:rgba(255,255,255,.4);font-size:22px;line-height:1;cursor:pointer}
+.ape-dialog-close:hover{color:#fff}
+.ape-dialog-body{padding:18px;color:rgba(255,255,255,.85);font-size:13px;line-height:1.55}
+.ape-dialog label{display:block;color:rgba(255,255,255,.45);font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;margin:0 0 6px}
+.ape-dialog input,.ape-dialog select,.ape-dialog textarea{width:100%;background:#081320;border:1px solid rgba(0,229,255,.2);color:#fff;border-radius:8px;padding:10px 14px;font-family:var(--font);font-size:13px;outline:none}
+.ape-dialog input:focus,.ape-dialog select:focus,.ape-dialog textarea:focus{border-color:#00e5ff}
+.ape-dialog-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;padding:0 18px 18px}
+.ape-btn-primary{background:#00e5ff;color:#000;border:none;border-radius:8px;font-weight:900;padding:10px 14px;cursor:pointer;font-family:var(--font)}
+.ape-btn-primary:hover{background:#33eaff}
+.ape-btn-secondary{background:transparent;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.7);border-radius:8px;font-weight:800;padding:10px 14px;cursor:pointer;font-family:var(--font)}
+.ape-btn-danger{background:transparent;border:1px solid #ff4444;color:#ff4444;border-radius:8px;font-weight:800;padding:10px 14px;cursor:pointer;font-family:var(--font)}
+.ape-btn-danger:hover{background:rgba(255,68,68,.1)}
 .program-week{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
 .program-day{background:var(--dk2);border:1px solid rgba(91,233,255,.12);border-radius:14px;padding:13px;min-height:170px;box-shadow:0 12px 28px rgba(0,0,0,.24)}
 .program-day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
@@ -688,7 +709,7 @@ select option{background:var(--dk3)}
 .program-empty-day{font-size:12px;color:var(--mt);line-height:1.55;padding:12px 0}
 .program-editor-overlay{display:none;position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:18px}
 .program-editor-overlay.open{display:flex}
-.program-editor{width:min(920px,100%);max-height:90vh;overflow:auto;background:var(--dk2);border:1px solid rgba(91,233,255,.18);border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.55);padding:20px}
+.program-editor{width:min(920px,100%);max-height:90vh;overflow:auto;background:#0d1821;border:1px solid rgba(0,229,255,.2);border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.55);padding:20px}
 .program-edit-row{display:grid;grid-template-columns:1.25fr .55fr .55fr .7fr .75fr .75fr auto;gap:7px;align-items:end;border:1px solid var(--bd2);background:var(--dk3);border-radius:10px;padding:10px;margin-bottom:8px}
 .program-edit-row input,.program-edit-row textarea{width:100%;background:var(--dk4);border:1px solid var(--bd);border-radius:7px;color:var(--tx);font-family:var(--font);font-size:12px;padding:8px}
 .program-edit-row textarea{min-height:38px;resize:vertical}
@@ -701,6 +722,7 @@ select option{background:var(--dk3)}
 .group-card{position:relative;background:var(--dk2);border:1px solid rgba(91,233,255,.12);border-radius:14px;padding:15px;margin-bottom:12px}
 .group-roster{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 @media(max-width:760px){.program-edit-row{grid-template-columns:1fr 1fr}.program-edit-row .wide{grid-column:1/-1}.bulk-program-bar{align-items:stretch}.bulk-program-bar .btn-save-prog,.bulk-program-bar .btn-p,.bulk-program-bar .btn-s{flex:1}}
+@media(max-width:760px){.phase-dropdown-menu{position:fixed;left:12px;right:12px;top:auto;bottom:80px;min-width:0}.phase-card-grid{grid-template-columns:1fr}.ape-dialog-actions{justify-content:stretch}.ape-dialog-actions button{flex:1}}
 .progression-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 .progression-card{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(15,18,26,.95),rgba(22,26,36,.88));border:1px solid rgba(91,233,255,.12);border-radius:var(--radius-lg);padding:16px;min-width:0;box-shadow:0 0 0 1px rgba(91,233,255,.05) inset,0 18px 44px rgba(0,0,0,.34)}
 .progression-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
@@ -960,9 +982,9 @@ select option{background:var(--dk3)}
 .profile-menu button:hover{background:var(--dk4);color:var(--tx)}
 .icon-inline{width:16px;height:16px;stroke:currentColor;stroke-width:1.75;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;vertical-align:-3px}
 /* ── Auth Modal ── */
-.auth-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.auth-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:20px}
 .auth-overlay.open{display:flex;animation:fu .18s ease}
-.auth-box{background:var(--dk2);border:1px solid var(--bd);border-radius:var(--radius-lg);padding:28px 28px 24px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+.auth-box{background:#0d1821;border:1px solid rgba(0,229,255,.2);border-radius:14px;padding:28px 28px 24px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
 .auth-tabs{display:flex;gap:0;margin-bottom:22px;border-bottom:1px solid var(--bd)}
 .auth-tab{flex:1;padding:9px 0;font-family:var(--font);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mt);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .18s;margin-bottom:-1px}
 .auth-tab.act{color:var(--or);border-bottom-color:var(--or)}
@@ -972,9 +994,9 @@ select option{background:var(--dk3)}
 .auth-sep{height:1px;background:var(--bd);margin:18px 0}
 .auth-footer{font-size:11px;color:var(--mt);text-align:center;margin-top:14px;line-height:1.6}
 /* ── Settings Modal ── */
-.settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:20px}
 .settings-overlay.open{display:flex;animation:fu .18s ease}
-.settings-box{background:var(--dk2);border:1px solid var(--bd);border-radius:var(--radius-lg);padding:28px 28px 24px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
+.settings-box{background:#0d1821;border:1px solid rgba(0,229,255,.2);border-radius:14px;padding:28px 28px 24px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,0,0,.6)}
 </style>
 </head>
 <body>
@@ -1436,15 +1458,27 @@ select option{background:var(--dk3)}
 </div>
 </div>
 
+<!-- ── APE Styled Dialog ── -->
+<div class="ape-dialog-overlay" id="ape-dialog-overlay" onclick="if(event.target===this)closeApeDialog(false)">
+  <div class="ape-dialog">
+    <div class="ape-dialog-head">
+      <div class="ape-dialog-title" id="ape-dialog-title">APE</div>
+      <button class="ape-dialog-close" type="button" onclick="closeApeDialog(false)">&times;</button>
+    </div>
+    <div class="ape-dialog-body" id="ape-dialog-body"></div>
+    <div class="ape-dialog-actions" id="ape-dialog-actions"></div>
+  </div>
+</div>
+
 <!-- ── Coach Programming Editor ── -->
 <div class="program-editor-overlay" id="program-editor-overlay" onclick="if(event.target===this)closeProgramEditor()">
   <div class="program-editor">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px">
+    <div class="ape-dialog-head" style="margin:-20px -20px 14px">
       <div>
         <div class="card-title" id="program-editor-title" style="margin-bottom:3px">Edit Training Day</div>
         <div class="pg-sub">Coach-facing only. Athlete and parent portal views never render programming.</div>
       </div>
-      <button onclick="closeProgramEditor()" style="background:none;border:none;color:var(--mt);font-size:22px;cursor:pointer">&times;</button>
+      <button class="ape-dialog-close" onclick="closeProgramEditor()">&times;</button>
     </div>
     <div id="program-editor-body"></div>
     <div class="btn-row" style="margin-top:14px">
@@ -2015,7 +2049,7 @@ function openAuth(){
   var u=SupaDB.getUser();
   if(u){
     // Already signed in — show signed-out option
-    if(confirm('Sign out of '+u.email+'?'))handleSignout();
+    openApeDialog({title:'Sign Out',message:'Sign out of '+u.email+'?',buttons:[{label:'Cancel',value:false,kind:'secondary'},{label:'Sign Out',value:true,kind:'danger'}]}).then(function(ok){if(ok)handleSignout();});
     return;
   }
   var ov=el('auth-overlay');if(ov)ov.classList.add('open');
@@ -2968,9 +3002,7 @@ function ensureAthleteProgram(aid){
   return p;
 }
 function programBucketKey(p){
-  var txt=String((p&&p.bucketPrimary)||'');
-  var m=txt.match(/Bucket\s+(\d+)/i);
-  return m?parseInt(m[1],10):2;
+  return bucketKeyFromName((p&&p.bucketPrimary)||'');
 }
 function programOptionsHtml(selected){
   selected=parseInt(selected,10)||2;
@@ -2985,9 +3017,9 @@ function phaseOptionsHtml(selected){
 function renderAthletePhaseDropdown(aid,selected){
   selected=normalizeProgramPhase(selected);
   var opts=Object.keys(PROGRAM_PHASES).map(function(k){
-    return'<button type="button" class="'+(k===selected?'act':'')+'" onclick="selectAthletePhase(\''+aid+'\',\''+k+'\')">'+esc(PROGRAM_PHASES[k].label)+'</button>';
+    return'<button type="button" class="phase-card '+(k===selected?'act':'')+'" onclick="selectAthletePhase(\''+aid+'\',\''+k+'\')"><div class="phase-card-title">'+esc(PROGRAM_PHASES[k].label)+'</div><div class="phase-card-copy">'+esc(PROGRAM_PHASE_COPY[k]||'')+'</div></button>';
   }).join('');
-  return'<div class="phase-dropdown" id="phase-dd-'+aid+'"><button type="button" class="phase-dropdown-btn" onclick="toggleAthletePhaseDropdown(event,\''+aid+'\')" aria-haspopup="menu" aria-expanded="false">'+esc(PROGRAM_PHASES[selected].label)+'</button><div class="phase-dropdown-menu" role="menu">'+opts+'</div></div>';
+  return'<div class="phase-dropdown" id="phase-dd-'+aid+'"><button type="button" class="phase-dropdown-btn" onclick="toggleAthletePhaseDropdown(event,\''+aid+'\')" aria-haspopup="menu" aria-expanded="false">'+esc(PROGRAM_PHASES[selected].label)+'</button><div class="phase-dropdown-menu" role="menu"><div class="phase-card-grid">'+opts+'</div></div></div>';
 }
 function toggleAthletePhaseDropdown(evt,aid){
   if(evt){evt.preventDefault();evt.stopPropagation();}
@@ -3025,8 +3057,8 @@ function buildProgramPanel(aid){
     +'<button class="btn-save-prog" style="padding:9px 12px;font-size:12px" onclick="resetAthleteProgramDefaults(\''+aid+'\')">Reset Program</button>'
     +'</div></div>'
     +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px">'
-    +'<div class="viewer-focus-box"><div class="viewer-label">Assigned Bucket</div><div class="viewer-value">'+esc(p.bucketPrimary||'Manual / Not Assigned')+'</div></div>'
-    +'<div class="viewer-focus-box"><div class="viewer-label">Secondary Block</div><div class="viewer-value">'+esc(p.bucketSecondary||'Bucket 2 - Extreme Isometrics (EI)')+'</div></div>'
+    +'<div class="viewer-focus-box"><div class="viewer-label">Assigned Bucket</div><div class="viewer-value">'+esc(bucketDisplay(p.bucketPrimary,bucket))+'</div><div class="program-note">'+esc(bucketSubtitle(bucket))+'</div></div>'
+    +'<div class="viewer-focus-box"><div class="viewer-label">Secondary Block</div><div class="viewer-value">Tendon Code</div><div class="program-note">'+esc(bucketSubtitle(2))+'</div></div>'
     +'<div class="viewer-focus-box"><div class="viewer-label">Season Phase</div><div class="viewer-value">'+esc(programPhaseLabel(p.seasonPhase||a.seasonPhase))+'</div></div>'
     +'</div>'
     +'<div class="program-week">';
@@ -3158,12 +3190,18 @@ function resetProgramDayDefault(){
 function replaceProgramExercisePrompt(){
   var lib=[];
   Object.keys(defaultPrograms).forEach(function(k){defaultPrograms[k].exercises.forEach(function(ex){if(lib.indexOf(ex.name)===-1)lib.push(ex.name);});});
-  var name=prompt('Type an exercise from the library or enter your own:\n\n'+lib.slice(0,18).join('\n'));
-  if(!name)return;
-  var match=null;
-  Object.keys(defaultPrograms).forEach(function(k){defaultPrograms[k].exercises.forEach(function(ex){if(ex.name.toLowerCase()===name.toLowerCase())match=ex;});});
-  var list=el('program-ex-edit-list'),i=list?list.querySelectorAll('.program-edit-row').length:0;
-  if(list)list.insertAdjacentHTML('beforeend',programEditRow(match||programExercise(name,'','','','','','',true),i));
+  var opts=lib.map(function(name){return{value:name,label:name};});
+  opts.unshift({value:'',label:'Custom exercise...'});
+  apePrompt('Replace From Library',[
+    {id:'library',label:'Exercise Library',type:'select',options:opts},
+    {id:'custom',label:'Custom Exercise Name',placeholder:'Use this if custom exercise is selected'}
+  ],function(v){
+    var name=(v.library||v.custom||'').trim();if(!name){apeAlert('Choose or enter an exercise name.','Replace Exercise');return;}
+    var match=null;
+    Object.keys(defaultPrograms).forEach(function(k){defaultPrograms[k].exercises.forEach(function(ex){if(ex.name.toLowerCase()===name.toLowerCase())match=ex;});});
+    var list=el('program-ex-edit-list'),i=list?list.querySelectorAll('.program-edit-row').length:0;
+    if(list)list.insertAdjacentHTML('beforeend',programEditRow(match||programExercise(name,'','','','','','',true),i));
+  });
 }
 function resolveViewerAthletesForEmail(athletes,email,role){
   email=_normEmail(email);
@@ -3588,16 +3626,16 @@ function _combineKey(name,level,teamName){return _combineNorm(name)+'|'+_combine
 function _combineExistingByKey(){var maps=_combineTeamMaps(),out={};DB.getAll().forEach(function(a){var tn=a.team&&maps.byId[a.team]?maps.byId[a.team].name:'';out[_combineKey(a.name,a.levelLabel||a.tier||'',tn)]=a;});return out;}
 function _combineEnsureTeam(name){name=String(name||'').trim();if(!name)return null;var maps=_combineTeamMaps(),existing=maps.byName[_combineNorm(name)];if(existing)return existing;return DB.createTeam(name,'#5be9ff');}
 function _combineCsvDownload(rows,filename){if(!rows.length)return;var headers=Object.keys(rows[0]);var csv=headers.join(',')+'\n'+rows.map(function(r){return headers.map(function(h){var v=String(r[h]===null||r[h]===undefined?'':r[h]);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',');}).join('\n');var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);if(a.parentNode)a.parentNode.removeChild(a);},0);}
-function _combineWriteRows(rows,filename,sheetName){if(!rows.length){alert('No rows to export.');return;}if(typeof XLSX!=='undefined'){var cfg=DB.loadSettings(),wb=XLSX.utils.book_new();var summary=[{'Section':'Coach Branding','Value':cfg.gymName||'Athlete Performance Evaluator'},{'Section':'Coach','Value':cfg.coachName||''},{'Section':'Contact','Value':cfg.contact||''},{'Section':'Export Date','Value':new Date().toLocaleDateString('en-US')},{'Section':'Rows','Value':rows.length},{'Section':'Logo','Value':cfg.logoBase64?'Logo included in HTML/PDF reports; XLSX stores branding text only.':''}];XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(summary),'Summary');var ws=XLSX.utils.json_to_sheet(rows);ws['!cols']=Object.keys(rows[0]||{}).map(function(){return{wch:18};});XLSX.utils.book_append_sheet(wb,ws,(sheetName||'Raw Data').substring(0,31));XLSX.writeFile(wb,filename.replace(/\.csv$/i,'.xlsx'));return;}_combineCsvDownload(rows,filename.replace(/\.xlsx$/i,'.csv'));}
+function _combineWriteRows(rows,filename,sheetName){if(!rows.length){apeAlert('No rows to export.','Export');return;}if(typeof XLSX!=='undefined'){var cfg=DB.loadSettings(),wb=XLSX.utils.book_new();var summary=[{'Section':'Coach Branding','Value':cfg.gymName||'Athlete Performance Evaluator'},{'Section':'Coach','Value':cfg.coachName||''},{'Section':'Contact','Value':cfg.contact||''},{'Section':'Export Date','Value':new Date().toLocaleDateString('en-US')},{'Section':'Rows','Value':rows.length},{'Section':'Logo','Value':cfg.logoBase64?'Logo included in HTML/PDF reports; XLSX stores branding text only.':''}];XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(summary),'Summary');var ws=XLSX.utils.json_to_sheet(rows);ws['!cols']=Object.keys(rows[0]||{}).map(function(){return{wch:18};});XLSX.utils.book_append_sheet(wb,ws,(sheetName||'Raw Data').substring(0,31));XLSX.writeFile(wb,filename.replace(/\.csv$/i,'.xlsx'));return;}_combineCsvDownload(rows,filename.replace(/\.xlsx$/i,'.csv'));}
 function downloadRosterTemplate(){_combineWriteRows([{'Athlete Name':'Jordan Smith','Team':'13 Gold','Sport':'Volleyball','Position':'Outside Hitter','Gender':'Female','Grade':'9th','Level':'13U','Age':'13','Grad Year':'2031','Bodyweight':'115','Height':'5-5','Athlete Email':'athlete@example.com','Parent Email':'parent@example.com','Notes':''}],'APE_Roster_Template.xlsx','Roster Template');}
 function parseRosterFile(file){return new Promise(function(resolve,reject){if(!file){resolve([]);return;}if(typeof XLSX==='undefined'){reject(new Error('XLSX library is not loaded.'));return;}var reader=new FileReader();reader.onload=function(e){try{var wb=XLSX.read(e.target.result,{type:'array'}),sheet=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(sheet,{defval:'',raw:false});resolve(rows||[]);}catch(err){reject(err);}};reader.onerror=function(){reject(new Error('Could not read roster file.'));};reader.readAsArrayBuffer(file);});}
 function normalizeRosterRow(src,idx){var first=String(_combineField(src,['First Name','first_name'])||'').trim(),last=String(_combineField(src,['Last Name','last_name'])||'').trim(),full=String(_combineField(src,['Athlete Name','athlete_name','Full Name','full_name','Name'])||'').trim();var name=full||(first||last?[first,last].filter(Boolean).join(' '):''),teamName=String(_combineField(src,['Team','Team Name'])||'').trim(),hadTeam=!!teamName;if(!teamName)teamName=_combineFallbackTeamName();var level=String(_combineField(src,['Level','Tier','Level / Tier','Tier / Level'])||'').trim(),age=_combineNum(_combineField(src,['Age']));return{idx:idx,name:name,nameKey:_combineNorm(name),teamName:teamName,hadTeam:hadTeam,club:String(_combineField(src,['Club','Club Team'])||'').trim(),age:age,gender:normalizeGender(_combineField(src,['Gender','Sex'])),grade:String(_combineField(src,['Grade','Class'])||'').trim(),gradYear:_combineNum(_combineField(src,['Grad Year','GradYear','Graduation Year'])),sport:String(_combineField(src,['Sport'])||'').trim(),position:String(_combineField(src,['Position','Pos'])||'').trim(),levelLabel:level,tier:_combineTier(level,age),bodyweight:_combineNum(_combineField(src,['Bodyweight','Body Weight','Weight'])),height:String(_combineField(src,['Height'])||'').trim(),athleteEmail:String(_combineField(src,['Athlete Email','AthleteEmail'])||'').trim(),parentEmail:String(_combineField(src,['Parent Email','ParentEmail'])||'').trim(),notes:String(_combineField(src,['Notes','Note'])||'').trim(),invalid:!name};}
-function handleRosterUpload(input){var file=input&&input.files&&input.files[0];if(!file)return;parseRosterFile(file).then(function(rows){_combineState.rawRows=rows;_combineState.fileName=file.name;previewRosterImport(rows,file.name);}).catch(function(err){console.error('[Event Mode] roster parse failed:',err);alert('Could not parse roster: '+err.message);});}
+function handleRosterUpload(input){var file=input&&input.files&&input.files[0];if(!file)return;parseRosterFile(file).then(function(rows){_combineState.rawRows=rows;_combineState.fileName=file.name;previewRosterImport(rows,file.name);}).catch(function(err){console.error('[Event Mode] roster parse failed:',err);apeAlert('Could not parse roster: '+err.message,'Roster Import');});}
 function previewRosterImport(rows,fileName){rows=rows||_combineState.rawRows||[];var out=el('combine-import-preview');if(!out)return;var fallbackName=_combineFallbackTeamName(),normalized=rows.map(function(r,i){return normalizeRosterRow(r,i+2);}),hasTeamColumn=normalized.some(function(r){return r.hadTeam;}),existing=_combineExistingByKey(),seen={},newCount=0,dupes=0,missing=0,skipped=0,createTeams={};var maps=_combineTeamMaps();normalized.forEach(function(r){if(r.invalid){missing++;skipped++;return;}if(!hasTeamColumn&&!fallbackName){r.needsTeam=true;skipped++;return;}var key=_combineKey(r.name,r.levelLabel||r.tier,r.teamName);if(seen[key]){r.fileDuplicate=true;dupes++;return;}seen[key]=true;if(existing[key]){r.duplicate=true;r.existingId=existing[key].id;dupes++;}else newCount++;if(r.teamName&&!maps.byName[_combineNorm(r.teamName)])createTeams[r.teamName]=true;});var teamsToCreate=Object.keys(createTeams).sort();_combineState.rows=normalized;_combineState.summary={total:rows.length,newCount:newCount,dupes:dupes,missing:missing,skipped:skipped,teamsToCreate:teamsToCreate,hasTeamColumn:hasTeamColumn};var h='<div class="combine-stat-grid"><div class="combine-stat"><div class="combine-stat-num">'+rows.length+'</div><div class="combine-stat-lbl">Rows Found</div></div><div class="combine-stat"><div class="combine-stat-num">'+newCount+'</div><div class="combine-stat-lbl">New Athletes</div></div><div class="combine-stat"><div class="combine-stat-num">'+dupes+'</div><div class="combine-stat-lbl">Duplicates</div></div><div class="combine-stat"><div class="combine-stat-num">'+missing+'</div><div class="combine-stat-lbl">Missing Names</div></div></div>';if(!hasTeamColumn)h+='<div class="combine-status">'+(fallbackName?'No Team column found. Import will assign valid athletes to '+esc(fallbackName)+'.':'No Team column found. Pick or type a team before confirming import.')+'</div>';if(teamsToCreate.length)h+='<div class="combine-status"><span class="combine-chip good">'+teamsToCreate.length+' team'+(teamsToCreate.length!==1?'s':'')+' will be created</span> '+teamsToCreate.map(esc).join(', ')+'</div>';if(!rows.length){out.innerHTML='<div class="empty-state"><div class="empty-p">No roster rows found in this file.</div></div>';return;}h+='<div class="combine-table-wrap" style="margin-top:12px;max-height:330px"><table class="combine-table"><thead><tr><th>Row</th><th class="combine-sticky">Athlete</th><th>Team</th><th>Level</th><th>Sport</th><th>Position</th><th>Status</th></tr></thead><tbody>';normalized.slice(0,120).forEach(function(r){var status=r.invalid?'<span class="combine-chip bad">Missing name</span>':r.needsTeam?'<span class="combine-chip bad">Needs team</span>':r.fileDuplicate?'<span class="combine-chip warn">File duplicate</span>':r.duplicate?'<span class="combine-chip warn">Possible duplicate</span>':'<span class="combine-chip good">Ready</span>';h+='<tr class="'+(r.invalid||r.needsTeam?'combine-row-error':(r.duplicate||r.fileDuplicate?'combine-row-warn':''))+'"><td>'+r.idx+'</td><td class="combine-sticky">'+esc(r.name||'')+'</td><td>'+esc(r.teamName||'')+'</td><td>'+esc(r.levelLabel||TIERS[r.tier]||r.tier)+'</td><td>'+esc(r.sport)+'</td><td>'+esc(r.position)+'</td><td>'+status+'</td></tr>';});h+='</tbody></table></div>';if(normalized.length>120)h+='<div class="combine-status">Showing first 120 rows for preview.</div>';h+='<div class="btn-row" style="margin-top:14px"><button class="btn-p" style="padding:10px 16px;font-size:13px" onclick="confirmRosterImport()">Confirm Import</button></div>';out.innerHTML=h;}
-function confirmRosterImport(){var rows=_combineState.rows||[];if(!rows.length){alert('Upload a roster first.');return;}var modeEl=el('combine-duplicate-mode'),mode=modeEl?modeEl.value:'skip',created=0,updated=0,skipped=0;var existing=_combineExistingByKey();rows.forEach(function(r){if(r.invalid||r.needsTeam||(r.fileDuplicate&&mode!=='import')){skipped++;return;}var team=_combineEnsureTeam(r.teamName),teamId=team?team.id:'',key=_combineKey(r.name,r.levelLabel||r.tier,r.teamName),dup=existing[key]||null,extra={club:r.club,levelLabel:r.levelLabel,athleteEmail:r.athleteEmail,parentEmail:r.parentEmail,gender:r.gender,grade:r.grade};if(dup&&mode==='skip'){skipped++;return;}if(dup&&mode==='update'){DB.updateAthlete(dup.id,r.name||dup.name,r.tier||dup.tier,r.sport||dup.sport,r.position||dup.position,r.age||dup.age,teamId||dup.team,r.gradYear||dup.gradYear,r.notes||dup.notes,r.bodyweight||dup.bodyweight,r.height||dup.height,extra);updated++;return;}DB.create(r.name,r.tier,r.sport,r.position,r.age,teamId,r.gradYear,r.notes,r.bodyweight,r.height,extra);created++;});_cloudSyncSoon();_toast('Roster import: '+created+' created, '+updated+' updated, '+skipped+' skipped.','#1e6f3e');buildEventMode();var msg=el('combine-import-result');if(msg)msg.innerHTML='<span class="combine-chip good">'+created+' created</span> <span class="combine-chip good">'+updated+' updated</span> <span class="combine-chip warn">'+skipped+' skipped</span>';}
+function confirmRosterImport(){var rows=_combineState.rows||[];if(!rows.length){apeAlert('Upload a roster first.','Roster Import');return;}var modeEl=el('combine-duplicate-mode'),mode=modeEl?modeEl.value:'skip',created=0,updated=0,skipped=0;var existing=_combineExistingByKey();rows.forEach(function(r){if(r.invalid||r.needsTeam||(r.fileDuplicate&&mode!=='import')){skipped++;return;}var team=_combineEnsureTeam(r.teamName),teamId=team?team.id:'',key=_combineKey(r.name,r.levelLabel||r.tier,r.teamName),dup=existing[key]||null,extra={club:r.club,levelLabel:r.levelLabel,athleteEmail:r.athleteEmail,parentEmail:r.parentEmail,gender:r.gender,grade:r.grade};if(dup&&mode==='skip'){skipped++;return;}if(dup&&mode==='update'){DB.updateAthlete(dup.id,r.name||dup.name,r.tier||dup.tier,r.sport||dup.sport,r.position||dup.position,r.age||dup.age,teamId||dup.team,r.gradYear||dup.gradYear,r.notes||dup.notes,r.bodyweight||dup.bodyweight,r.height||dup.height,extra);updated++;return;}DB.create(r.name,r.tier,r.sport,r.position,r.age,teamId,r.gradYear,r.notes,r.bodyweight,r.height,extra);created++;});_cloudSyncSoon();_toast('Roster import: '+created+' created, '+updated+' updated, '+skipped+' skipped.','#1e6f3e');buildEventMode();var msg=el('combine-import-result');if(msg)msg.innerHTML='<span class="combine-chip good">'+created+' created</span> <span class="combine-chip good">'+updated+' updated</span> <span class="combine-chip warn">'+skipped+' skipped</span>';}
 function _combineMetricSpecs(){return[{k:'vj',label:'Vertical Jump',short:'VJ',step:'0.1'},{k:'bj',label:'Broad Jump',short:'BJ',step:'0.01'},{k:'rsi',label:'RSI',short:'RSI',step:'0.01'},{k:'f5',label:'5-10 Fly',short:'5-10',step:'0.01'},{k:'f10',label:'10-10 Fly',short:'10-10',step:'0.01'},{k:'threeConeTime',label:'3-Cone L Drill',short:'3-Cone',step:'0.01'},{k:'pro_agility_5_10_5',label:'5-10-5 Pro Agility',short:'5-10-5',step:'0.01'},{k:'gps',label:'GPS Max Velocity',short:'GPS',step:'0.1'}];}
 function _combineStationMetrics(){var st=_combineState.station||'full',all=_combineMetricSpecs();if(st==='power')return all.filter(function(m){return m.k==='vj'||m.k==='bj'||m.k==='rsi';});if(st==='speed')return all.filter(function(m){return m.k==='f5'||m.k==='f10'||m.k==='gps';});if(st==='agility')return all.filter(function(m){return m.k==='threeConeTime'||m.k==='pro_agility_5_10_5';});return all;}
-function _combineComputeSession(a,raw){var t=a.tier||'hs',b=BENCH[t]||BENCH.hs,g=normalizeGender(a.gender);raw.fivetenFiveTime=raw.fivetenFiveTime!=null?raw.fivetenFiveTime:raw.pro_agility_5_10_5;var vp=raw.vj!==null?calculateMetricScore5(raw.vj,'vj',t,g,a.age,b.vj,false):null,hp=raw.bj!==null?calculateMetricScore5(raw.bj,'bj',t,g,a.age,b.bj,false):null,rs=raw.rsi!==null?sRSI(raw.rsi,t):null,ac=raw.f5!==null?calculateMetricScore5(raw.f5,'f5',t,g,a.age,b.f5,true):null,mv=raw.f10!==null?calculateMetricScore5(raw.f10,'f10',t,g,a.age,b.f10,true):null,threeConeScore=calculateAgilityTestScore('threeCone',raw.threeConeTime,t,a.age,g),fivetenFiveScore=calculateAgilityTestScore('fivetenFive',raw.fivetenFiveTime,t,a.age,g),agilityScore=calculateAgilityScore100(raw.threeConeTime,raw.fivetenFiveTime,t,a.age,g),cod=score100ToScore5(agilityScore),gv=raw.gps!==null?scv(raw.gps,b.gps,false):null;var metricScore100={vj:calculateMetricScore100(raw.vj,'vj',t,g,a.age),bj:calculateMetricScore100(raw.bj,'bj',t,g,a.age),f5:calculateMetricScore100(raw.f5,'f5',t,g,a.age),f10:calculateMetricScore100(raw.f10,'f10',t,g,a.age),threeConeTime:threeConeScore,fivetenFiveTime:fivetenFiveScore,pro_agility_5_10_5:fivetenFiveScore,agility:agilityScore};var pa=avg([vp,hp]),sa=avg([ac,mv,gv]),ft=null;if(pa!==null&&sa!==null){var off=sa-pa;ft=off>=1.5?5:off>=0.5?4:off>=-1.0?3:2;if(pa<3&&sa<3)ft=2;}var dp=[vp,hp].filter(function(x){return x!==null;}),ds=[ac,mv,gv,cod].filter(function(x){return x!==null;});var dpa=dp.length?dp.reduce(function(x,y){return x+y;},0)/dp.length:null,dsa=ds.length?ds.reduce(function(x,y){return x+y;},0)/ds.length:null,defType='Incomplete Data',focus='Not enough metrics';if(dpa!==null&&dsa!==null){if(dpa<3&&dsa>=3){defType='Force Deficient';focus='Force production';}else if(dsa<3&&dpa>=3){defType='Form Deficient';focus='Sprint mechanics';}else if(dpa<3&&dsa<3){defType='Mixed Deficiency';focus='General athletic development';}else{defType='Well Developed';focus='Refinement';}}var bkt='base';if(rs!==null&&rs<=2)bkt=1;else if(cod!==null&&cod<=2)bkt=6;else if((vp!==null&&vp<=2)||(hp!==null&&hp<=2)){if(rs===null||rs>=3)bkt=2;}else if(ac!==null&&ac<=2&&pa!==null&&pa>=3)bkt=3;else if(((mv!==null&&mv<=2)||(gv!==null&&gv<=2))&&ac!==null&&ac>=3)bkt=4;else if(ft!==null&&ft<=2&&pa!==null&&pa>=4)bkt=5;var BK={1:{n:'Bucket 1 - Reactive Strength',pri:'Reactive strength and stiffness'},2:{n:'Bucket 2 - Force and Power',pri:'Force production'},base:{n:'Bucket 2 - Force and Power (Base Build)',pri:'General force and power base'},3:{n:'Bucket 3 - Acceleration',pri:'First-step speed and short-area acceleration'},4:{n:'Bucket 4 - Max Velocity',pri:'Top-end speed and max velocity mechanics'},5:{n:'Bucket 5 - Force Transfer',pri:'Converting power into movement speed'},6:{n:'Bucket 6 - Change of Direction',pri:'Deceleration and lateral re-acceleration'}};var sc={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gps:gv,ft:ft},ape=calculateAPEscore(sc),adj=computeAdjustedScores(sc,resolvePosGroup(a.sport,a.position));return{raw:raw,sc:sc,bkt:bkt,bktName:BK[bkt].n,defType:defType,focus:BK[bkt].pri||focus,cnt:Object.keys(raw).filter(function(k){return raw[k]!==null;}).length,apeScore:ape,posAdjScore:adj?adj.ape:null,threeConeScore:threeConeScore,fivetenFiveScore:fivetenFiveScore,agilityScore:agilityScore,metricScore100:metricScore100};}
+function _combineComputeSession(a,raw){var t=a.tier||'hs',b=BENCH[t]||BENCH.hs,g=normalizeGender(a.gender);raw.fivetenFiveTime=raw.fivetenFiveTime!=null?raw.fivetenFiveTime:raw.pro_agility_5_10_5;var vp=raw.vj!==null?calculateMetricScore5(raw.vj,'vj',t,g,a.age,b.vj,false):null,hp=raw.bj!==null?calculateMetricScore5(raw.bj,'bj',t,g,a.age,b.bj,false):null,rs=raw.rsi!==null?sRSI(raw.rsi,t):null,ac=raw.f5!==null?calculateMetricScore5(raw.f5,'f5',t,g,a.age,b.f5,true):null,mv=raw.f10!==null?calculateMetricScore5(raw.f10,'f10',t,g,a.age,b.f10,true):null,threeConeScore=calculateAgilityTestScore('threeCone',raw.threeConeTime,t,a.age,g),fivetenFiveScore=calculateAgilityTestScore('fivetenFive',raw.fivetenFiveTime,t,a.age,g),agilityScore=calculateAgilityScore100(raw.threeConeTime,raw.fivetenFiveTime,t,a.age,g),cod=score100ToScore5(agilityScore),gv=raw.gps!==null?scv(raw.gps,b.gps,false):null;var metricScore100={vj:calculateMetricScore100(raw.vj,'vj',t,g,a.age),bj:calculateMetricScore100(raw.bj,'bj',t,g,a.age),f5:calculateMetricScore100(raw.f5,'f5',t,g,a.age),f10:calculateMetricScore100(raw.f10,'f10',t,g,a.age),threeConeTime:threeConeScore,fivetenFiveTime:fivetenFiveScore,pro_agility_5_10_5:fivetenFiveScore,agility:agilityScore};var pa=avg([vp,hp]),sa=avg([ac,mv,gv]),ft=null;if(pa!==null&&sa!==null){var off=sa-pa;ft=off>=1.5?5:off>=0.5?4:off>=-1.0?3:2;if(pa<3&&sa<3)ft=2;}var dp=[vp,hp].filter(function(x){return x!==null;}),ds=[ac,mv,gv,cod].filter(function(x){return x!==null;});var dpa=dp.length?dp.reduce(function(x,y){return x+y;},0)/dp.length:null,dsa=ds.length?ds.reduce(function(x,y){return x+y;},0)/ds.length:null,defType='Incomplete Data',focus='Not enough metrics';if(dpa!==null&&dsa!==null){if(dpa<3&&dsa>=3){defType='Force Deficient';focus='Force production';}else if(dsa<3&&dpa>=3){defType='Form Deficient';focus='Sprint mechanics';}else if(dpa<3&&dsa<3){defType='Mixed Deficiency';focus='General athletic development';}else{defType='Well Developed';focus='Refinement';}}var bkt='base';if(rs!==null&&rs<=2)bkt=1;else if(cod!==null&&cod<=2)bkt=6;else if((vp!==null&&vp<=2)||(hp!==null&&hp<=2)){if(rs===null||rs>=3)bkt=2;}else if(ac!==null&&ac<=2&&pa!==null&&pa>=3)bkt=3;else if(((mv!==null&&mv<=2)||(gv!==null&&gv<=2))&&ac!==null&&ac>=3)bkt=4;else if(ft!==null&&ft<=2&&pa!==null&&pa>=4)bkt=5;var BK={1:{n:'Force Foundation',pri:'Max force production'},2:{n:'Tendon Code',pri:'Extreme isometrics and position strength'},base:{n:'Tendon Code',pri:'General force and tendon capacity'},3:{n:'Power Bridge',pri:'Strength-speed expression'},4:{n:'Drive Phase',pri:'Acceleration and drive mechanics'},5:{n:'Max Velocity',pri:'Top end speed expression'},6:{n:'Change of Direction',pri:'Deceleration and lateral re-acceleration'}};var sc={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gps:gv,ft:ft},ape=calculateAPEscore(sc),adj=computeAdjustedScores(sc,resolvePosGroup(a.sport,a.position));return{raw:raw,sc:sc,bkt:bkt,bktName:BK[bkt].n,defType:defType,focus:BK[bkt].pri||focus,cnt:Object.keys(raw).filter(function(k){return raw[k]!==null;}).length,apeScore:ape,posAdjScore:adj?adj.ape:null,threeConeScore:threeConeScore,fivetenFiveScore:fivetenFiveScore,agilityScore:agilityScore,metricScore100:metricScore100};}
 function buildEventMode(){go(0);var nd=el('nav-dash'),nt=el('nav-teams');if(nd)nd.classList.remove('act');if(nt)nt.classList.add('act');var cont=el('dash-out');if(!cont)return;var teams=DB.getTeams(),selectedTeam=teams.length?teams[0].id:'',today=new Date().toISOString().slice(0,10);var h='<div class="combine-hero"><div class="combine-kicker">Event Mode</div><div class="pg-title">Roster Import + Event Testing</div><div class="pg-sub">Athlete Performance Evaluator - Evolve the athlete. Built for club teams, camps, events, and mass testing days.</div></div><div class="combine-grid"><div class="combine-panel"><div class="card-title">Roster Import</div><div class="combine-toolbar"><button class="btn-save-prog" style="padding:10px 14px" onclick="downloadRosterTemplate()">Download Template</button><div class="field"><label>Upload .xlsx or .csv</label><input type="file" id="combine-roster-file" accept=".xlsx,.xls,.csv" onchange="handleRosterUpload(this)"></div></div><div class="g2" style="margin-top:14px"><div class="field"><label>If No Team Column</label><select id="combine-import-team" onchange="previewRosterImport()">'+_combineTeamOptions('',true)+'</select></div><div class="field"><label>Or New Team</label><input type="text" id="combine-import-team-new" placeholder="e.g. 16U Elite" oninput="previewRosterImport()"></div></div><div class="field"><label>Duplicate Handling</label><select id="combine-duplicate-mode"><option value="skip">Skip duplicates</option><option value="update">Update existing profiles</option><option value="import">Import anyway</option></select></div><div id="combine-import-result" class="combine-status"></div><div id="combine-import-preview" class="combine-status">Upload a roster to preview athletes before saving.</div></div><div class="combine-panel"><div class="card-title">Testing Day Setup</div><div class="g2"><div class="field"><label>Team</label><select id="combine-test-team" onchange="buildTestingDayTable()">'+_combineTeamOptions(selectedTeam,true)+'</select></div><div class="field"><label>Event</label><input type="text" id="combine-event-name" placeholder="Spring Testing Event"></div><div class="field"><label>Test Date</label><input type="date" id="combine-test-date" value="'+today+'"></div><div class="field"><label>Speed Method</label><select id="combine-speed-verification"><option value="Hand Timed">Hand Timed</option><option value="Timing Gates / Laser">Timing Gates / Laser</option></select></div><div class="field"><label>Jump Method</label><select id="combine-jump-verification"><option value="Vertec">Vertec</option><option value="Force Plate">Force Plate</option></select></div><div class="field"><label>RSI Method</label><select id="combine-rsi-verification"><option value="Force Plate">Force Plate</option><option value="Laser OVR">Laser OVR</option></select></div><div class="field"><label>Broad Jump Method</label><select id="combine-bj-verification"><option value="Tape Measure">Tape Measure</option><option value="Laser Measure">Laser Measure</option></select></div><div class="field"><label>Tester Name</label><input type="text" id="combine-tester-name" placeholder="Optional"></div><label class="verify-toggle-row" style="align-self:end;margin-bottom:8px"><input type="checkbox" id="combine-verified"> Verified Test</label><div class="field"><label>Sport Filter</label><select id="combine-sport-filter" onchange="buildTestingDayTable()"><option value="">All Sports</option>'+SPORT_OPTIONS.map(function(s){return'<option value="'+esc(s)+'">'+esc(s)+'</option>';}).join('')+'</select></div><div class="field"><label>Level Filter</label><input type="text" id="combine-level-filter" placeholder="13U, Varsity, HS..." oninput="buildTestingDayTable()"></div><div class="field"><label>Position Filter</label><input type="text" id="combine-position-filter" placeholder="WR, PG, OH..." oninput="buildTestingDayTable()"></div><div class="field"><label>Gender Filter</label><select id="combine-gender-filter" onchange="buildTestingDayTable()"><option value="">All</option><option value="female">Female</option><option value="male">Male</option></select></div><div class="field"><label>Grade Filter</label><select id="combine-grade-filter" onchange="buildTestingDayTable()"><option value="">All</option><option value="9th">9th - Freshman</option><option value="10th">10th - Sophomore</option><option value="11th">11th - Junior</option><option value="12th">12th - Senior</option><option value="Freshman">College Freshman</option><option value="Sophomore">College Sophomore</option><option value="Junior">College Junior</option><option value="Senior">College Senior</option><option value="Graduate">Graduate</option><option value="Redshirt">Redshirt</option></select></div></div><div class="combine-tabs"><button class="combine-tab act" id="combine-tab-full" onclick="_combineState.station=\'full\';buildTestingDayTable()">Full Table</button><button class="combine-tab" id="combine-tab-power" onclick="_combineState.station=\'power\';buildTestingDayTable()">Power Station</button><button class="combine-tab" id="combine-tab-speed" onclick="_combineState.station=\'speed\';buildTestingDayTable()">Speed Station</button></div><div class="btn-row" style="margin-top:10px"><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportLatestTeamResults()">Export Latest Team Results</button><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportTeamHistory()">Export Full Team History</button><button class="btn-save-prog" style="padding:9px 13px;font-size:12px" onclick="exportEventResults()">Export Event Results</button></div></div></div><div class="combine-panel"><div class="card-title">Testing Day / Event Mode</div><div id="combine-testing-table" class="combine-status"></div></div>';cont.innerHTML=h;buildTestingDayTable();}
 function _combineFilteredAthletes(){var tid=el('combine-test-team')?el('combine-test-team').value:'',sport=_combineNorm(el('combine-sport-filter')?el('combine-sport-filter').value:''),level=_combineNorm(el('combine-level-filter')?el('combine-level-filter').value:''),pos=_combineNorm(el('combine-position-filter')?el('combine-position-filter').value:''),gender=_combineNorm(el('combine-gender-filter')?el('combine-gender-filter').value:''),grade=_combineNorm(el('combine-grade-filter')?el('combine-grade-filter').value:'');return DB.getAll().filter(function(a){if(tid&&a.team!==tid)return false;if(sport&&_combineNorm(a.sport)!==sport)return false;if(level&&_combineNorm((a.levelLabel||'')+' '+(TIERS[a.tier]||a.tier)).indexOf(level)===-1)return false;if(pos&&_combineNorm(a.position)!==pos)return false;if(gender&&_combineNorm(a.gender)!==gender)return false;if(grade&&_combineNorm(a.grade)!==grade)return false;return true;}).sort(function(a,b){return a.name.localeCompare(b.name);});}
 function _ensureCombineAgilityTab(){var speed=el('combine-tab-speed');if(speed&&!el('combine-tab-agility')){var btn=document.createElement('button');btn.className='combine-tab';btn.id='combine-tab-agility';btn.textContent='Agility Station';btn.onclick=function(){_combineState.station='agility';buildTestingDayTable();};speed.parentNode.insertBefore(btn,speed.nextSibling);}}
@@ -3605,14 +3643,14 @@ function buildTestingDayTable(){_ensureCombineAgilityTab();['full','power','spee
 function saveBulkTestingSessions(){var athletes=_combineFilteredAthletes(),dateEl=el('combine-test-date'),eventEl=el('combine-event-name'),dateStr=dateEl&&dateEl.value?dateEl.value:new Date().toISOString().slice(0,10),eventName=eventEl?eventEl.value.trim():'',dt=new Date(dateStr+'T12:00:00'),saved=0,skipped=0;athletes.forEach(function(a){var raw={vj:null,bj:null,rsi:null,f5:null,f10:null,threeConeTime:null,fivetenFiveTime:null,pro_agility_5_10_5:null,gps:null};_combineMetricSpecs().forEach(function(m){var inp=el('bulk-'+a.id+'-'+m.k);raw[m.k]=inp?_combineNum(inp.value):null;});raw.fivetenFiveTime=raw.pro_agility_5_10_5;var cnt=Object.keys(raw).filter(function(k){return k!=='fivetenFiveTime'&&raw[k]!==null;}).length,st=el('bulk-'+a.id+'-status');if(cnt===0){if(st)st.textContent='No data';return;}if(cnt<2){skipped++;if(st){st.textContent='Need 2 values';st.style.color='var(--s1b)';}return;}var comp=_combineComputeSession(a,raw),speedM=el('combine-speed-verification')?el('combine-speed-verification').value:'Hand Timed',jumpM=el('combine-jump-verification')?el('combine-jump-verification').value:'Vertec',rsiM=el('combine-rsi-verification')?el('combine-rsi-verification').value:'Force Plate',bjM=el('combine-bj-verification')?el('combine-bj-verification').value:'Tape Measure';comp.note=el('bulk-'+a.id+'-note')?el('bulk-'+a.id+'-note').value.trim():'';comp.eventName=eventName;comp.combine=true;comp.verified=!!(el('combine-verified')&&el('combine-verified').checked);comp.timingMethod=normalizeTimingMethod(speedM);comp.testerName=el('combine-tester-name')?el('combine-tester-name').value.trim():'';comp.verification={speed:speedM,jump:jumpM,shuttle:speedM,verticalJump:jumpM,rsi:rsiM,broadJump:bjM};comp.ts=dt.getTime();comp.date=dt.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});DB.addSession(a.id,comp);saved++;if(st){st.textContent='Saved';st.style.color='var(--s4b)';}});_toast('Testing day saved: '+saved+' session'+(saved!==1?'s':'')+(skipped?', '+skipped+' skipped':'')+'.','#1e6f3e');}
 function _combinePrevSession(a,s){var hist=(a.s||[]).slice().sort(function(x,y){return(x.ts||0)-(y.ts||0);});for(var i=0;i<hist.length;i++)if(hist[i].id===s.id)return i>0?hist[i-1]:null;return null;}
 function _combineDelta(curr,prev,key,scoreKey){if(!prev)return'';var a=scoreKey?(curr[scoreKey]!=null?curr[scoreKey]:null):((curr.raw||{})[key]);var b=scoreKey?(prev[scoreKey]!=null?prev[scoreKey]:null):((prev.raw||{})[key]);if(a===null||a===undefined||b===null||b===undefined)return'';return Math.round((a-b)*100)/100;}
-function _combineExportRow(a,s,maps){var raw=s.raw||{},sc=s.sc||{},prev=_combinePrevSession(a,s);return{'Athlete Name':a.name,'Team':a.team&&maps.byId[a.team]?maps.byId[a.team].name:'','Club':a.club||'','Sport':a.sport||'','Position':a.position||'','Level':a.levelLabel||TIERS[a.tier]||a.tier,'Age':a.age||'','Grad Year':a.gradYear||'','Bodyweight':a.bodyweight||'','Height':a.height||'','Athlete Email':a.athleteEmail||'','Parent Email':a.parentEmail||'','Test Date':s.date||'','Event Name':s.eventName||'','Vertical Jump':raw.vj!=null?raw.vj:'','Broad Jump':raw.bj!=null?raw.bj:'','RSI':raw.rsi!=null?raw.rsi:'','5-10 Fly':raw.f5!=null?raw.f5:'','10-10 Fly':raw.f10!=null?raw.f10:'','GPS Max Velocity':raw.gps!=null?raw.gps:'','Vertical Power Score':sc.vp!=null?sc.vp:'','Horizontal Power Score':sc.hp!=null?sc.hp:'','Reactive Score':sc.rs!=null?sc.rs:'','Acceleration Score':sc.ac!=null?sc.ac:'','Max Velocity Score':sc.mv!=null?sc.mv:'','GPS Score':sc.gps!=null?sc.gps:'','Force Transfer Score':sc.ft!=null?sc.ft:'','Raw APE Score':s.apeScore!=null?s.apeScore:getAPEScore(sc),'Position-Adjusted APE Score':s.posAdjScore!=null?s.posAdjScore:'','Deficiency Type':s.defType||'','Primary Focus':s.focus||'','Training Bucket':s.bktName||'','Notes':s.note||a.notes||'','Vertical Jump Change':_combineDelta(s,prev,'vj'),'Broad Jump Change':_combineDelta(s,prev,'bj'),'RSI Change':_combineDelta(s,prev,'rsi'),'5-10 Fly Change':_combineDelta(s,prev,'f5'),'10-10 Fly Change':_combineDelta(s,prev,'f10'),'GPS Change':_combineDelta(s,prev,'gps'),'APE Score Change':_combineDelta(s,prev,null,'apeScore'),'Position-Adjusted APE Change':_combineDelta(s,prev,null,'posAdjScore')};}
+function _combineExportRow(a,s,maps){var raw=s.raw||{},sc=s.sc||{},prev=_combinePrevSession(a,s);return{'Athlete Name':a.name,'Team':a.team&&maps.byId[a.team]?maps.byId[a.team].name:'','Club':a.club||'','Sport':a.sport||'','Position':a.position||'','Level':a.levelLabel||TIERS[a.tier]||a.tier,'Age':a.age||'','Grad Year':a.gradYear||'','Bodyweight':a.bodyweight||'','Height':a.height||'','Athlete Email':a.athleteEmail||'','Parent Email':a.parentEmail||'','Test Date':s.date||'','Event Name':s.eventName||'','Vertical Jump':raw.vj!=null?raw.vj:'','Broad Jump':raw.bj!=null?raw.bj:'','RSI':raw.rsi!=null?raw.rsi:'','5-10 Fly':raw.f5!=null?raw.f5:'','10-10 Fly':raw.f10!=null?raw.f10:'','GPS Max Velocity':raw.gps!=null?raw.gps:'','Vertical Power Score':sc.vp!=null?sc.vp:'','Horizontal Power Score':sc.hp!=null?sc.hp:'','Reactive Score':sc.rs!=null?sc.rs:'','Acceleration Score':sc.ac!=null?sc.ac:'','Max Velocity Score':sc.mv!=null?sc.mv:'','GPS Score':sc.gps!=null?sc.gps:'','Force Transfer Score':sc.ft!=null?sc.ft:'','Raw APE Score':s.apeScore!=null?s.apeScore:getAPEScore(sc),'Position-Adjusted APE Score':s.posAdjScore!=null?s.posAdjScore:'','Deficiency Type':s.defType||'','Primary Focus':s.focus||'','Training Bucket':bucketDisplay(s.bktName,s.bkt)||'','Notes':s.note||a.notes||'','Vertical Jump Change':_combineDelta(s,prev,'vj'),'Broad Jump Change':_combineDelta(s,prev,'bj'),'RSI Change':_combineDelta(s,prev,'rsi'),'5-10 Fly Change':_combineDelta(s,prev,'f5'),'10-10 Fly Change':_combineDelta(s,prev,'f10'),'GPS Change':_combineDelta(s,prev,'gps'),'APE Score Change':_combineDelta(s,prev,null,'apeScore'),'Position-Adjusted APE Change':_combineDelta(s,prev,null,'posAdjScore')};}
 var _combineExportRowBase=_combineExportRow;
 _combineExportRow=function(a,s,maps){var row=_combineExportRowBase(a,s,maps),raw=s.raw||{},sc=s.sc||{},prev=_combinePrevSession(a,s),f505=raw.fivetenFiveTime!=null?raw.fivetenFiveTime:raw.pro_agility_5_10_5;row['Benchmark Gender']=normalizeGender(a.gender);row['3-Cone L Drill']=raw.threeConeTime!=null?raw.threeConeTime:'';row['3-Cone Score']=s.threeConeScore!=null?s.threeConeScore:(raw.threeConeTime!=null?calculateAgilityTestScore('threeCone',raw.threeConeTime,a.tier,a.age,a.gender):'');row['3-Cone Tier']=raw.threeConeTime!=null?getAgilityBenchmarkTier('threeCone',raw.threeConeTime,a.tier,a.age,a.gender):'';row['3-Cone Change']=_combineDelta(s,prev,'threeConeTime');row['5-10-5 Pro Agility']=f505!=null?f505:'';row['5-10-5 Score']=s.fivetenFiveScore!=null?s.fivetenFiveScore:(f505!=null?calculateAgilityTestScore('fivetenFive',f505,a.tier,a.age,a.gender):'');row['5-10-5 Tier']=f505!=null?get505BenchmarkTier(f505,a.tier,a.age,a.gender):'';row['5-10-5 Percentile']=sc.cod?calculatePercentiles(sc.cod):'';row['Agility Score']=s.agilityScore!=null?s.agilityScore:'';row['COD Score']=sc.cod!=null?sc.cod:'';row['5-10-5 Change']=_combineDelta(s,prev,'pro_agility_5_10_5');row['Raw APE Score']=s.apeScore!=null?s.apeScore:calculateAPEscore(sc);return row;};
 var _combineExportRowVerified=_combineExportRow;
 _combineExportRow=function(a,s,maps){var row=_combineExportRowVerified(a,s,maps),v=getSessionVerification(s),profile=getAthletePositionProfile(a),cfg=DB.loadSettings();row['Gender']=genderLabel(a.gender);row['Benchmark Gender']=normalizeGender(a.gender);row['Grade/Class']=gradeDisplay(a.grade);row['Verification']=v.timingMethod;row['Verified Test']=v.verified?'Yes':'No';row['Tester Name']=v.testerName;row['Speed Method']=v.verification.speed;row['Jump Method']=v.verification.jump;row['RSI Method']=v.verification.rsi;row['Broad Jump Method']=v.verification.broadJump;row['Position Group']=profile.positionGroup;row['Priority Metrics']=profile.priorityMetrics.map(function(k){return METRIC_NAMES[k]||k;}).join(', ');row['Position Context']=profile.whyItMatters;row['Gym Name']=cfg.gymName||'';row['Coach Name']=cfg.coachName||'';row['Contact']=cfg.contact||'';row['Export Date']=new Date().toLocaleDateString('en-US');return row;};
-function exportLatestTeamResults(){var tid=el('combine-test-team')?el('combine-test-team').value:'';if(!tid){alert('Select a team first.');return;}var maps=_combineTeamMaps(),rows=[];DB.getAll().filter(function(a){return a.team===tid;}).forEach(function(a){if(a.s&&a.s.length)rows.push(_combineExportRow(a,a.s[a.s.length-1],maps));});if(!rows.length){alert('No sessions found for this team.');return;}_combineWriteRows(rows,'APE_Latest_Team_Results.xlsx','Latest Results');}
-function exportTeamHistory(){var tid=el('combine-test-team')?el('combine-test-team').value:'';if(!tid){alert('Select a team first.');return;}var maps=_combineTeamMaps(),rows=[];DB.getAll().filter(function(a){return a.team===tid;}).forEach(function(a){(a.s||[]).forEach(function(s){rows.push(_combineExportRow(a,s,maps));});});if(!rows.length){alert('No history found for this team.');return;}_combineWriteRows(rows,'APE_Full_Team_History.xlsx','Team History');}
-function exportEventResults(){var tid=el('combine-test-team')?el('combine-test-team').value:'',eventName=el('combine-event-name')?el('combine-event-name').value.trim():'';if(!eventName){alert('Enter the event name to export.');return;}var maps=_combineTeamMaps(),rows=[];DB.getAll().filter(function(a){return!tid||a.team===tid;}).forEach(function(a){(a.s||[]).forEach(function(s){if(_combineNorm(s.eventName)===_combineNorm(eventName))rows.push(_combineExportRow(a,s,maps));});});if(!rows.length){alert('No sessions found for this event name.');return;}_combineWriteRows(rows,'APE_'+eventName.replace(/[^a-z0-9]/gi,'_')+'_Results.xlsx','Event Results');}
+function exportLatestTeamResults(){var tid=el('combine-test-team')?el('combine-test-team').value:'';if(!tid){apeAlert('Select a team first.','Export');return;}var maps=_combineTeamMaps(),rows=[];DB.getAll().filter(function(a){return a.team===tid;}).forEach(function(a){if(a.s&&a.s.length)rows.push(_combineExportRow(a,a.s[a.s.length-1],maps));});if(!rows.length){apeAlert('No sessions found for this team.','Export');return;}_combineWriteRows(rows,'APE_Latest_Team_Results.xlsx','Latest Results');}
+function exportTeamHistory(){var tid=el('combine-test-team')?el('combine-test-team').value:'';if(!tid){apeAlert('Select a team first.','Export');return;}var maps=_combineTeamMaps(),rows=[];DB.getAll().filter(function(a){return a.team===tid;}).forEach(function(a){(a.s||[]).forEach(function(s){rows.push(_combineExportRow(a,s,maps));});});if(!rows.length){apeAlert('No history found for this team.','Export');return;}_combineWriteRows(rows,'APE_Full_Team_History.xlsx','Team History');}
+function exportEventResults(){var tid=el('combine-test-team')?el('combine-test-team').value:'',eventName=el('combine-event-name')?el('combine-event-name').value.trim():'';if(!eventName){apeAlert('Enter the event name to export.','Export');return;}var maps=_combineTeamMaps(),rows=[];DB.getAll().filter(function(a){return!tid||a.team===tid;}).forEach(function(a){(a.s||[]).forEach(function(s){if(_combineNorm(s.eventName)===_combineNorm(eventName))rows.push(_combineExportRow(a,s,maps));});});if(!rows.length){apeAlert('No sessions found for this event name.','Export');return;}_combineWriteRows(rows,'APE_'+eventName.replace(/[^a-z0-9]/gi,'_')+'_Results.xlsx','Event Results');}
 
 function _resetEvalBtn(){
   var b=el('btn-eval');if(!b)return;
@@ -3836,13 +3874,13 @@ function build(vj,bj,rsi,s5,s10,gps,threeCone,pa505){
   else if(ft!==null&&ft<=2&&pa!==null&&pa>=4)bkt=5;
 
   var BK={
-    1:{n:'Bucket 1 — Reactive Strength',ico:'&#9889;',c:'#5BE9FF',pri:'Reactive strength and stiffness',sec:'Landing mechanics and ground contact',w:'RSI is the limiting factor. Build ankle stiffness, landing mechanics, and pogo progressions before any intensive jump or sprint work.',m:['Pogo hops (bilateral then unilateral)','Low hurdle hops — focus on ground contact time','Landing mechanics and deceleration drills','Ankle and calf stiffness work','Depth drops to stick — control before intensity']},
-    2:{n:'Bucket 2 — Force and Power',ico:'&#128170;',c:'#E8A020',pri:'Force production',sec:'Jump output and power expression',w:'Jump scores are below threshold. More raw force needed before speed development sticks. Strength and power first.',m:['Heavy compound lifts (trap bar, squat, hip hinge)','Loaded jump variations (box jump, trap bar jump)','Broad jump and vertical jump progressions','Med ball throws for power expression','Sled pushes for horizontal force']},
-    base:{n:'Bucket 2 — Force and Power (Base Build)',ico:'&#127959;',c:'#E8A020',pri:'General force and power base',sec:'Movement quality and capacity',w:'No single dominant gap identified. Building a solid force and power base creates the capacity everything else depends on.',m:['Compound lifting (squat, deadlift, press)','Jump variations for power expression','Med ball throws','Sled exposure','Complete full test battery for more specific programming']},
-    3:{n:'Bucket 3 — Acceleration',ico:'&#128640;',c:'#9B7FE8',pri:'First-step speed and short-area acceleration',sec:'Force application angle and start mechanics',w:'Power base is adequate but short-area speed is the gap. Focus on body lean, shin angle, and horizontal force in the first 10 yards.',m:['Resisted sled sprints (10–20% bodyweight)','Falling starts and wall drills','3-point stance starts','Broad jump into sprint (10–15 yds)','Short sprints 5–15 yards with full recovery']},
-    4:{n:'Bucket 4 — Max Velocity',ico:'&#128168;',c:'#3BA8D0',pri:'Top-end speed and max velocity mechanics',sec:'Stride mechanics and hip height at speed',w:'Acceleration is solid but top-end speed is the limiting quality. Focus on stride mechanics, hip height, and neuromuscular exposure to high speeds.',m:['Flying sprints 20–40m with full recovery','Wicket runs for stride length and frequency','Stride outs at 90–95% effort','B-skips and high-knee drills','Max velocity exposure 2–3x per week']},
-    5:{n:'Bucket 5 — Force Transfer',ico:'&#128257;',c:'#3EB890',pri:'Converting power into movement speed',sec:'Sprint mechanics and power expression',w:'Jump scores are strong but speed outputs do not match. A transfer gap — force exists but is not expressing into velocity.',m:['Contrast training: heavy lift immediately followed by sprint','Bound-to-sprint transitions','Sprint mechanics and relaxation drills','Flying sprints after plyometric activation','Timing and coordination work at speed']},
-    6:{n:'Bucket 6 - Change of Direction',ico:'&#8644;',c:'#5be9ff',pri:'Deceleration and lateral re-acceleration',sec:'Braking mechanics, COD angles, and unilateral force',w:'5-10-5 output is below threshold. Linear speed is not enough yet; the athlete needs better braking, body position, lateral force, and re-acceleration mechanics.',m:['Shuffle-to-stick deceleration drills','Lateral sled marches and pushes','Split-stance force work','COD plyos: lateral bound to stick','Reactive mirror drills with controlled braking']}
+    1:{n:'Force Foundation',ico:'&#9889;',c:'#5BE9FF',pri:'Max force production',sec:'Heavy end of the curve',w:'Max force production is the limiting factor. Build the heavy end of the curve with controlled, high-intent force work.',m:['Heavy Prowler Push','Overcoming Iso Wall Push (split stance)','Heavy Sled Drag (backward)','Landing mechanics and deceleration drills','Ankle and calf stiffness work']},
+    2:{n:'Tendon Code',ico:'&#128170;',c:'#E8A020',pri:'Extreme Isometrics',sec:'Position strength and nervous system',w:'Position strength and tendon capacity need the most attention. Extreme isometrics help create the chassis for speed and power expression.',m:['Sprint Stance Iso','Wall Sit at 90 degrees','Single-Leg RDL Iso Hold','Lunge Iso','Sled pushes for horizontal force']},
+    base:{n:'Tendon Code',ico:'&#127959;',c:'#E8A020',pri:'Extreme Isometrics',sec:'Position strength and nervous system',w:'No single dominant gap identified. Build tendon capacity and position strength as a base for the rest of the curve.',m:['Sprint Stance Iso','Wall Sit at 90 degrees','Single-Leg RDL Iso Hold','Lunge Iso','Complete full test battery for more specific programming']},
+    3:{n:'Power Bridge',ico:'&#128640;',c:'#9B7FE8',pri:'Strength-speed',sec:'Where force meets velocity',w:'The athlete needs strength-speed expression. Bridge raw force into faster movement with loaded jumps and med ball power.',m:['Trap Bar Deadlift Jump','Moderate Sled Push','Rotational Med Ball Slam','Broad Jump','Short sprints with full recovery']},
+    4:{n:'Drive Phase',ico:'&#128168;',c:'#3BA8D0',pri:'Acceleration',sec:'First step and drive mechanics',w:'Acceleration and drive mechanics are the priority. Focus on first-step projection, shin angle, and early-phase force application.',m:['Light Sled Sprint','Wall Drive','Power Skip for Distance','Resisted Start','Short acceleration sprints']},
+    5:{n:'Max Velocity',ico:'&#128257;',c:'#3EB890',pri:'Top end speed',sec:'Full expression of the curve',w:'Top end speed is the limiting quality. Focus on relaxed upright sprinting, fly work, and high-quality exposure to max velocity.',m:['Build Sprint','Fly 20','Light Sled Sprint','Falling Start Sprint','Timing and coordination work at speed']},
+    6:{n:'Change of Direction',ico:'&#8644;',c:'#5be9ff',pri:'Deceleration and lateral re-acceleration',sec:'Braking mechanics, COD angles, and unilateral force',w:'5-10-5 output is below threshold. Linear speed is not enough yet; the athlete needs better braking, body position, lateral force, and re-acceleration mechanics.',m:['Shuffle-to-stick deceleration drills','Lateral sled marches and pushes','Split-stance force work','COD plyos: lateral bound to stick','Reactive mirror drills with controlled braking']}
   };
   var bk=BK[bkt];
   var metricScore100={
@@ -4685,7 +4723,7 @@ function buildComp(prev,curr){
       +'<div style="flex:1;padding-left:8px;font-size:12px;font-weight:600;color:'+dc+'">'+dt+'</div>'
       +'<div style="flex:0 0 70px;text-align:right;font-size:12px;font-weight:600;color:'+sc2+'">'+ss+'</div></div>';
   }
-  var bs=prev.bktName===curr.bktName,ds2=prev.defType===curr.defType;
+  var bs=bucketDisplay(prev.bktName,prev.bkt)===bucketDisplay(curr.bktName,curr.bkt),ds2=prev.defType===curr.defType;
   var pts=[];
   if(imp>0)pts.push('<span style="color:#5DCAA5;font-weight:600">'+imp+' improved</span>');
   if(dec>0)pts.push('<span style="color:#F09595;font-weight:600">'+dec+' declined</span>');
@@ -4697,7 +4735,7 @@ function buildComp(prev,curr){
     +'<div style="font-family:Inter,sans-serif;font-size:11px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:#3BA8D0;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:baseline">'
     +'<span>Progress</span><span style="font-size:11px;color:var(--mt);font-weight:500;text-transform:none">vs '+esc(prev.date)+' &nbsp;&middot;&nbsp; '+dl+'</span></div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">'
-    +'<div style="background:var(--dk3);border:1px solid var(--bd);border-radius:4px;padding:10px 12px"><div class="fl" style="margin-bottom:4px">Classification</div><div style="font-size:11px;color:var(--mt);margin-bottom:2px">Prev: '+esc(prev.bktName||'—')+'</div><div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:4px">Now: '+esc(curr.bktName||'—')+'</div><div style="font-size:11px;font-weight:600;color:'+(bs?'var(--sb)':'#EF9F27')+'">'+(bs?'● Same':'● Changed')+'</div></div>'
+    +'<div style="background:var(--dk3);border:1px solid var(--bd);border-radius:4px;padding:10px 12px"><div class="fl" style="margin-bottom:4px">Classification</div><div style="font-size:11px;color:var(--mt);margin-bottom:2px">Prev: '+esc(bucketDisplay(prev.bktName,prev.bkt)||'—')+'</div><div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:4px">Now: '+esc(bucketDisplay(curr.bktName,curr.bkt)||'—')+'</div><div style="font-size:11px;font-weight:600;color:'+(bs?'var(--sb)':'#EF9F27')+'">'+(bs?'● Same':'● Changed')+'</div></div>'
     +'<div style="background:var(--dk3);border:1px solid var(--bd);border-radius:4px;padding:10px 12px"><div class="fl" style="margin-bottom:4px">Deficiency</div><div style="font-size:11px;color:var(--mt);margin-bottom:2px">Prev: '+esc(prev.defType||'—')+'</div><div style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:4px">Now: '+esc(curr.defType||'—')+'</div><div style="font-size:11px;font-weight:600;color:'+(ds2?'var(--sb)':'#EF9F27')+'">'+(ds2?'● Same':'● Changed')+'</div></div></div>'
     +'<div style="display:flex;align-items:center;gap:8px;padding:0 0 6px;border-bottom:1px solid var(--bd);margin-bottom:2px">'
     +'<div style="flex:0 0 120px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mt)">Metric</div>'
@@ -4737,37 +4775,64 @@ function normalizeProgramPhase(phase){
 }
 function programPhaseLabel(phase){phase=normalizeProgramPhase(phase);return PROGRAM_PHASES[phase].label;}
 function programLegacyPhase(phase){phase=normalizeProgramPhase(phase);return PROGRAM_PHASES[phase].legacy;}
+var PROGRAM_PHASE_COPY={
+  offSeason:'Full volume progressive overload',
+  preSeason:'Speed & power expression focus',
+  inSeason:'Maintenance lower volume keep intensity'
+};
+var BUCKET_BRAND={
+  1:{name:'Force Foundation',subtitle:'Max force production - heavy end of the curve',legacy:['Reactive Strength','Max Force']},
+  2:{name:'Tendon Code',subtitle:'Extreme Isometrics - position strength & nervous system',legacy:['Force and Power','Extreme Isometrics','Force and Power (Base Build)']},
+  3:{name:'Power Bridge',subtitle:'Strength-speed - where force meets velocity',legacy:['Acceleration','Strength-Speed']},
+  4:{name:'Drive Phase',subtitle:'Acceleration - first step & drive mechanics',legacy:['Speed-Strength / Acceleration']},
+  5:{name:'Max Velocity',subtitle:'Top end speed - full expression of the curve',legacy:['Top End Speed','Force Transfer']},
+  6:{name:'Change of Direction',subtitle:'Deceleration, lateral force & re-acceleration',legacy:['Change of Direction']}
+};
+function bucketBrandByKey(key){key=parseInt(key,10);return BUCKET_BRAND[key]||BUCKET_BRAND[2];}
+function bucketKeyFromName(name){
+  var txt=String(name||'');
+  var m=txt.match(/Bucket\s+(\d+)/i);if(m)return parseInt(m[1],10);
+  for(var k in BUCKET_BRAND){
+    if(txt.indexOf(BUCKET_BRAND[k].name)>-1)return parseInt(k,10);
+    var arr=BUCKET_BRAND[k].legacy||[];
+    for(var i=0;i<arr.length;i++)if(txt.indexOf(arr[i])>-1)return parseInt(k,10);
+  }
+  return 2;
+}
+function bucketName(keyOrName){return bucketBrandByKey(typeof keyOrName==='number'?keyOrName:bucketKeyFromName(keyOrName)).name;}
+function bucketSubtitle(keyOrName){return bucketBrandByKey(typeof keyOrName==='number'?keyOrName:bucketKeyFromName(keyOrName)).subtitle;}
+function bucketDisplay(name,key){return bucketName(key||bucketKeyFromName(name));}
 var defaultPrograms={
-  1:{name:'Bucket 1 - Max Force',primary:'Max Force',exercises:[
+  1:{name:'Force Foundation',subtitle:BUCKET_BRAND[1].subtitle,primary:'Max Force',exercises:[
     programExercise('Heavy Prowler Push','4','','','20 yards','3-4 min','100% intent. Full recovery between pushes.',false),
     programExercise('Overcoming Iso Wall Push (split stance)','4','','8 sec','100% intent','90 sec','Max intent. Switch lead leg each set.',false),
     programExercise('Heavy Sled Drag (backward)','3','','','15 yards','2-3 min','Stay low and drive through the floor.',false)
   ]},
-  2:{name:'Bucket 2 - Extreme Isometrics (EI)',primary:'Extreme Isometrics',exercises:[
+  2:{name:'Tendon Code',subtitle:BUCKET_BRAND[2].subtitle,primary:'Extreme Isometrics',exercises:[
     programExercise('Sprint Stance Iso (drive position)','3','','45 sec each leg','bodyweight','60 sec','Own posture and shin angle.',false),
     programExercise('Wall Sit (90 degrees)','3','','60 sec','bodyweight','60 sec','Maintain full-foot pressure.',false),
     programExercise('Single-Leg RDL Iso Hold','3','','30 sec each leg','bodyweight','60 sec','Hips square. Reach long.',false),
     programExercise('Lunge Iso (back knee 1 inch off ground)','3','','45 sec','bodyweight','60 sec','Stay tall through trunk.',false)
   ]},
-  3:{name:'Bucket 3 - Strength-Speed',primary:'Strength-Speed',exercises:[
+  3:{name:'Power Bridge',subtitle:BUCKET_BRAND[3].subtitle,primary:'Strength-Speed',exercises:[
     programExercise('Trap Bar Deadlift Jump','4','4','','30-40% max','2-3 min','Fast intent every rep.',false),
     programExercise('Moderate Sled Push','4','','','20 yards','2-3 min','Powerful projection without grinding.',false),
     programExercise('Rotational Med Ball Slam','4','6','','med ball','75 sec','Explode through hip rotation.',false),
     programExercise('Broad Jump','4','3','','max distance','90 sec','Full reset between reps.',false)
   ]},
-  4:{name:'Bucket 4 - Speed-Strength / Acceleration',primary:'Speed-Strength / Acceleration',exercises:[
+  4:{name:'Drive Phase',subtitle:BUCKET_BRAND[4].subtitle,primary:'Speed-Strength / Acceleration',exercises:[
     programExercise('Light Sled Sprint','6','','','20 yards, 10-15% BW','3 min','Fast first 3 steps. Keep posture.',false),
     programExercise('Wall Drive','4','10 each leg','','bodyweight','45 sec','Punch down and back.',false),
     programExercise('Power Skip for Distance','4','','','20 yards','90 sec','Project forward with rhythm.',false),
     programExercise('Resisted Start','4','','','15 yards','2-3 min','First 3-5 steps only.',false)
   ]},
-  5:{name:'Bucket 5 - Top End Speed',primary:'Top End Speed',exercises:[
+  5:{name:'Max Velocity',subtitle:BUCKET_BRAND[5].subtitle,primary:'Top End Speed',exercises:[
     programExercise('Build Sprint','4','','','40 yards','3 min','Smooth acceleration into upright sprinting.',false),
     programExercise('Fly 20','4','1 rep','','30-yard build-up','full recovery','Relaxed max velocity mechanics.',false),
     programExercise('Light Sled Sprint','4','','','30 yards, 5-8% BW','3 min','Do not overload mechanics.',false),
     programExercise('Falling Start Sprint','3','','','30 yards','2-3 min','Fall, catch, and accelerate cleanly.',false)
   ]},
-  6:{name:'Bucket 6 - Change of Direction',primary:'Change of Direction',exercises:[
+  6:{name:'Change of Direction',subtitle:BUCKET_BRAND[6].subtitle,primary:'Change of Direction',exercises:[
     programExercise('Shuffle-to-Stick Deceleration','4','4 each side','','bodyweight','60 sec','Brake under control before re-accelerating.',false),
     programExercise('Lateral Bound to Stick','4','3 each side','','bodyweight','75 sec','Own the landing position.',false),
     programExercise('5-10-5 Technique Reps','4','1 rep','','submax to fast','2 min','Cut angles and braking mechanics first.',false),
@@ -4816,8 +4881,8 @@ function buildDefaultProgramModel(S,days,phase,groupId){
     athleteId:S.aid||S.athleteId||null,
     groupId:groupId||null,
     seasonPhase:phase,
-    bucketPrimary:(defaultPrograms[bKey]&&defaultPrograms[bKey].name)||'Bucket 2 - Extreme Isometrics (EI)',
-    bucketSecondary:'Bucket 2 - Extreme Isometrics (EI)',
+    bucketPrimary:(defaultPrograms[bKey]&&defaultPrograms[bKey].name)||'Tendon Code',
+    bucketSecondary:'Tendon Code',
     weeks:weeks,
     lastEditedBy:(typeof SupaDB!=='undefined'&&SupaDB.getUser&&SupaDB.getUser())?SupaDB.getUser().id:'local',
     lastEditedAt:Date.now(),
@@ -5693,37 +5758,43 @@ function buildBulkProgramBar(){
     +'</div></div>';
 }
 function createGroupFromSelected(){
-  var ids=selectedAthleteIds();if(!ids.length){alert('Select athletes first.');return;}
-  var name=prompt('Group name');if(!name)return;
-  var label=prompt('Sport/team label',name)||name;
-  var phase=normalizeProgramPhase(prompt('Season phase: offSeason, preSeason, or inSeason','offSeason')||'offSeason');
-  var g=DB.saveGroup({name:name,label:label,athleteIds:ids,seasonPhase:phase});
-  var p=buildDefaultProgramModel({bkt:2,seasonPhase:phase},7,phase,g.id);
-  p.groupId=g.id;p=DB.saveProgram(p);g.sharedProgramId=p.id;DB.saveGroup(g);
-  ids.forEach(function(id){DB.setAthleteSeasonPhase(id,phase);});
-  _programSelect={mode:false,ids:{}};_toast('Group created: '+name,'#1e6f3e');buildTeams();
+  var ids=selectedAthleteIds();if(!ids.length){apeAlert('Select athletes first.','Create Group');return;}
+  apePrompt('Create Group',[
+    {id:'name',label:'Group Name',placeholder:'e.g. Varsity Speed Group'},
+    {id:'label',label:'Sport / Team Label',placeholder:'e.g. Football Varsity'},
+    {id:'phase',label:'Season Phase',type:'select',value:'offSeason',options:Object.keys(PROGRAM_PHASES).map(function(k){return{value:k,label:PROGRAM_PHASES[k].label};})}
+  ],function(v){
+    var name=(v.name||'').trim();if(!name){apeAlert('Group name is required.','Create Group');return;}
+    var label=(v.label||name).trim(),phase=normalizeProgramPhase(v.phase);
+    var g=DB.saveGroup({name:name,label:label,athleteIds:ids,seasonPhase:phase});
+    var p=buildDefaultProgramModel({bkt:2,seasonPhase:phase},7,phase,g.id);
+    p.groupId=g.id;p=DB.saveProgram(p);g.sharedProgramId=p.id;DB.saveGroup(g);
+    ids.forEach(function(id){DB.setAthleteSeasonPhase(id,phase);});
+    _programSelect={mode:false,ids:{}};_toast('Group created: '+name,'#1e6f3e');buildTeams();
+  });
 }
 function assignProgramToSelected(){
-  var ids=selectedAthleteIds();if(!ids.length){alert('Select athletes first.');return;}
-  var bucket=parseInt(prompt('Assign bucket number 1-6','2'),10)||2;if(!defaultPrograms[bucket])bucket=2;
-  ids.forEach(function(id){
-    var a=DB.get(id);if(!a)return;
-    DB.saveProgram(buildDefaultProgramModel({aid:id,bkt:bucket,seasonPhase:a.seasonPhase||'offSeason'},7,a.seasonPhase||'offSeason',null));
+  var ids=selectedAthleteIds();if(!ids.length){apeAlert('Select athletes first.','Assign Program');return;}
+  apePrompt('Assign Program',[{id:'bucket',label:'Training Bucket',type:'select',value:'2',options:Object.keys(defaultPrograms).map(function(k){return{value:k,label:defaultPrograms[k].name};})}],function(v){
+    var bucket=parseInt(v.bucket,10)||2;if(!defaultPrograms[bucket])bucket=2;
+    ids.forEach(function(id){var a=DB.get(id);if(!a)return;DB.saveProgram(buildDefaultProgramModel({aid:id,bkt:bucket,seasonPhase:a.seasonPhase||'offSeason'},7,a.seasonPhase||'offSeason',null));});
+    _toast('Program assigned to '+ids.length+' athletes.','#1e6f3e');buildDash();
   });
-  _toast('Program assigned to '+ids.length+' athletes.','#1e6f3e');buildDash();
 }
 function setPhaseForSelected(){
-  var ids=selectedAthleteIds();if(!ids.length){alert('Select athletes first.');return;}
-  var phase=normalizeProgramPhase(prompt('Season phase: offSeason, preSeason, or inSeason','inSeason')||'inSeason');
-  ids.forEach(function(id){changeAthleteProgramPhase(id,phase);});
-  _toast('Season phase updated for '+ids.length+' athletes. Custom exercises were kept.','#1e6f3e');buildDash();
+  var ids=selectedAthleteIds();if(!ids.length){apeAlert('Select athletes first.','Set Season Phase');return;}
+  apePrompt('Set Season Phase',[{id:'phase',label:'Season Phase',type:'select',value:'inSeason',options:Object.keys(PROGRAM_PHASES).map(function(k){return{value:k,label:PROGRAM_PHASES[k].label};})}],function(v){
+    var phase=normalizeProgramPhase(v.phase);
+    ids.forEach(function(id){changeAthleteProgramPhase(id,phase);});
+    _toast('Season phase updated for '+ids.length+' athletes. Custom exercises were kept.','#1e6f3e');buildDash();
+  });
 }
 function exportSelectedAthletes(){
-  var ids=selectedAthleteIds();if(!ids.length){alert('Select athletes first.');return;}
+  var ids=selectedAthleteIds();if(!ids.length){apeAlert('Select athletes first.','Export Selected');return;}
   if(!_xlsxCheck())return;
   var rows=[];
   ids.forEach(function(id){var a=DB.get(id);if(a)(a.s||[]).forEach(function(s){rows.push(_sesRow(a,s));});});
-  if(!rows.length){alert('Selected athletes have no sessions to export.');return;}
+  if(!rows.length){apeAlert('Selected athletes have no sessions to export.','Export Selected');return;}
   var wb=XLSX.utils.book_new(),ws=XLSX.utils.json_to_sheet(rows);
   XLSX.utils.book_append_sheet(wb,ws,'Selected Athletes');
   XLSX.writeFile(wb,'APE_Selected_Athletes.xlsx');
@@ -5888,8 +5959,7 @@ function buildDash(){
       +(last
         ?'<div class="ath-last-strip" style="border-left:3px solid '+bc+'">'
           +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">'
-          +'<div class="ath-last-bkt" style="flex:1;min-width:0">'+esc(last.bktName||'')+'</div>'
-          +(apeMeta&&apeMeta.label?'<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:3px;background:'+apeMeta.color+'18;color:'+apeMeta.color+';border:1px solid '+apeMeta.color+'33;white-space:nowrap;flex-shrink:0">'+apeMeta.label+'</span>':'')
+          +'<div class="ath-last-bkt" style="flex:1;min-width:0">'+esc(bucketDisplay(last.bktName,last.bkt))+(apeMeta&&apeMeta.label?' &middot; '+esc(apeMeta.label):'')+'</div>'
           +'</div>'
           +'<div class="ath-last-def">'+esc(last.defType||'')+'</div></div>'
         :'<div style="font-size:12px;color:var(--mt);font-style:italic;margin-bottom:12px">No test data yet — add first evaluation.</div>')
@@ -6049,7 +6119,7 @@ function buildHist(aid){
     h+='<div style="display:flex;align-items:flex-start;gap:11px;padding:8px 0;border-bottom:1px solid var(--bd);opacity:'+(ci===0?'1':'0.72')+'">'
       +'<div style="flex:0 0 86px;font-size:11px;color:var(--mt);padding-top:2px">'+esc(s2.date||'')
       +(ci===0?'<br><span style="font-size:10px;color:var(--or);font-weight:700">Latest</span>':'')+'</div>'
-      +'<div style="flex:1"><div style="font-size:12px;font-weight:600;color:'+bc2+';margin-bottom:2px">'+esc(s2.bktName||'—')+'</div>'
+      +'<div style="flex:1"><div style="font-size:12px;font-weight:600;color:'+bc2+';margin-bottom:2px">'+esc(bucketDisplay(s2.bktName,s2.bkt)||'—')+'</div>'
       +'<div style="font-size:11px;color:var(--sb)">'+esc(s2.defType||'—')+'</div></div>'
       +'<div style="flex:0 0 50px;text-align:right;font-size:11px;color:var(--mt)">'+(s2.cnt||0)+'/8</div></div>';
   }
@@ -6068,7 +6138,7 @@ function buildHist(aid){
       +'<div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:Inter,sans-serif;font-size:15px;font-weight:700;color:#fff">'+esc(s3.date||'')+renderVerificationBadge(ver3.timingMethod)+'</div>'
       +'<div style="font-size:11px;color:var(--mt);margin-top:2px">'+(s3.cnt||0)+' metrics &nbsp;·&nbsp; Avg '+avgS+'</div></div>'
       +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">'
-      +'<div style="text-align:right"><div style="font-size:12px;font-weight:600;color:'+bc3+'">'+esc(s3.bktName||'—')+'</div>'
+      +'<div style="text-align:right"><div style="font-size:12px;font-weight:600;color:'+bc3+'">'+esc(bucketDisplay(s3.bktName,s3.bkt)||'—')+'</div>'
       +'<div style="font-size:11px;color:var(--sb);margin-top:2px">'+esc(s3.defType||'—')+'</div></div>'
       +'<button class="del-btn" id="delsess-'+s3.id+'" onclick="confirmDelSess(\''+aid+'\',\''+s3.id+'\')" style="padding:4px 9px;font-size:11px">&#128465; Delete Session</button>'
       +'</div></div>'
@@ -6160,7 +6230,7 @@ function doDelAth(aid){
 
 // ─── EXCEL EXPORT ─────────────────────────────────────────────────────────────
 function _xlsxCheck(){
-  if(typeof XLSX==='undefined'){alert('Export library not loaded — check your internet connection.');return false;}
+  if(typeof XLSX==='undefined'){apeAlert('Export library not loaded. Check your internet connection.','Export');return false;}
   return true;
 }
 function _sesRow(a,s){
@@ -6216,7 +6286,7 @@ function _sesRow(a,s){
     'GPS Score 100':sessionMetricScore100(s,a,'gps')||'',
     'APE Score':ape!=null?ape:'',
     'Classification':s.defType||'',
-    'Training Bucket':s.bktName||'',
+    'Training Bucket':bucketDisplay(s.bktName,s.bkt)||'',
     'Position Group':profile.positionGroup,
     'Priority Metrics':profile.priorityMetrics.map(function(k){return METRIC_NAMES[k]||k;}).join(', '),
     'Position Context':profile.whyItMatters,
@@ -6227,7 +6297,7 @@ function exportAthleteXLSX(aid){
   if(!_xlsxCheck())return;
   var a=DB.get(aid);if(!a)return;
   var rows=a.s.map(function(s){return _sesRow(a,s);});
-  if(!rows.length){alert('No sessions to export for this athlete.');return;}
+  if(!rows.length){apeAlert('No sessions to export for this athlete.','Export');return;}
   var cfg=DB.loadSettings(),profile=getAthletePositionProfile(a),last=a.s[a.s.length-1]||{},v=getSessionVerification(last);
   var wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet([
@@ -6257,7 +6327,7 @@ function exportAllAthletesXLSX(){
   if(!_xlsxCheck())return;
   var athletes=DB.getAll(),rows=[];
   athletes.forEach(function(a){a.s.forEach(function(s){rows.push(_sesRow(a,s));});});
-  if(!rows.length){alert('No data to export.');return;}
+  if(!rows.length){apeAlert('No data to export.','Export');return;}
   var ws=XLSX.utils.json_to_sheet(rows);
   var wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'All Athletes');
@@ -6298,10 +6368,10 @@ function exportLeaderboardXLSX(){
       'COD Score':sc.cod!=null?sc.cod:'',
       'GPS (mph)':raw.gps!=null?raw.gps:'',
       'Classification':last.defType||'',
-      'Training Bucket':last.bktName||''
+      'Training Bucket':bucketDisplay(last.bktName,last.bkt)||''
     });
   });
-  if(!rows.length){alert('No data to export.');return;}
+  if(!rows.length){apeAlert('No data to export.','Export');return;}
   rows.sort(function(a,b){return(typeof b['APE Score']==='number'?b['APE Score']:-1)-(typeof a['APE Score']==='number'?a['APE Score']:-1);});
   rows=rows.map(function(r,i){return Object.assign({'Rank':i+1},r);});
   var ws=XLSX.utils.json_to_sheet(rows);
@@ -6340,12 +6410,14 @@ function changeGroupPhase(gid,phase){
 }
 function assignGroupProgram(gid){
   var g=DB.getGroup(gid);if(!g)return;
-  var bucket=parseInt(prompt('Assign bucket number 1-6','2'),10)||2;if(!defaultPrograms[bucket])bucket=2;
-  var shared=buildDefaultProgramModel({bkt:bucket,seasonPhase:g.seasonPhase},7,g.seasonPhase,gid);
-  shared.groupId=gid;shared=DB.saveProgram(shared);g.sharedProgramId=shared.id;DB.saveGroup(g);
-  (g.athleteIds||[]).forEach(function(aid){var a=DB.get(aid);if(a)DB.saveProgram(buildDefaultProgramModel({aid:aid,bkt:bucket,seasonPhase:g.seasonPhase},7,g.seasonPhase,gid));});
-  _toast('Shared group template assigned.','#1e6f3e');
-  buildTeams();
+  apePrompt('Assign Group Program',[{id:'bucket',label:'Training Bucket',type:'select',value:'2',options:Object.keys(defaultPrograms).map(function(k){return{value:k,label:defaultPrograms[k].name};})}],function(v){
+    var bucket=parseInt(v.bucket,10)||2;if(!defaultPrograms[bucket])bucket=2;
+    var shared=buildDefaultProgramModel({bkt:bucket,seasonPhase:g.seasonPhase},7,g.seasonPhase,gid);
+    shared.groupId=gid;shared=DB.saveProgram(shared);g.sharedProgramId=shared.id;DB.saveGroup(g);
+    (g.athleteIds||[]).forEach(function(aid){var a=DB.get(aid);if(a)DB.saveProgram(buildDefaultProgramModel({aid:aid,bkt:bucket,seasonPhase:g.seasonPhase},7,g.seasonPhase,gid));});
+    _toast('Shared group template assigned.','#1e6f3e');
+    buildTeams();
+  });
 }
 function buildTeams(){
   go(0);
@@ -6440,7 +6512,7 @@ function doCreateTeam(){
     _toast('Team "'+name+'" created!','#1e6f3e');
   }catch(e){
     console.error('[Teams] doCreateTeam error:',e);
-    alert('Error creating team: '+e.message);
+    apeAlert('Error creating team: '+e.message,'Teams');
   }
 }
 function _toast(msg,bg){
@@ -6448,6 +6520,41 @@ function _toast(msg,bg){
   t.style.cssText='position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:'+(bg||'#1e6f3e')+';color:#fff;padding:10px 22px;border-radius:8px;font-size:13px;font-family:Inter,sans-serif;z-index:9999;box-shadow:0 4px 14px rgba(0,0,0,.4);pointer-events:none';
   document.body.appendChild(t);
   setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},2500);
+}
+var _apeDialogResolver=null;
+function openApeDialog(opts){
+  opts=opts||{};
+  var ov=el('ape-dialog-overlay'),title=el('ape-dialog-title'),body=el('ape-dialog-body'),actions=el('ape-dialog-actions');
+  if(!ov||!body||!actions)return Promise.resolve(null);
+  if(title)title.textContent=opts.title||'APE';
+  body.innerHTML=opts.html||'<p>'+esc(opts.message||'')+'</p>';
+  actions.innerHTML='';
+  (opts.buttons||[{label:'OK',value:true,kind:'primary'}]).forEach(function(btn){
+    var b=document.createElement('button');
+    b.type='button';b.textContent=btn.label;
+    b.className=btn.kind==='danger'?'ape-btn-danger':btn.kind==='secondary'?'ape-btn-secondary':'ape-btn-primary';
+    b.onclick=function(){closeApeDialog(btn.value);};
+    actions.appendChild(b);
+  });
+  ov.classList.add('open');
+  setTimeout(function(){var f=body.querySelector('input,select,textarea,button');if(f)f.focus();},30);
+  return new Promise(function(resolve){_apeDialogResolver=resolve;});
+}
+function closeApeDialog(value){
+  var ov=el('ape-dialog-overlay');if(ov)ov.classList.remove('open');
+  if(_apeDialogResolver){var r=_apeDialogResolver;_apeDialogResolver=null;r(value);}
+}
+function apeAlert(message,title){return openApeDialog({title:title||'Notice',message:message,buttons:[{label:'OK',value:true,kind:'primary'}]});}
+function apePrompt(title,fields,onSubmit){
+  var html=(fields||[]).map(function(f){
+    if(f.type==='select')return'<div class="field"><label>'+esc(f.label)+'</label><select id="dlg-'+f.id+'">'+(f.options||[]).map(function(o){return'<option value="'+esc(o.value)+'"'+(String(o.value)===String(f.value||'')?' selected':'')+'>'+esc(o.label)+'</option>';}).join('')+'</select></div>';
+    return'<div class="field"><label>'+esc(f.label)+'</label><input id="dlg-'+f.id+'" value="'+esc(f.value||'')+'" placeholder="'+esc(f.placeholder||'')+'"></div>';
+  }).join('');
+  openApeDialog({title:title,html:html,buttons:[{label:'Cancel',value:false,kind:'secondary'},{label:'Save',value:true,kind:'primary'}]}).then(function(ok){
+    if(!ok)return;
+    var values={};(fields||[]).forEach(function(f){var e=el('dlg-'+f.id);values[f.id]=e?e.value:'';});
+    if(onSubmit)onSubmit(values);
+  });
 }
 
 function editTeamCard(tid){
@@ -6834,10 +6941,10 @@ function exportTeamXLSX(tid){
   for(var i=0;i<teams.length;i++)if(teams[i].id===tid){t=teams[i];break;}
   if(!t)return;
   var athletes=DB.getAll().filter(function(a){return a.team===tid;});
-  if(!athletes.length){alert('No athletes assigned to this team.');return;}
+  if(!athletes.length){apeAlert('No athletes assigned to this team.','Team Export');return;}
   var rows=[];
   athletes.forEach(function(a){a.s.forEach(function(s){rows.push(_sesRow(a,s));});});
-  if(!rows.length){alert('No session data for this team yet.');return;}
+  if(!rows.length){apeAlert('No session data for this team yet.','Team Export');return;}
   var ws=XLSX.utils.json_to_sheet(rows);
   var wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,t.name.substring(0,31));
@@ -6854,7 +6961,7 @@ function exportTeamStatsXLSX(){
   });
   var unassigned=allAthletes.filter(function(a){return !a.team&&a.s.length;});
   if(unassigned.length)groups.push({name:'Unassigned',athletes:unassigned});
-  if(!groups.length){alert('No team data to export.');return;}
+  if(!groups.length){apeAlert('No team data to export.','Team Export');return;}
   var MKEYS=[
     {k:'ape',l:'Avg APE Score'},
     {k:'vj', l:'Avg VJ (in)'},
@@ -7044,7 +7151,7 @@ function generateAthleteCode(athleteId){
     sessions:(a.s||[]).slice(-8).map(function(s){
       return{date:s.date||'',ape:s.apeScore!=null?s.apeScore:getAPEScore(s.sc||{}),
         sc:s.sc||{},raw:s.raw||{},defType:s.defType||'',focus:s.focus||'',
-        bktName:s.bktName||'',note:s.note||''};
+        bktName:bucketDisplay(s.bktName,s.bkt)||'',note:s.note||''};
     })
   };
   return btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
@@ -7170,7 +7277,7 @@ function buildAthletePortal(d){
       'Well Developed':'Your power and speed qualities are well matched. Your coach will target the individual weak link to drive your next gain.'
     }[defType]||'';
     var focusAreas=last.focus?last.focus.split(','):[];
-    if(last.bktName)focusAreas.unshift(last.bktName.replace(/Bucket \d+ - /,''));
+    if(last.bktName)focusAreas.unshift(bucketDisplay(last.bktName,last.bkt));
     html+='<div class="ap-card">'
       +'<div class="ap-card-head"><div class="ap-card-ico" style="background:rgba(30,144,255,.1)">&#127919;</div><div class="ap-card-title">Classification &amp; Focus</div></div>'
       +'<div class="ap-card-body">'
@@ -7417,7 +7524,7 @@ if ('serviceWorker' in navigator) {
     window.location.reload();
   });
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=20260528-phase-dropdown').then(function(reg) {
+    navigator.serviceWorker.register('sw.js?v=20260528-buckets-dialogs').then(function(reg) {
       if (reg && reg.update) reg.update();
       console.log('[APE] Service worker registered:', reg.scope);
     }).catch(function(err) {
