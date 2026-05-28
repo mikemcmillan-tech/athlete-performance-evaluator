@@ -1,6 +1,9 @@
 -- APE programs and training groups foundation.
 -- The app stores these locally first; these tables prepare safe coach-scoped cloud sync.
 
+ALTER TABLE public.athletes
+  ADD COLUMN IF NOT EXISTS season_phase text NOT NULL DEFAULT 'offSeason';
+
 CREATE TABLE IF NOT EXISTS public.program_groups (
   id uuid PRIMARY KEY,
   coach_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,

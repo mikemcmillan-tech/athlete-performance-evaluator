@@ -665,6 +665,34 @@ select option{background:var(--dk3)}
 .hist-tab.act{background:var(--electric);border-color:var(--electric);color:#001218;box-shadow:0 0 18px rgba(30,144,255,.22)}
 .hist-panel{display:none}
 .hist-panel.act{display:block}
+.program-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.program-phase-select,.program-bucket-select{background:var(--dk3);border:1px solid var(--bd);border-radius:var(--radius-sm);color:var(--tx);font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:9px 12px;outline:none}
+.program-week{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.program-day{background:var(--dk2);border:1px solid rgba(91,233,255,.12);border-radius:14px;padding:13px;min-height:170px;box-shadow:0 12px 28px rgba(0,0,0,.24)}
+.program-day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.program-day-name{font-family:var(--font);font-size:14px;font-weight:900;text-transform:uppercase;color:#fff;letter-spacing:.06em}
+.program-tag{display:inline-flex;align-items:center;border:1px solid rgba(91,233,255,.22);background:rgba(91,233,255,.08);color:var(--or);border-radius:999px;padding:3px 8px;font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.program-ex-list{display:flex;flex-direction:column;gap:7px;margin:8px 0 10px}
+.program-ex{border:1px solid var(--bd2);background:rgba(255,255,255,.025);border-radius:8px;padding:8px}
+.program-ex-name{font-size:12px;font-weight:800;color:#fff;line-height:1.3}
+.program-ex-meta{font-size:11px;color:var(--sb);line-height:1.45;margin-top:3px}
+.program-note{font-size:11px;color:var(--mt);line-height:1.45;margin-top:8px;white-space:pre-wrap}
+.program-empty-day{font-size:12px;color:var(--mt);line-height:1.55;padding:12px 0}
+.program-editor-overlay{display:none;position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:18px}
+.program-editor-overlay.open{display:flex}
+.program-editor{width:min(920px,100%);max-height:90vh;overflow:auto;background:var(--dk2);border:1px solid rgba(91,233,255,.18);border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.55);padding:20px}
+.program-edit-row{display:grid;grid-template-columns:1.25fr .55fr .55fr .7fr .75fr .75fr auto;gap:7px;align-items:end;border:1px solid var(--bd2);background:var(--dk3);border-radius:10px;padding:10px;margin-bottom:8px}
+.program-edit-row input,.program-edit-row textarea{width:100%;background:var(--dk4);border:1px solid var(--bd);border-radius:7px;color:var(--tx);font-family:var(--font);font-size:12px;padding:8px}
+.program-edit-row textarea{min-height:38px;resize:vertical}
+.program-edit-label{font-size:9px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--mt);margin-bottom:4px}
+.ath-card{position:relative}
+.ath-select-box{display:none;position:absolute;top:12px;left:12px;z-index:2}
+.select-mode .ath-select-box,.ath-card:hover .ath-select-box{display:block}
+.bulk-program-bar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:950;width:min(920px,calc(100vw - 24px));display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:rgba(15,18,26,.96);border:1px solid rgba(91,233,255,.25);border-radius:16px;padding:12px 14px;box-shadow:0 20px 60px rgba(0,0,0,.45),0 0 40px rgba(91,233,255,.12)}
+.bulk-program-bar.active{display:flex}
+.group-card{position:relative;background:var(--dk2);border:1px solid rgba(91,233,255,.12);border-radius:14px;padding:15px;margin-bottom:12px}
+.group-roster{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+@media(max-width:760px){.program-edit-row{grid-template-columns:1fr 1fr}.program-edit-row .wide{grid-column:1/-1}.bulk-program-bar{align-items:stretch}.bulk-program-bar .btn-save-prog,.bulk-program-bar .btn-p,.bulk-program-bar .btn-s{flex:1}}
 .progression-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 .progression-card{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(15,18,26,.95),rgba(22,26,36,.88));border:1px solid rgba(91,233,255,.12);border-radius:var(--radius-lg);padding:16px;min-width:0;box-shadow:0 0 0 1px rgba(91,233,255,.05) inset,0 18px 44px rgba(0,0,0,.34)}
 .progression-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
@@ -1400,6 +1428,24 @@ select option{background:var(--dk3)}
 </div>
 </div>
 
+<!-- ── Coach Programming Editor ── -->
+<div class="program-editor-overlay" id="program-editor-overlay" onclick="if(event.target===this)closeProgramEditor()">
+  <div class="program-editor">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px">
+      <div>
+        <div class="card-title" id="program-editor-title" style="margin-bottom:3px">Edit Training Day</div>
+        <div class="pg-sub">Coach-facing only. Athlete and parent portal views never render programming.</div>
+      </div>
+      <button onclick="closeProgramEditor()" style="background:none;border:none;color:var(--mt);font-size:22px;cursor:pointer">&times;</button>
+    </div>
+    <div id="program-editor-body"></div>
+    <div class="btn-row" style="margin-top:14px">
+      <button class="btn-p" onclick="saveProgramDayEditor()">Save Day</button>
+      <button class="btn-s" onclick="closeProgramEditor()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
 // DB is a self-contained module with a clean API surface.
@@ -1507,6 +1553,7 @@ var DB = (function(){
       if(extra.parentEmail)a.parentEmail=extra.parentEmail;
       a.gender=normalizeGender(extra.gender);
       if(extra.grade)a.grade=extra.grade;
+      a.seasonPhase=normalizeProgramPhase(extra.seasonPhase||'offSeason');
       d.a[id]=a;w(d);_cloudSyncSoon();return a;
     },
     addSession: function(aid,data){
@@ -1552,7 +1599,7 @@ var DB = (function(){
         id:id,
         athleteId:program.athleteId||null,
         groupId:program.groupId||null,
-        seasonPhase:program.seasonPhase||'off',
+        seasonPhase:normalizeProgramPhase(program.seasonPhase||'offSeason'),
         bucketPrimary:program.bucketPrimary||'',
         bucketSecondary:program.bucketSecondary||'',
         weeks:Array.isArray(program.weeks)?program.weeks:[],
@@ -1574,7 +1621,7 @@ var DB = (function(){
         label:group.label||group.name||'Training Group',
         coachId:group.coachId||((typeof SupaDB!=='undefined'&&SupaDB.getUser&&SupaDB.getUser())?SupaDB.getUser().id:'local'),
         athleteIds:Array.isArray(group.athleteIds)?group.athleteIds.slice():[],
-        seasonPhase:group.seasonPhase||'off',
+        seasonPhase:normalizeProgramPhase(group.seasonPhase||'offSeason'),
         sharedProgramId:group.sharedProgramId||null,
         createdAt:group.createdAt||now
       };
@@ -1646,6 +1693,12 @@ var DB = (function(){
       a.parentEmail=extra.parentEmail||a.parentEmail||'';
       a.gender=normalizeGender(extra.gender||a.gender);
       a.grade=extra.grade||a.grade||'';
+      a.seasonPhase=normalizeProgramPhase(extra.seasonPhase||a.seasonPhase||'offSeason');
+      var ok=w(d);if(ok)_cloudSyncSoon();return ok;
+    },
+    setAthleteSeasonPhase: function(aid,phase){
+      var d=r(),a=d.a[aid];if(!a)return false;
+      a.seasonPhase=normalizeProgramPhase(phase||'offSeason');
       var ok=w(d);if(ok)_cloudSyncSoon();return ok;
     },
 
@@ -2172,6 +2225,7 @@ function clearProgramLogo(){
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 var tier=null, _S={}, _dashFilter={team:'',sport:'',level:'',grade:'',q:''}, _lbState={metric:'ape',team:'',sport:'',pos:'',level:'',gender:'separate',limit:10};
+var _programSelect={mode:false,ids:{}};
 var _combineState={rawRows:[],rows:[],summary:null,fileName:'',station:'full'};
 var TIERS={youth:'Youth (U14)',hs:'High School',college:'College',pro:'Pro / Elite'};
 // Sprint benchmarks (f5 = 5-10 fly, f10 = 10-10 fly) — lower time = better (lb:true).
@@ -2872,14 +2926,6 @@ function buildProgressionGraphs(athleteId){
   });
 }
 var _progressionCharts={};
-function switchHistoryTab(tab,aid){
-  ['sessions','progression'].forEach(function(k){
-    var b=el('hist-tab-'+k),p=el('hist-panel-'+k);
-    if(b)b.classList.toggle('act',k===tab);
-    if(p)p.classList.toggle('act',k===tab);
-  });
-  if(tab==='progression')setTimeout(function(){renderProgressionGraphCanvases(aid);},40);
-}
 function renderProgressionGraphCanvases(aid){
   if(typeof Chart==='undefined')return;
   Object.keys(_progressionCharts).forEach(function(k){try{_progressionCharts[k].destroy();}catch(e){}});
@@ -2894,6 +2940,199 @@ function renderProgressionGraphCanvases(aid){
     var styles=cfg.points.map(function(p){return p.session.id===prId?'star':'circle';});
     _progressionCharts[cfg.metric]=new Chart(canvas,{type:'line',data:{labels:labels,datasets:[{label:cfg.label,data:values,borderColor:chartColor,backgroundColor:chartRgba(chartColor,.08),pointBackgroundColor:cfg.points.map(function(p){return p.session.id===prId?'#C9A227':chartColor;}),pointBorderColor:cfg.points.map(function(p){return p.session.id===prId?'#C9A227':'#D9F3FF';}),pointRadius:radii,pointHoverRadius:radii.map(function(r){return r+2;}),pointStyle:styles,borderWidth:2,tension:.35,fill:true}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:650,easing:'easeOutQuart'},plugins:{legend:{display:false},tooltip:{backgroundColor:'#0F121A',titleColor:chartColor,bodyColor:'#EEF1F6',borderColor:chartRgba(chartColor,.22),borderWidth:1,padding:11,displayColors:false,titleFont:{family:'JetBrains Mono',size:11,weight:'700'},bodyFont:{family:'JetBrains Mono',size:11},callbacks:{label:function(ctx){return cfg.label+': '+ctx.parsed.y+(cfg.unit?' '+cfg.unit:'');}}}},scales:apeChartScales({unit:cfg.unit})}});
   });
+}
+function latestProgramSource(a){
+  var last=getLatestSession(a)||{};
+  var source={};
+  for(var k in last)if(last.hasOwnProperty(k))source[k]=last[k];
+  source.aid=a.id;source.athleteId=a.id;source.seasonPhase=a.seasonPhase||'offSeason';
+  if(source.bkt===undefined)source.bkt=2;
+  return source;
+}
+function ensureAthleteProgram(aid){
+  var a=DB.get(aid);if(!a)return null;
+  var ps=DB.getPrograms({athleteId:aid}),p=ps.length?ps[0]:null;
+  if(!p){
+    p=buildDefaultProgramModel(latestProgramSource(a),7,a.seasonPhase||'offSeason',null);
+    p.athleteId=aid;
+    p=DB.saveProgram(p);
+  }
+  return p;
+}
+function programBucketKey(p){
+  var txt=String((p&&p.bucketPrimary)||'');
+  var m=txt.match(/Bucket\s+(\d+)/i);
+  return m?parseInt(m[1],10):2;
+}
+function programOptionsHtml(selected){
+  selected=parseInt(selected,10)||2;
+  return Object.keys(defaultPrograms).map(function(k){
+    return'<option value="'+k+'"'+(parseInt(k,10)===selected?' selected':'')+'>'+esc(defaultPrograms[k].name)+'</option>';
+  }).join('');
+}
+function phaseOptionsHtml(selected){
+  selected=normalizeProgramPhase(selected);
+  return Object.keys(PROGRAM_PHASES).map(function(k){return'<option value="'+k+'"'+(k===selected?' selected':'')+'>'+PROGRAM_PHASES[k].label+'</option>';}).join('');
+}
+function currentProgramWeek(p){
+  return p&&p.weeks&&p.weeks.length?p.weeks[0]:{weekNumber:1,days:[]};
+}
+function programExerciseHtml(ex){
+  return'<div class="program-ex"><div class="program-ex-name">'+esc(ex.name||'Exercise')+(ex.isCustom?' <span class="program-tag">Custom</span>':'')+'</div>'
+    +'<div class="program-ex-meta">'+[ex.sets?ex.sets+' sets':'',ex.reps?ex.reps+' reps':'',ex.duration||'',ex.load||'',ex.rest?'Rest '+ex.rest:''].filter(Boolean).map(esc).join(' · ')+'</div>'
+    +(ex.notes?'<div class="program-note">'+esc(ex.notes)+'</div>':'')+'</div>';
+}
+function buildProgramPanel(aid){
+  if(document.body.classList.contains('viewer-mode'))return'<div class="viewer-empty">Programming is coach-facing only.</div>';
+  var a=DB.get(aid);if(!a)return'<div class="empty-state"><div class="empty-p">Athlete not found.</div></div>';
+  var p=ensureAthleteProgram(aid),wk=currentProgramWeek(p),bucket=programBucketKey(p);
+  var h='<div class="card"><div class="program-toolbar">'
+    +'<div><div class="card-title">Programming</div><div class="pg-sub">Coach-facing only. Athletes and parents cannot access this module.</div></div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +'<select class="program-phase-select" onchange="changeAthleteProgramPhase(\''+aid+'\',this.value)">'+phaseOptionsHtml(p.seasonPhase||a.seasonPhase)+'</select>'
+    +'<select class="program-bucket-select" onchange="assignAthleteBucketProgram(\''+aid+'\',this.value)">'+programOptionsHtml(bucket)+'</select>'
+    +'<button class="btn-save-prog" style="padding:9px 12px;font-size:12px" onclick="resetAthleteProgramDefaults(\''+aid+'\')">Reset Program</button>'
+    +'</div></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px">'
+    +'<div class="viewer-focus-box"><div class="viewer-label">Assigned Bucket</div><div class="viewer-value">'+esc(p.bucketPrimary||'Manual / Not Assigned')+'</div></div>'
+    +'<div class="viewer-focus-box"><div class="viewer-label">Secondary Block</div><div class="viewer-value">'+esc(p.bucketSecondary||'Bucket 2 - Extreme Isometrics (EI)')+'</div></div>'
+    +'<div class="viewer-focus-box"><div class="viewer-label">Season Phase</div><div class="viewer-value">'+esc(programPhaseLabel(p.seasonPhase||a.seasonPhase))+'</div></div>'
+    +'</div>'
+    +'<div class="program-week">';
+  (wk.days||[]).forEach(function(day,idx){
+    var exs=day.exercises||[];
+    h+='<div class="program-day"><div class="program-day-head"><div class="program-day-name">'+esc(day.day||('Day '+(idx+1)))+'</div>'+(day.customized?'<span class="program-tag">Customized</span>':'')+'</div>'
+      +(exs.length?'<div class="program-ex-list">'+exs.map(programExerciseHtml).join('')+'</div>':'<div class="program-empty-day">No workout assigned.</div>')
+      +(day.coachNote?'<div class="program-note"><strong>Coach note:</strong> '+esc(day.coachNote)+'</div>':'')
+      +'<button class="btn-s" style="width:100%;padding:8px 10px;font-size:12px;margin-top:8px" onclick="openProgramDayEditor(\''+p.id+'\','+idx+')">Edit Day</button>'
+      +'</div>';
+  });
+  h+='</div></div>';
+  return h;
+}
+function switchHistoryTab(tab,aid){
+  ['sessions','progression','program'].forEach(function(k){
+    var b=el('hist-tab-'+k),p=el('hist-panel-'+k);
+    if(b)b.classList.toggle('act',k===tab);
+    if(p)p.classList.toggle('act',k===tab);
+  });
+  if(tab==='progression')setTimeout(function(){renderProgressionGraphCanvases(aid);},40);
+  if(tab==='program'){var panel=el('hist-panel-program');if(panel)panel.innerHTML=buildProgramPanel(aid);}
+}
+function changeAthleteProgramPhase(aid,phase){
+  var p=ensureAthleteProgram(aid),a=DB.get(aid);if(!p||!a)return;
+  phase=normalizeProgramPhase(phase);DB.setAthleteSeasonPhase(aid,phase);
+  p.seasonPhase=phase;
+  var bucket=programBucketKey(p),fresh=buildDefaultProgramModel({aid:aid,bkt:bucket,seasonPhase:phase},7,phase,p.groupId);
+  (p.weeks||[]).forEach(function(w,wi){
+    (w.days||[]).forEach(function(d,di){
+      if(!d.customized&&fresh.weeks[wi]&&fresh.weeks[wi].days[di]){d.exercises=fresh.weeks[wi].days[di].exercises;d.coachNote=d.coachNote||'';}
+    });
+  });
+  DB.saveProgram(p);
+  _toast('Program updated for '+programPhaseLabel(phase)+'. Your custom exercises were kept.','#1e6f3e');
+  switchHistoryTab('program',aid);
+}
+function assignAthleteBucketProgram(aid,bucket){
+  var a=DB.get(aid);if(!a)return;
+  bucket=parseInt(bucket,10)||2;
+  var fresh=buildDefaultProgramModel({aid:aid,bkt:bucket,seasonPhase:a.seasonPhase||'offSeason'},7,a.seasonPhase||'offSeason',null);
+  DB.saveProgram(fresh);
+  _toast('Program assigned: '+defaultPrograms[bucket].name,'#1e6f3e');
+  switchHistoryTab('program',aid);
+}
+function resetAthleteProgramDefaults(aid){
+  var a=DB.get(aid),p=ensureAthleteProgram(aid);if(!a||!p)return;
+  var bucket=programBucketKey(p),fresh=buildDefaultProgramModel({aid:aid,bkt:bucket,seasonPhase:p.seasonPhase||a.seasonPhase},7,p.seasonPhase||a.seasonPhase,null);
+  DB.saveProgram(fresh);
+  _toast('Program reset to default template.','#1e6f3e');
+  switchHistoryTab('program',aid);
+}
+var _programEdit={programId:null,dayIndex:null};
+function openProgramDayEditor(programId,dayIndex){
+  var p=DB.getProgram(programId),day=p&&p.weeks&&p.weeks[0]&&p.weeks[0].days?p.weeks[0].days[dayIndex]:null;
+  if(!p||!day)return;
+  _programEdit={programId:programId,dayIndex:dayIndex};
+  var ov=el('program-editor-overlay'),body=el('program-editor-body'),title=el('program-editor-title');
+  if(title)title.textContent='Edit '+(day.day||'Training Day');
+  var h='<div class="field"><label>Day-Level Coach Note</label><textarea id="program-day-note" style="min-height:70px">'+esc(day.coachNote||'')+'</textarea></div><div id="program-ex-edit-list">';
+  (day.exercises||[]).forEach(function(ex,i){h+=programEditRow(ex,i);});
+  h+='</div><div class="btn-row"><button class="btn-save-prog" onclick="addProgramExerciseRow()">Add Custom Exercise</button><button class="btn-save-prog" onclick="replaceProgramExercisePrompt()">Replace From Library</button><button class="btn-s" onclick="resetProgramDayDefault()">Reset to Default</button></div>';
+  if(body)body.innerHTML=h;
+  if(ov)ov.classList.add('open');
+}
+function programEditRow(ex,i){
+  return'<div class="program-edit-row" data-ex-row="'+i+'" draggable="true" ondragstart="programDragStart(event)" ondragover="programDragOver(event)" ondrop="programDrop(event)">'
+    +'<div class="wide"><div class="program-edit-label">Exercise</div><input id="pex-name-'+i+'" value="'+esc(ex.name||'')+'"></div>'
+    +'<div><div class="program-edit-label">Sets</div><input id="pex-sets-'+i+'" value="'+esc(ex.sets||'')+'"></div>'
+    +'<div><div class="program-edit-label">Reps</div><input id="pex-reps-'+i+'" value="'+esc(ex.reps||'')+'"></div>'
+    +'<div><div class="program-edit-label">Duration</div><input id="pex-duration-'+i+'" value="'+esc(ex.duration||'')+'"></div>'
+    +'<div><div class="program-edit-label">Load</div><input id="pex-load-'+i+'" value="'+esc(ex.load||'')+'"></div>'
+    +'<div><div class="program-edit-label">Rest</div><input id="pex-rest-'+i+'" value="'+esc(ex.rest||'')+'"></div>'
+    +'<button class="del-btn" style="padding:8px 10px" onclick="removeProgramExerciseRow(this)">Delete</button>'
+    +'<div class="wide" style="grid-column:1/-1"><div class="program-edit-label">Notes</div><textarea id="pex-notes-'+i+'">'+esc(ex.notes||'')+'</textarea></div>'
+    +'</div>';
+}
+var _programDragRow=null;
+function programDragStart(evt){_programDragRow=evt.currentTarget;if(evt.dataTransfer)evt.dataTransfer.effectAllowed='move';}
+function programDragOver(evt){evt.preventDefault();if(evt.dataTransfer)evt.dataTransfer.dropEffect='move';}
+function programDrop(evt){
+  evt.preventDefault();
+  var target=evt.currentTarget;
+  if(!_programDragRow||!target||_programDragRow===target)return;
+  var list=target.parentNode;
+  var rows=[].slice.call(list.children);
+  if(rows.indexOf(_programDragRow)<rows.indexOf(target))list.insertBefore(_programDragRow,target.nextSibling);
+  else list.insertBefore(_programDragRow,target);
+}
+function closeProgramEditor(){var ov=el('program-editor-overlay');if(ov)ov.classList.remove('open');_programEdit={programId:null,dayIndex:null};}
+function addProgramExerciseRow(){
+  var list=el('program-ex-edit-list');if(!list)return;
+  var i=list.querySelectorAll('.program-edit-row').length;
+  list.insertAdjacentHTML('beforeend',programEditRow(programExercise('Custom Exercise','','','','','','',true),i));
+}
+function removeProgramExerciseRow(btn){var row=btn&&btn.closest?btn.closest('.program-edit-row'):null;if(row&&row.parentNode)row.parentNode.removeChild(row);}
+function collectProgramEditorExercises(){
+  var rows=document.querySelectorAll('#program-ex-edit-list .program-edit-row'),out=[];
+  rows.forEach(function(row,idx){
+    function v(field){var e=row.querySelector('[id^="pex-'+field+'-"]');return e?e.value.trim():'';}
+    var name=v('name');if(!name)return;
+    out.push(programExercise(name,v('sets'),v('reps'),v('duration'),v('load'),v('rest'),v('notes'),true));
+  });
+  return out;
+}
+function saveProgramDayEditor(){
+  var p=DB.getProgram(_programEdit.programId);if(!p||!p.weeks||!p.weeks[0])return;
+  var day=p.weeks[0].days[_programEdit.dayIndex];if(!day)return;
+  day.coachNote=el('program-day-note')?el('program-day-note').value.trim():'';
+  day.exercises=collectProgramEditorExercises();
+  day.customized=true;
+  p.lastEditedAt=Date.now();
+  DB.saveProgram(p);
+  closeProgramEditor();
+  _toast('Training day saved.','#1e6f3e');
+  var aid=p.athleteId;if(aid)switchHistoryTab('program',aid);
+}
+function resetProgramDayDefault(){
+  var p=DB.getProgram(_programEdit.programId);if(!p||!p.weeks||!p.weeks[0])return;
+  var idx=_programEdit.dayIndex,day=p.weeks[0].days[idx],bucket=programBucketKey(p);
+  if(!day)return;
+  day.exercises=defaultProgramExercises(bucket,p.seasonPhase,1,day.day);
+  day.coachNote='';
+  day.customized=false;
+  DB.saveProgram(p);
+  closeProgramEditor();
+  if(p.athleteId)switchHistoryTab('program',p.athleteId);
+}
+function replaceProgramExercisePrompt(){
+  var lib=[];
+  Object.keys(defaultPrograms).forEach(function(k){defaultPrograms[k].exercises.forEach(function(ex){if(lib.indexOf(ex.name)===-1)lib.push(ex.name);});});
+  var name=prompt('Type an exercise from the library or enter your own:\n\n'+lib.slice(0,18).join('\n'));
+  if(!name)return;
+  var match=null;
+  Object.keys(defaultPrograms).forEach(function(k){defaultPrograms[k].exercises.forEach(function(ex){if(ex.name.toLowerCase()===name.toLowerCase())match=ex;});});
+  var list=el('program-ex-edit-list'),i=list?list.querySelectorAll('.program-edit-row').length:0;
+  if(list)list.insertAdjacentHTML('beforeend',programEditRow(match||programExercise(name,'','','','','','',true),i));
 }
 function resolveViewerAthletesForEmail(athletes,email,role){
   email=_normEmail(email);
@@ -3063,7 +3302,7 @@ function buildViewerDashboard(user){
   var h='<div class="viewer-hero"><div class="viewer-kicker">'+esc(roleCfg.label)+'</div><div class="viewer-title">Athlete Progress Portal</div><div class="viewer-sub">Read-only progress, coach notes, reports, and current improvement focus. This view keeps programming tools and internal coach workflow hidden.</div></div>';
   if(!athletes.length){
     h+='<div class="viewer-empty"><div class="empty-ico">'+iconSvg('users')+'</div><div class="empty-h">No Linked Athlete Yet</div><div class="empty-p">Signed in as '+esc(email||'this account')+'. Ask your coach to add this exact email to the Athlete Email or Parent Email field on the athlete profile, then sign in again.</div></div>';
-    cont.innerHTML=h;return;
+    cont.innerHTML=h;setTimeout(function(){animateRadarCharts(cont);},40);return;
   }
   var teamMap={};DB.getTeams().forEach(function(t){teamMap[t.id]=t;});
   athletes.forEach(function(a){
@@ -4453,76 +4692,101 @@ function programExercise(name,sets,reps,duration,load,rest,notes,isCustom){
     isDefault:!isCustom
   };
 }
-function defaultProgramExercises(bucketKey,phase,weekNumber){
-  var deload=weekNumber===6,build=weekNumber>=3&&weekNumber<=5;
-  var common=[
-    programExercise('Dynamic warm-up','1','','10 min','','','Mobility, skips, build-ups, and landing prep.',false),
-    programExercise('Core / trunk stability','2-3','8-12','','bodyweight','45-60 sec','Keep reps crisp and posture tall.',false)
-  ];
-  var pools={
-    1:[
-      programExercise('Pogo hop progression',deload?'2':'3','10-20 contacts','','bodyweight','60 sec','Low amplitude. Stop if stiffness or landing quality drops.',false),
-      programExercise('Snap-down to stick','3','4-5','','bodyweight','60 sec','Own landing position before progressing intensity.',false),
-      programExercise('Low hurdle hop',build?'3':'2','4-5','','low hurdle','75-90 sec','Fast ground contact with clean posture.',false)
-    ],
-    2:[
-      programExercise('Trap bar deadlift',deload?'2':'4',build?'3-5':'5','','moderate-heavy','2-3 min','Primary force production lift.',false),
-      programExercise('Loaded jump',deload?'2':'3','3-4','','light-moderate','90 sec','Move fast. Stop before velocity fades.',false),
-      programExercise('Broad jump series','3','3','','bodyweight','90 sec','Full reset between jumps.',false)
-    ],
-    3:[
-      programExercise('Wall drive series','3','6 each','','bodyweight','45 sec','Shin angle and front-side posture.',false),
-      programExercise('Resisted sled sprint',deload?'2':'4','10-15 yd','','10-20% BW','2 min','Push hard without changing mechanics.',false),
-      programExercise('Falling start sprint','3','10 yd','','bodyweight','2 min','Quality over volume.',false)
-    ],
-    4:[
-      programExercise('Fly sprint build-up',deload?'2':'4','20-30 yd fly','','bodyweight','3-4 min','Relax at top speed. Full recovery.',false),
-      programExercise('Wicket run','2-3','20-30 yd','','bodyweight','2 min','Tall posture and rhythm.',false),
-      programExercise('Stride-out exposure','3','30-40 yd','','90-95%','2-3 min','Smooth, not strained.',false)
-    ],
-    5:[
-      programExercise('Heavy lift to sprint contrast','3','3 + 10 yd','','heavy + bodyweight','3 min','Pair strength with immediate sprint expression.',false),
-      programExercise('Bound-to-sprint transition','3','3 bounds + 10 yd','','bodyweight','2-3 min','Convert projection into acceleration.',false),
-      programExercise('Med ball throw to sprint','3','3 + 10 yd','','med ball','2 min','Intentful throw, clean first step.',false)
-    ],
-    6:[
-      programExercise('Shuffle-to-stick deceleration','3','4 each side','','bodyweight','60 sec','Brake with hips low and chest controlled.',false),
-      programExercise('Lateral bound to stick','3','4 each side','','bodyweight','75 sec','Control before re-acceleration.',false),
-      programExercise('5-10-5 technique reps',deload?'2':'4','1 rep','','submax to fast','2 min','Quality cuts. Do not chase fatigue.',false)
-    ],
-    base:[
-      programExercise('Compound lift pattern','3','6-8','','moderate','90 sec','Build general strength capacity.',false),
-      programExercise('Jump variation','3','3-5','','bodyweight','75 sec','Clean takeoff and landing.',false),
-      programExercise('Sprint exposure','3','10-20 yd','','bodyweight','2 min','Keep acceleration mechanics sharp.',false)
-    ]
-  };
-  return common.concat(pools[bucketKey]||pools.base);
+var PROGRAM_PHASES={
+  offSeason:{label:'Off-Season',legacy:'off',note:'Full bucket training, higher volume, progressive overload.'},
+  preSeason:{label:'Pre-Season',legacy:'pre',note:'Shift toward speed and power expression; reduce max force volume.'},
+  inSeason:{label:'In-Season',legacy:'in',note:'Maintenance: lower volume, keep intensity, shorten EI holds, prioritize recovery.'}
+};
+function normalizeProgramPhase(phase){
+  phase=String(phase||'offSeason');
+  if(phase==='off')return'offSeason';
+  if(phase==='pre')return'preSeason';
+  if(phase==='in')return'inSeason';
+  return PROGRAM_PHASES[phase]?phase:'offSeason';
+}
+function programPhaseLabel(phase){phase=normalizeProgramPhase(phase);return PROGRAM_PHASES[phase].label;}
+function programLegacyPhase(phase){phase=normalizeProgramPhase(phase);return PROGRAM_PHASES[phase].legacy;}
+var defaultPrograms={
+  1:{name:'Bucket 1 - Max Force',primary:'Max Force',exercises:[
+    programExercise('Heavy Prowler Push','4','','','20 yards','3-4 min','100% intent. Full recovery between pushes.',false),
+    programExercise('Overcoming Iso Wall Push (split stance)','4','','8 sec','100% intent','90 sec','Max intent. Switch lead leg each set.',false),
+    programExercise('Heavy Sled Drag (backward)','3','','','15 yards','2-3 min','Stay low and drive through the floor.',false)
+  ]},
+  2:{name:'Bucket 2 - Extreme Isometrics (EI)',primary:'Extreme Isometrics',exercises:[
+    programExercise('Sprint Stance Iso (drive position)','3','','45 sec each leg','bodyweight','60 sec','Own posture and shin angle.',false),
+    programExercise('Wall Sit (90 degrees)','3','','60 sec','bodyweight','60 sec','Maintain full-foot pressure.',false),
+    programExercise('Single-Leg RDL Iso Hold','3','','30 sec each leg','bodyweight','60 sec','Hips square. Reach long.',false),
+    programExercise('Lunge Iso (back knee 1 inch off ground)','3','','45 sec','bodyweight','60 sec','Stay tall through trunk.',false)
+  ]},
+  3:{name:'Bucket 3 - Strength-Speed',primary:'Strength-Speed',exercises:[
+    programExercise('Trap Bar Deadlift Jump','4','4','','30-40% max','2-3 min','Fast intent every rep.',false),
+    programExercise('Moderate Sled Push','4','','','20 yards','2-3 min','Powerful projection without grinding.',false),
+    programExercise('Rotational Med Ball Slam','4','6','','med ball','75 sec','Explode through hip rotation.',false),
+    programExercise('Broad Jump','4','3','','max distance','90 sec','Full reset between reps.',false)
+  ]},
+  4:{name:'Bucket 4 - Speed-Strength / Acceleration',primary:'Speed-Strength / Acceleration',exercises:[
+    programExercise('Light Sled Sprint','6','','','20 yards, 10-15% BW','3 min','Fast first 3 steps. Keep posture.',false),
+    programExercise('Wall Drive','4','10 each leg','','bodyweight','45 sec','Punch down and back.',false),
+    programExercise('Power Skip for Distance','4','','','20 yards','90 sec','Project forward with rhythm.',false),
+    programExercise('Resisted Start','4','','','15 yards','2-3 min','First 3-5 steps only.',false)
+  ]},
+  5:{name:'Bucket 5 - Top End Speed',primary:'Top End Speed',exercises:[
+    programExercise('Build Sprint','4','','','40 yards','3 min','Smooth acceleration into upright sprinting.',false),
+    programExercise('Fly 20','4','1 rep','','30-yard build-up','full recovery','Relaxed max velocity mechanics.',false),
+    programExercise('Light Sled Sprint','4','','','30 yards, 5-8% BW','3 min','Do not overload mechanics.',false),
+    programExercise('Falling Start Sprint','3','','','30 yards','2-3 min','Fall, catch, and accelerate cleanly.',false)
+  ]},
+  6:{name:'Bucket 6 - Change of Direction',primary:'Change of Direction',exercises:[
+    programExercise('Shuffle-to-Stick Deceleration','4','4 each side','','bodyweight','60 sec','Brake under control before re-accelerating.',false),
+    programExercise('Lateral Bound to Stick','4','3 each side','','bodyweight','75 sec','Own the landing position.',false),
+    programExercise('5-10-5 Technique Reps','4','1 rep','','submax to fast','2 min','Cut angles and braking mechanics first.',false),
+    programExercise('Reactive Mirror Drill','3','','15 sec','bodyweight','60 sec','React without crossing feet early.',false)
+  ]}
+};
+function cloneExercise(ex){
+  return programExercise(ex.name,ex.sets,ex.reps,ex.duration,ex.load,ex.rest,ex.notes,false);
+}
+function adjustExerciseForPhase(ex,phase){
+  var copy=cloneExercise(ex),p=normalizeProgramPhase(phase);
+  if(p==='inSeason'){
+    if(copy.sets&&/^\d+$/.test(String(copy.sets)))copy.sets=String(Math.max(1,parseInt(copy.sets,10)-1));
+    copy.notes=(copy.notes?copy.notes+' ':'')+'In-season: keep intensity, reduce fatigue.';
+    if(String(copy.duration).indexOf('45 sec')>-1)copy.duration='25-30 sec';
+    if(String(copy.duration).indexOf('60 sec')>-1)copy.duration='30-40 sec';
+  }else if(p==='preSeason'){
+    copy.notes=(copy.notes?copy.notes+' ':'')+'Pre-season: express speed and power; stop before quality drops.';
+  }
+  return copy;
+}
+function defaultProgramExercises(bucketKey,phase,weekNumber,dayName){
+  var key=parseInt(bucketKey,10)||2,primary=defaultPrograms[key]||defaultPrograms[2],ei=defaultPrograms[2],day=String(dayName||''),out=[];
+  if(day==='Monday'||day==='Wednesday'||day==='Friday')out=primary.exercises.map(function(ex){return adjustExerciseForPhase(ex,phase);});
+  else if(day==='Tuesday'||day==='Thursday')out=ei.exercises.map(function(ex){return adjustExerciseForPhase(ex,phase);});
+  else out=[programExercise('Recovery / Mobility','1','','20-30 min','','','Coach-directed recovery, tissue work, walk, or light tempo. EI bucket remains the secondary training block on training days.',false)];
+  if(weekNumber===6)out=out.map(function(ex){var c=cloneExercise(ex);c.notes=(c.notes?c.notes+' ':'')+'Week 6 deload/retest readiness.';return c;});
+  return out;
+}
+function resolveProgramBucketFromSession(s){
+  if(!s)return 2;
+  var b=s.bkt;
+  if(b==='base')return 2;
+  b=parseInt(b,10);
+  return defaultPrograms[b]?b:2;
 }
 function buildDefaultProgramModel(S,days,phase,groupId){
-  S=S||{};days=parseInt(days,10)||3;
-  var bKey=S.bkt||'base',dayNames=days===2?['Day 1','Day 2']:days===3?['Day 1','Day 2','Day 3']:['Day 1','Day 2','Day 3','Day 4'];
-  var weeks=[];
+  S=S||{};phase=normalizeProgramPhase(phase||S.seasonPhase||'offSeason');
+  var bKey=resolveProgramBucketFromSession(S),dayNames=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],weeks=[];
   for(var w=1;w<=6;w++){
-    weeks.push({
-      weekNumber:w,
-      days:dayNames.map(function(dayName,idx){
-        return{
-          day:dayName,
-          exercises:defaultProgramExercises(bKey,phase,w).map(function(ex){
-            var copy={};for(var k in ex)if(ex.hasOwnProperty(k))copy[k]=ex[k];
-            if(idx===0&&copy.notes)copy.notes+=' Primary focus day.';
-            return copy;
-          })
-        };
-      })
-    });
+    weeks.push({weekNumber:w,days:dayNames.map(function(dayName){
+      return{day:dayName,coachNote:'',customized:false,exercises:defaultProgramExercises(bKey,phase,w,dayName)};
+    })});
   }
   return{
-    athleteId:S.aid||null,
+    athleteId:S.aid||S.athleteId||null,
     groupId:groupId||null,
-    seasonPhase:phase||'off',
-    bucketPrimary:S.bktName||S.defLimiter||'',
-    bucketSecondary:S.focus||S.defType||'',
+    seasonPhase:phase,
+    bucketPrimary:(defaultPrograms[bKey]&&defaultPrograms[bKey].name)||'Bucket 2 - Extreme Isometrics (EI)',
+    bucketSecondary:'Bucket 2 - Extreme Isometrics (EI)',
     weeks:weeks,
     lastEditedBy:(typeof SupaDB!=='undefined'&&SupaDB.getUser&&SupaDB.getUser())?SupaDB.getUser().id:'local',
     lastEditedAt:Date.now(),
@@ -5335,6 +5599,7 @@ function buildLeaderboard(){
   }
   h+='</div>';
   cont.innerHTML=h;
+  setTimeout(function(){animateRadarCharts(cont);},40);
 }
 
 // Get the value for a given metric key from the athlete's last session
@@ -5372,6 +5637,65 @@ function _fmtMetricVal(val,metricKey){
     case 'gps':return n.toFixed(1)+'mph';
     default:   return n;
   }
+}
+function selectedAthleteIds(){return Object.keys(_programSelect.ids).filter(function(id){return _programSelect.ids[id];});}
+function toggleProgramSelectMode(){
+  _programSelect.mode=!_programSelect.mode;
+  if(!_programSelect.mode)_programSelect.ids={};
+  buildDash();
+}
+function toggleAthleteSelected(aid,on){
+  if(on)_programSelect.ids[aid]=true;else delete _programSelect.ids[aid];
+  var bar=el('bulk-program-bar');
+  if(bar)bar.classList.toggle('active',selectedAthleteIds().length>0);
+  var c=el('bulk-program-count');if(c)c.textContent=selectedAthleteIds().length;
+}
+function buildBulkProgramBar(){
+  var count=selectedAthleteIds().length;
+  return'<div class="bulk-program-bar'+(count?' active':'')+'" id="bulk-program-bar">'
+    +'<div style="font-size:13px;font-weight:800;color:#fff"><span id="bulk-program-count">'+count+'</span> selected</div>'
+    +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
+    +'<button class="btn-save-prog" style="padding:8px 11px;font-size:12px" onclick="createGroupFromSelected()">Create Group</button>'
+    +'<button class="btn-save-prog" style="padding:8px 11px;font-size:12px" onclick="assignProgramToSelected()">Assign Program</button>'
+    +'<button class="btn-save-prog" style="padding:8px 11px;font-size:12px" onclick="setPhaseForSelected()">Set Season Phase</button>'
+    +'<button class="btn-save-prog" style="padding:8px 11px;font-size:12px" onclick="exportSelectedAthletes()">Export Selected</button>'
+    +'</div></div>';
+}
+function createGroupFromSelected(){
+  var ids=selectedAthleteIds();if(!ids.length){alert('Select athletes first.');return;}
+  var name=prompt('Group name');if(!name)return;
+  var label=prompt('Sport/team label',name)||name;
+  var phase=normalizeProgramPhase(prompt('Season phase: offSeason, preSeason, or inSeason','offSeason')||'offSeason');
+  var g=DB.saveGroup({name:name,label:label,athleteIds:ids,seasonPhase:phase});
+  var p=buildDefaultProgramModel({bkt:2,seasonPhase:phase},7,phase,g.id);
+  p.groupId=g.id;p=DB.saveProgram(p);g.sharedProgramId=p.id;DB.saveGroup(g);
+  ids.forEach(function(id){DB.setAthleteSeasonPhase(id,phase);});
+  _programSelect={mode:false,ids:{}};_toast('Group created: '+name,'#1e6f3e');buildTeams();
+}
+function assignProgramToSelected(){
+  var ids=selectedAthleteIds();if(!ids.length){alert('Select athletes first.');return;}
+  var bucket=parseInt(prompt('Assign bucket number 1-6','2'),10)||2;if(!defaultPrograms[bucket])bucket=2;
+  ids.forEach(function(id){
+    var a=DB.get(id);if(!a)return;
+    DB.saveProgram(buildDefaultProgramModel({aid:id,bkt:bucket,seasonPhase:a.seasonPhase||'offSeason'},7,a.seasonPhase||'offSeason',null));
+  });
+  _toast('Program assigned to '+ids.length+' athletes.','#1e6f3e');buildDash();
+}
+function setPhaseForSelected(){
+  var ids=selectedAthleteIds();if(!ids.length){alert('Select athletes first.');return;}
+  var phase=normalizeProgramPhase(prompt('Season phase: offSeason, preSeason, or inSeason','inSeason')||'inSeason');
+  ids.forEach(function(id){changeAthleteProgramPhase(id,phase);});
+  _toast('Season phase updated for '+ids.length+' athletes. Custom exercises were kept.','#1e6f3e');buildDash();
+}
+function exportSelectedAthletes(){
+  var ids=selectedAthleteIds();if(!ids.length){alert('Select athletes first.');return;}
+  if(!_xlsxCheck())return;
+  var rows=[];
+  ids.forEach(function(id){var a=DB.get(id);if(a)(a.s||[]).forEach(function(s){rows.push(_sesRow(a,s));});});
+  if(!rows.length){alert('Selected athletes have no sessions to export.');return;}
+  var wb=XLSX.utils.book_new(),ws=XLSX.utils.json_to_sheet(rows);
+  XLSX.utils.book_append_sheet(wb,ws,'Selected Athletes');
+  XLSX.writeFile(wb,'APE_Selected_Athletes.xlsx');
 }
 
 // ─── DASHBOARD ────────────────────────────────────────────────────────────────
@@ -5434,6 +5758,7 @@ function buildDash(){
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildLeaderboard()">'+iconSvg('trophy')+' Leaderboard</button>'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildTeamStats()">'+iconSvg('bar-chart-3')+' Team Stats</button>'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildEventMode()">Event Mode</button>'
+    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="toggleProgramSelectMode()">'+(_programSelect.mode?'Done Selecting':'Select')+'</button>'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="exportAllAthletesXLSX()">'+iconSvg('download')+' Export All</button>'
     +'<button class="btn-p" style="padding:9px 16px;font-size:13px;flex:none" onclick="goNew()">'+iconSvg('user-plus')+' New Athlete</button>'
     +'</div></div>';
@@ -5475,7 +5800,7 @@ function buildDash(){
   }
 
   var bkC={1:'#5BE9FF',2:'#E8A020',base:'#E8A020',3:'#9B7FE8',4:'#3BA8D0',5:'#3EB890'};
-  h+='<div class="dash-grid">';
+  h+='<div class="dash-grid'+(_programSelect.mode?' select-mode':'')+'">';
   for(var i=0;i<filtered.length;i++){
     var a=filtered[i],last=a.last,tm2=TM[a.tier]||{label:a.tier,c:'#8AAABE'};
     var cnt2=a.s.length,dr='';
@@ -5498,6 +5823,7 @@ function buildDash(){
       }
     }
     h+='<div class="ath-card" id="athcard-'+a.id+'">'
+      +'<label class="ath-select-box" onclick="event.stopPropagation()"><input type="checkbox" '+(_programSelect.ids[a.id]?'checked':'')+' onchange="toggleAthleteSelected(\''+a.id+'\',this.checked)"> <span style="font-size:11px;font-weight:800;color:var(--or)">Select</span></label>'
       // ── Card header: name/team (left) + tier badge + APE (right) ──
       +'<div class="ath-hdr">'
       +'<div class="ath-info">'
@@ -5547,7 +5873,7 @@ function buildDash(){
       +'</div>'
       +'</div>';
   }
-  h+='</div>';
+  h+='</div>'+buildBulkProgramBar();
 
   // ── Team Performance Overview ─────────────────────────────────────────────────
   // Inline summary on the main dashboard: avg APE, avg VJ, avg 5-10 fly per team.
@@ -5629,16 +5955,27 @@ function buildHist(aid){
     +(a.sport||a.position||a.age?'&nbsp;&nbsp;':'')
     +sessions.length+' session'+(sessions.length!==1?'s':'')
     +(sessions.length?' &nbsp;·&nbsp; First test '+esc(sessions[0].date||''):'')+'</div></div>'
+    +'<select class="program-phase-select" title="Season phase" onchange="changeAthleteProgramPhase(\''+aid+'\',this.value)">'+phaseOptionsHtml(a.seasonPhase||'offSeason')+'</select>'
     +'<button class="btn-share" style="padding:8px 13px;font-size:12px;flex:none" onclick="copyAthleteLink(\''+aid+'\')">&#128279; Share</button>'
     +'<button class="btn-save-prog" style="padding:8px 13px;font-size:12px;flex:none" onclick="exportAthleteXLSX(\''+aid+'\')">&#8681; Export</button>'
     +'<button class="btn-p" style="padding:8px 13px;font-size:12px;flex:none" onclick="startTest(\''+aid+'\')">&#9889; New Test</button></div>';
   h+=AthleteProfileCard(a,'athlete-profile-'+aid);
 
-  if(!sessions.length){h+='<div class="empty-state"><div class="empty-p">No sessions recorded yet.</div></div>';cont.innerHTML=h;setTimeout(function(){animateRadarCharts(cont);},40);return;}
+  if(!sessions.length){
+    h+='<div class="hist-tabs">'
+      +'<button class="hist-tab act" id="hist-tab-sessions" onclick="switchHistoryTab(\'sessions\',\''+aid+'\')">Sessions</button>'
+      +'<button class="hist-tab" id="hist-tab-progression" onclick="switchHistoryTab(\'progression\',\''+aid+'\')">Progression</button>'
+      +'<button class="hist-tab" id="hist-tab-program" onclick="switchHistoryTab(\'program\',\''+aid+'\')">Program</button>'
+      +'</div><div class="hist-panel act" id="hist-panel-sessions"><div class="empty-state"><div class="empty-p">No sessions recorded yet. Programming is still available for this athlete.</div></div></div>'
+      +'<div class="hist-panel" id="hist-panel-progression"><div class="empty-state"><div class="empty-p">More sessions needed to show progression.</div></div></div>'
+      +'<div class="hist-panel" id="hist-panel-program">'+buildProgramPanel(aid)+'</div>';
+    cont.innerHTML=h;setTimeout(function(){animateRadarCharts(cont);},40);return;
+  }
 
   h+='<div class="hist-tabs">'
     +'<button class="hist-tab act" id="hist-tab-sessions" onclick="switchHistoryTab(\'sessions\',\''+aid+'\')">Sessions</button>'
     +'<button class="hist-tab" id="hist-tab-progression" onclick="switchHistoryTab(\'progression\',\''+aid+'\')">Progression</button>'
+    +'<button class="hist-tab" id="hist-tab-program" onclick="switchHistoryTab(\'program\',\''+aid+'\')">Program</button>'
     +'</div>'
     +'<div class="hist-panel act" id="hist-panel-sessions">';
 
@@ -5726,7 +6063,7 @@ function buildHist(aid){
       +(gc.points.length<=1?'<div class="progression-note">More sessions needed to show progression</div>':(gc.pr?'<div class="progression-note"><span style="color:#C9A227;font-weight:800">&#9733;</span> PR: '+gc.pr.value+(gc.unit?' '+gc.unit:'')+'</div>':''))
       +'</div>';
   }
-  h+='</div></div>';
+  h+='</div></div><div class="hist-panel" id="hist-panel-program">'+buildProgramPanel(aid)+'</div>';
   h+='<div class="btn-row" style="margin-top:8px">'
     +'<button class="btn-s" onclick="goDash()">&larr; Back to Athletes</button>'
     +'<button class="btn-p" onclick="startTest(\''+aid+'\')">&#9889; New Test</button>'
@@ -5943,12 +6280,49 @@ function exportLeaderboardXLSX(){
 }
 
 // ─── TEAMS PAGE ───────────────────────────────────────────────────────────────
+function groupRadarData(group,athletes){
+  var members=(athletes||[]).filter(function(a){return(group.athleteIds||[]).indexOf(a.id)!==-1;});
+  var mapped=members.map(mapAthleteToRadarData),scores={forceOutput:0,strength:0,power:0,acceleration:0,speed:0,agility:0};
+  APE_RADAR_METRICS.forEach(function(m){scores[m.key]=_avgScore100(mapped.map(function(d){return d.scores[m.key];}));});
+  return{name:group.name||'Group',sport:group.label||'',position:programPhaseLabel(group.seasonPhase),overall:_avgScore100(mapped.map(function(d){return d.overall;})),scores:scores};
+}
+function renderGroupsSection(groups,athletes){
+  if(!groups.length)return'';
+  var h='<div class="card" style="margin-bottom:20px"><div class="card-title">Teams / Groups Programming</div><div class="pg-sub" style="margin-bottom:12px">Coach-only groups with shared season phase, shared program template, and averaged force-velocity radar.</div>';
+  groups.forEach(function(g){
+    var members=athletes.filter(function(a){return(g.athleteIds||[]).indexOf(a.id)!==-1;}),data=groupRadarData(g,athletes);
+    h+='<div class="group-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">'
+      +'<div><div style="font-family:var(--font);font-size:18px;font-weight:900;color:#fff;text-transform:uppercase">'+esc(g.name)+'</div><div class="pg-sub">'+esc(g.label||'Group')+' · '+members.length+' athlete'+(members.length!==1?'s':'')+' · '+esc(programPhaseLabel(g.seasonPhase))+'</div></div>'
+      +'<div style="display:flex;gap:7px;flex-wrap:wrap"><select class="program-phase-select" onchange="changeGroupPhase(\''+g.id+'\',this.value)">'+phaseOptionsHtml(g.seasonPhase)+'</select><button class="btn-save-prog" style="padding:8px 11px;font-size:12px" onclick="assignGroupProgram(\''+g.id+'\')">Assign Program</button></div></div>'
+      +'<div style="display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;margin-top:12px">'+RadarChart(data,'group-'+g.id,{mini:true})+'<div><div class="group-roster">'+members.map(function(a){return'<span class="program-tag" onclick="goHist(\''+a.id+'\')" style="cursor:pointer">'+esc(a.name)+'</span>';}).join('')+'</div></div></div>'
+      +'</div>';
+  });
+  h+='</div>';
+  return h;
+}
+function changeGroupPhase(gid,phase){
+  var g=DB.getGroup(gid);if(!g)return;
+  phase=normalizeProgramPhase(phase);g.seasonPhase=phase;DB.saveGroup(g);
+  (g.athleteIds||[]).forEach(function(aid){DB.setAthleteSeasonPhase(aid,phase);var p=ensureAthleteProgram(aid);if(p){p.groupId=gid;p.seasonPhase=phase;DB.saveProgram(p);}});
+  _toast('Group updated for '+programPhaseLabel(phase)+'. Individual custom edits were kept.','#1e6f3e');
+  buildTeams();
+}
+function assignGroupProgram(gid){
+  var g=DB.getGroup(gid);if(!g)return;
+  var bucket=parseInt(prompt('Assign bucket number 1-6','2'),10)||2;if(!defaultPrograms[bucket])bucket=2;
+  var shared=buildDefaultProgramModel({bkt:bucket,seasonPhase:g.seasonPhase},7,g.seasonPhase,gid);
+  shared.groupId=gid;shared=DB.saveProgram(shared);g.sharedProgramId=shared.id;DB.saveGroup(g);
+  (g.athleteIds||[]).forEach(function(aid){var a=DB.get(aid);if(a)DB.saveProgram(buildDefaultProgramModel({aid:aid,bkt:bucket,seasonPhase:g.seasonPhase},7,g.seasonPhase,gid));});
+  _toast('Shared group template assigned.','#1e6f3e');
+  buildTeams();
+}
 function buildTeams(){
   go(0);
   var nd=el('nav-dash');if(nd)nd.classList.remove('act');
   var nt=el('nav-teams');if(nt)nt.classList.add('act');
   var cont=el('dash-out');if(!cont)return;
   var teams=DB.getTeams();
+  var groups=DB.getGroups();
   var athletes=DB.getAll();
   var teamCounts={};
   athletes.forEach(function(a){if(a.team)teamCounts[a.team]=(teamCounts[a.team]||0)+1;});
@@ -5966,6 +6340,8 @@ function buildTeams(){
     +'<div class="pg-sub">Import rosters, auto-create club teams, enter event results, and export team history.</div></div>'
     +'<button class="btn-p" style="padding:10px 16px;font-size:13px;flex:none" onclick="buildEventMode()">Open Event Mode</button>'
     +'</div></div>';
+
+  h+=renderGroupsSection(groups,athletes);
 
   // Create team form
   h+='<div class="card" style="margin-bottom:20px">'
@@ -7010,7 +7386,7 @@ if ('serviceWorker' in navigator) {
     window.location.reload();
   });
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=20260528-program-model').then(function(reg) {
+    navigator.serviceWorker.register('sw.js?v=20260528-program-module').then(function(reg) {
       if (reg && reg.update) reg.update();
       console.log('[APE] Service worker registered:', reg.scope);
     }).catch(function(err) {

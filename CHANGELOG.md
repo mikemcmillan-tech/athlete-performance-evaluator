@@ -11,6 +11,7 @@ All notable changes to APE will be documented here.
 - Aligned athlete Supabase upsert naming with the `nk` schema column.
 - Added migration for athlete `height` field used by the profile UI.
 - Added a structured programs and training groups data model foundation for generated 6-week plans.
+- Added coach-facing Programming tabs, default Schroeder/Ryan Paul bucket templates, group assignment actions, and editable training days.
 
 ## Earlier History
 

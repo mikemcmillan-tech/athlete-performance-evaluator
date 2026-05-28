@@ -1,5 +1,5 @@
-// APE Service Worker - v6
-const CACHE_NAME = 'ape-v6-program-model';
+// APE Service Worker - v7
+const CACHE_NAME = 'ape-v7-program-module';
 const PRECACHE = [
   './',
   './index.html',
