@@ -6558,8 +6558,15 @@ refreshTeamSelect('');
 
 <script>
 if ('serviceWorker' in navigator) {
+  var _apeSwRefreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', function() {
+    if (_apeSwRefreshing) return;
+    _apeSwRefreshing = true;
+    window.location.reload();
+  });
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js').then(function(reg) {
+    navigator.serviceWorker.register('sw.js?v=20260528-radar').then(function(reg) {
+      if (reg && reg.update) reg.update();
       console.log('[APE] Service worker registered:', reg.scope);
     }).catch(function(err) {
       console.warn('[APE] Service worker error:', err);

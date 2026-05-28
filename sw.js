@@ -1,5 +1,5 @@
-// APE Service Worker - v2
-const CACHE_NAME = 'ape-v2';
+// APE Service Worker - v3
+const CACHE_NAME = 'ape-v3-radar';
 const PRECACHE = [
   './',
   './index.html',
