@@ -2686,6 +2686,14 @@ function getLatestSession(a){
   var hist=(a&&a.s)||[];
   return hist.length?hist[hist.length-1]:null;
 }
+var APE_RADAR_METRICS=[
+  {label:'Force Output',key:'forceOutput'},
+  {label:'Strength',key:'strength'},
+  {label:'Power',key:'power'},
+  {label:'Acceleration',key:'acceleration'},
+  {label:'Speed',key:'speed'},
+  {label:'Agility',key:'agility'}
+];
 function _score5To100(v){
   if(v===null||v===undefined||isNaN(Number(v)))return null;
   return Math.max(0,Math.min(100,Math.round(Number(v)*20)));
@@ -2698,18 +2706,18 @@ function _avgScore100(list){
 function mapAthleteToRadarData(a){
   a=a||{};
   var s=getLatestSession(a)||{},sc=s.sc||{},ape=s?(s.apeScore!=null?s.apeScore:(s.sc?getAPEScore(s.sc):null)):null;
-  var speed=_avgScore100([_score5To100(sc.ac),_score5To100(sc.mv),_score5To100(sc.gps)]);
+  var forceOutput=_avgScore100([_score5To100(sc.vp),_score5To100(sc.hp)]);
   var strength=_avgScore100([_score5To100(sc.ft),_score5To100(sc.hp)]);
-  var power=_avgScore100([_score5To100(sc.vp),_score5To100(sc.hp)]);
-  var endurance=_avgScore100([_score5To100(sc.gps),_score5To100(sc.mv)]);
+  var power=_avgScore100([_score5To100(sc.vp),_score5To100(sc.hp),_score5To100(sc.rs)]);
+  var acceleration=_avgScore100([_score5To100(sc.ac)]);
+  var speed=_avgScore100([_score5To100(sc.mv),_score5To100(sc.gps)]);
   var agility=_avgScore100([_score5To100(sc.cod)]);
-  var recovery=_avgScore100([_score5To100(sc.vp),_score5To100(sc.hp),_score5To100(sc.rs),_score5To100(sc.ac),_score5To100(sc.mv),_score5To100(sc.cod),_score5To100(sc.gps),_score5To100(sc.ft)]);
   return{
     name:a.name||'Athlete',
     sport:a.sport||'',
     position:a.position||'',
     overall:ape!=null?Math.round(ape):0,
-    scores:{speed:speed,strength:strength,power:power,endurance:endurance,agility:agility,recovery:recovery}
+    scores:{forceOutput:forceOutput,strength:strength,power:power,acceleration:acceleration,speed:speed,agility:agility}
   };
 }
 function _radarPoints(values,cx,cy,r){
@@ -2724,11 +2732,11 @@ function _radarPolygon(points){
 }
 function RadarChart(data,uid,opt){
   opt=opt||{};data=data||{scores:{}};uid=String(uid||('radar-'+Math.random())).replace(/[^a-zA-Z0-9_-]/g,'');
-  var labels=['speed','strength','power','endurance','agility','recovery'],cx=120,cy=120,r=86,vals=labels.map(function(k){return data.scores&&data.scores[k]!=null?data.scores[k]:0;});
+  var metrics=APE_RADAR_METRICS,labels=metrics.map(function(m){return m.key;}),cx=120,cy=120,r=86,vals=metrics.map(function(m){return data.scores&&data.scores[m.key]!=null?data.scores[m.key]:0;});
   var rings=[.25,.5,.75,1].map(function(p){return'<polygon points="'+_radarPolygon(_radarPoints([p*100,p*100,p*100,p*100,p*100,p*100],cx,cy,r))+'" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';}).join('');
   var axes=labels.map(function(k,i){var p=_radarPoints([100,100,100,100,100,100],cx,cy,r)[i];return'<line x1="'+cx+'" y1="'+cy+'" x2="'+p.x.toFixed(2)+'" y2="'+p.y.toFixed(2)+'" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';}).join('');
   var finalPoints=_radarPoints(vals,cx,cy,r),centerPts=_radarPolygon(labels.map(function(){return{x:cx,y:cy};})),dataPts=_radarPolygon(finalPoints),filterId='apeRadarGlow-'+uid,gradId='apeRadarGrad-'+uid;
-  var axisGroups=labels.map(function(k,i){var lp=_radarPoints([116,116,116,116,116,116],cx,cy,r)[i],dp=finalPoints[i],anchor=lp.x<cx-8?'end':lp.x>cx+8?'start':'middle',score=vals[i];return'<g class="ape-radar-axis"><text class="ape-radar-label" x="'+lp.x.toFixed(2)+'" y="'+lp.y.toFixed(2)+'" text-anchor="'+anchor+'" dominant-baseline="middle" fill="#97A0B3" font-size="'+(opt.mini?8:10)+'" font-weight="800" letter-spacing=".08em">'+k.toUpperCase()+'</text><circle class="ape-radar-dot" cx="'+cx+'" cy="'+cy+'" data-final-x="'+dp.x.toFixed(2)+'" data-final-y="'+dp.y.toFixed(2)+'" r="'+(opt.mini?2.8:4)+'" fill="#EEF1F6" stroke="#5BE9FF" stroke-width="1.5"><title>'+k.toUpperCase()+': '+score+'</title></circle></g>';}).join('');
+  var axisGroups=metrics.map(function(m,i){var lp=_radarPoints([116,116,116,116,116,116],cx,cy,r)[i],dp=finalPoints[i],anchor=lp.x<cx-8?'end':lp.x>cx+8?'start':'middle',score=vals[i];return'<g class="ape-radar-axis"><text class="ape-radar-label" x="'+lp.x.toFixed(2)+'" y="'+lp.y.toFixed(2)+'" text-anchor="'+anchor+'" dominant-baseline="middle" fill="#97A0B3" font-size="'+(opt.mini?8:10)+'" font-weight="800" letter-spacing=".08em">'+esc(m.label.toUpperCase())+'</text><circle class="ape-radar-dot" cx="'+cx+'" cy="'+cy+'" data-final-x="'+dp.x.toFixed(2)+'" data-final-y="'+dp.y.toFixed(2)+'" r="'+(opt.mini?2.8:4)+'" fill="#EEF1F6" stroke="#5BE9FF" stroke-width="1.5"><title>'+esc(m.label)+': '+score+'</title></circle></g>';}).join('');
   return'<div class="ape-radar-svg-wrap"><svg class="ape-radar-svg" data-radar-ready="0" viewBox="0 0 240 240" role="img" aria-label="'+esc(data.name||'Athlete')+' performance radar">'
     +'<defs><filter id="'+filterId+'" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5" result="blur"/><feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.36 0 0 0 0 0.91 0 0 0 0 1 0 0 0 .75 0"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="'+gradId+'" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5BE9FF" stop-opacity=".56"/><stop offset="100%" stop-color="#0A84FF" stop-opacity=".22"/></linearGradient></defs>'
     +'<circle class="ape-radar-halo" cx="'+cx+'" cy="'+cy+'" r="92" fill="none" stroke="#5BE9FF" stroke-width="2" opacity=".25"/>'
@@ -2765,9 +2773,9 @@ function animateRadarCharts(root){
   });
 }
 function AthleteProfileCard(a,uid){
-  var d=mapAthleteToRadarData(a),labels=['speed','strength','power','endurance','agility','recovery'];
+  var d=mapAthleteToRadarData(a),metrics=APE_RADAR_METRICS;
   return'<div class="ape-radar-card ape-radar-profile">'
-    +'<div class="ape-radar-profile-info"><div class="ape-radar-kicker">Athlete Performance Profile</div><div class="ape-radar-name">'+esc(d.name)+'</div><div class="ape-radar-meta">'+[d.sport,d.position].filter(Boolean).map(esc).join(' / ')+'</div><div class="ape-radar-overall">'+d.overall+'<span>Overall</span></div><div class="ape-radar-scores">'+labels.map(function(k){return'<div class="ape-radar-score-row"><div class="ape-radar-score-label">'+k+'</div><div class="ape-radar-score-val">'+d.scores[k]+'</div></div>';}).join('')+'</div></div>'
+    +'<div class="ape-radar-profile-info"><div class="ape-radar-kicker">Force-Velocity Profile</div><div class="ape-radar-name">'+esc(d.name)+'</div><div class="ape-radar-meta">'+[d.sport,d.position].filter(Boolean).map(esc).join(' / ')+'</div><div class="ape-radar-overall">'+d.overall+'<span>Overall</span></div><div class="ape-radar-scores">'+metrics.map(function(m){return'<div class="ape-radar-score-row"><div class="ape-radar-score-label">'+esc(m.label)+'</div><div class="ape-radar-score-val">'+d.scores[m.key]+'</div></div>';}).join('')+'</div></div>'
     +RadarChart(d,uid||('profile-'+(a&&a.id||'athlete')),{})
     +'</div>';
 }
