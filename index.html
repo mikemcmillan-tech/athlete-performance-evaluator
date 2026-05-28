@@ -5115,6 +5115,7 @@ function buildDash(){
       +'<span>'+cnt2+' session'+(cnt2!==1?'s':'')+(dr?' &middot; '+dr:'')+'</span>'
       +(last?'<span class="ath-meta-date">'+esc(last.date||'')+'</span>':'')
       +'</div>'
+      +AthleteCardMini(a,'coach-card-'+a.id)
       // ── Last result strip ──
       +(last
         ?'<div class="ath-last-strip" style="border-left:3px solid '+bc+'">'
@@ -5179,6 +5180,7 @@ function buildDash(){
   }
 
   cont.innerHTML=h;
+  setTimeout(function(){animateRadarCharts(cont);},40);
 }
 
 // ─── ATHLETE HISTORY ──────────────────────────────────────────────────────────
