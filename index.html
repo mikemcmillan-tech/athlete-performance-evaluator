@@ -198,10 +198,14 @@ body{font-family:var(--font);background:
 .ape-radar-score-val{font-family:var(--mono);font-size:18px;font-weight:800;color:#fff}
 .ape-radar-svg-wrap{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;min-height:250px}
 .ape-radar-svg{width:100%;max-width:310px;height:auto;overflow:visible;filter:drop-shadow(0 18px 40px rgba(0,0,0,.35))}
-.ape-radar-poly{animation:ape-radar-draw 1.15s cubic-bezier(.16,1,.3,1) both}
-.ape-radar-halo{animation:ape-radar-pulse 1.65s ease-in-out infinite;transform-origin:center}
-@keyframes ape-radar-draw{from{opacity:0;transform:scale(.78)}to{opacity:1;transform:scale(1)}}
-@keyframes ape-radar-pulse{0%,100%{opacity:.18;filter:blur(0)}50%{opacity:.5;filter:blur(1px)}}
+.ape-radar-poly{opacity:0;transition:opacity .18s ease}
+.ape-radar-svg.radar-ready .ape-radar-poly{opacity:1}
+.ape-radar-halo{animation:ape-radar-pulse 2.8s ease-in-out infinite;transform-origin:center}
+.ape-radar-dot{cursor:pointer;transition:r .16s ease,fill .16s ease,stroke .16s ease,filter .16s ease}
+.ape-radar-axis:hover .ape-radar-dot{r:6;fill:#5BE9FF;stroke:#EEF1F6;filter:drop-shadow(0 0 8px rgba(91,233,255,.75))}
+.ape-radar-axis:hover .ape-radar-label{fill:#5BE9FF}
+.ape-radar-label{transition:fill .16s ease}
+@keyframes ape-radar-pulse{0%,100%{opacity:.35}50%{opacity:.75}}
 .ape-radar-mini{position:relative;z-index:1;display:grid;grid-template-columns:92px 1fr;gap:13px;align-items:center;background:rgba(91,233,255,.045);border:1px solid rgba(91,233,255,.14);border-radius:14px;padding:12px;margin-bottom:14px}
 .ape-radar-mini .ape-radar-svg-wrap{min-height:92px}
 .ape-radar-mini .ape-radar-svg{max-width:92px}
@@ -2723,14 +2727,42 @@ function RadarChart(data,uid,opt){
   var labels=['speed','strength','power','endurance','agility','recovery'],cx=120,cy=120,r=86,vals=labels.map(function(k){return data.scores&&data.scores[k]!=null?data.scores[k]:0;});
   var rings=[.25,.5,.75,1].map(function(p){return'<polygon points="'+_radarPolygon(_radarPoints([p*100,p*100,p*100,p*100,p*100,p*100],cx,cy,r))+'" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';}).join('');
   var axes=labels.map(function(k,i){var p=_radarPoints([100,100,100,100,100,100],cx,cy,r)[i];return'<line x1="'+cx+'" y1="'+cy+'" x2="'+p.x.toFixed(2)+'" y2="'+p.y.toFixed(2)+'" stroke="rgba(255,255,255,.08)" stroke-width="1"/>';}).join('');
-  var labelHtml=labels.map(function(k,i){var p=_radarPoints([116,116,116,116,116,116],cx,cy,r)[i],anchor=p.x<cx-8?'end':p.x>cx+8?'start':'middle';return'<text x="'+p.x.toFixed(2)+'" y="'+p.y.toFixed(2)+'" text-anchor="'+anchor+'" dominant-baseline="middle" fill="#97A0B3" font-size="'+(opt.mini?8:10)+'" font-weight="800" letter-spacing=".08em">'+k.toUpperCase()+'</text>';}).join('');
-  var dataPts=_radarPolygon(_radarPoints(vals,cx,cy,r)),filterId='apeRadarGlow-'+uid,gradId='apeRadarGrad-'+uid;
-  return'<div class="ape-radar-svg-wrap"><svg class="ape-radar-svg" viewBox="0 0 240 240" role="img" aria-label="'+esc(data.name||'Athlete')+' performance radar">'
+  var finalPoints=_radarPoints(vals,cx,cy,r),centerPts=_radarPolygon(labels.map(function(){return{x:cx,y:cy};})),dataPts=_radarPolygon(finalPoints),filterId='apeRadarGlow-'+uid,gradId='apeRadarGrad-'+uid;
+  var axisGroups=labels.map(function(k,i){var lp=_radarPoints([116,116,116,116,116,116],cx,cy,r)[i],dp=finalPoints[i],anchor=lp.x<cx-8?'end':lp.x>cx+8?'start':'middle',score=vals[i];return'<g class="ape-radar-axis"><text class="ape-radar-label" x="'+lp.x.toFixed(2)+'" y="'+lp.y.toFixed(2)+'" text-anchor="'+anchor+'" dominant-baseline="middle" fill="#97A0B3" font-size="'+(opt.mini?8:10)+'" font-weight="800" letter-spacing=".08em">'+k.toUpperCase()+'</text><circle class="ape-radar-dot" cx="'+cx+'" cy="'+cy+'" data-final-x="'+dp.x.toFixed(2)+'" data-final-y="'+dp.y.toFixed(2)+'" r="'+(opt.mini?2.8:4)+'" fill="#EEF1F6" stroke="#5BE9FF" stroke-width="1.5"><title>'+k.toUpperCase()+': '+score+'</title></circle></g>';}).join('');
+  return'<div class="ape-radar-svg-wrap"><svg class="ape-radar-svg" data-radar-ready="0" viewBox="0 0 240 240" role="img" aria-label="'+esc(data.name||'Athlete')+' performance radar">'
     +'<defs><filter id="'+filterId+'" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="5" result="blur"/><feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.36 0 0 0 0 0.91 0 0 0 0 1 0 0 0 .75 0"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter><linearGradient id="'+gradId+'" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#5BE9FF" stop-opacity=".56"/><stop offset="100%" stop-color="#0A84FF" stop-opacity=".22"/></linearGradient></defs>'
     +'<circle class="ape-radar-halo" cx="'+cx+'" cy="'+cy+'" r="92" fill="none" stroke="#5BE9FF" stroke-width="2" opacity=".25"/>'
-    +rings+axes+'<polygon class="ape-radar-poly" points="'+dataPts+'" fill="url(#'+gradId+')" stroke="#5BE9FF" stroke-width="2.5" filter="url(#'+filterId+')"/>'
-    +_radarPoints(vals,cx,cy,r).map(function(p){return'<circle cx="'+p.x.toFixed(2)+'" cy="'+p.y.toFixed(2)+'" r="'+(opt.mini?2.8:4)+'" fill="#EEF1F6" stroke="#5BE9FF" stroke-width="1.5"/>';}).join('')
-    +labelHtml+'</svg></div>';
+    +rings+axes+'<polygon class="ape-radar-poly" points="'+centerPts+'" data-center-points="'+centerPts+'" data-final-points="'+dataPts+'" fill="url(#'+gradId+')" stroke="#5BE9FF" stroke-width="2.5" filter="url(#'+filterId+')"/>'
+    +axisGroups+'</svg></div>';
+}
+function animateRadarCharts(root){
+  if(typeof window==='undefined'||!window.requestAnimationFrame)return;
+  root=root||document;
+  var charts=root.querySelectorAll?root.querySelectorAll('.ape-radar-svg[data-radar-ready="0"]'):[];
+  charts.forEach(function(svg){
+    if(svg.dataset.animating==='1')return;
+    var poly=svg.querySelector('.ape-radar-poly');if(!poly)return;
+    var final=(poly.getAttribute('data-final-points')||'').split(' ').map(function(pair){var xy=pair.split(',');return{x:parseFloat(xy[0]),y:parseFloat(xy[1])};}).filter(function(p){return !isNaN(p.x)&&!isNaN(p.y);});
+    if(!final.length)return;
+    var dots=[].slice.call(svg.querySelectorAll('.ape-radar-dot')),cx=120,cy=120,start=null,dur=900;
+    svg.dataset.animating='1';
+    svg.classList.add('radar-ready');
+    function frame(ts){
+      if(start===null)start=ts;
+      var p=Math.min(1,(ts-start)/dur),ease=1-Math.pow(1-p,3);
+      var pts=final.map(function(pt){return(cx+(pt.x-cx)*ease).toFixed(2)+','+(cy+(pt.y-cy)*ease).toFixed(2);}).join(' ');
+      poly.setAttribute('points',pts);
+      dots.forEach(function(dot,i){
+        var fx=parseFloat(dot.getAttribute('data-final-x')),fy=parseFloat(dot.getAttribute('data-final-y'));
+        if(isNaN(fx)||isNaN(fy))return;
+        dot.setAttribute('cx',(cx+(fx-cx)*ease).toFixed(2));
+        dot.setAttribute('cy',(cy+(fy-cy)*ease).toFixed(2));
+      });
+      if(p<1)requestAnimationFrame(frame);
+      else{svg.setAttribute('data-radar-ready','1');svg.dataset.animating='0';}
+    }
+    requestAnimationFrame(frame);
+  });
 }
 function AthleteProfileCard(a,uid){
   var d=mapAthleteToRadarData(a),labels=['speed','strength','power','endurance','agility','recovery'];
@@ -2787,7 +2819,7 @@ function buildViewerDashboard(user){
     h+='</div></div>';
   });
   cont.innerHTML=h;
-  setTimeout(function(){renderViewerProgressCharts(athletes);},40);
+  setTimeout(function(){animateRadarCharts(cont);renderViewerProgressCharts(athletes);},40);
 }
 function renderViewerProgressCharts(athletes){
   if(typeof Chart==='undefined')return;
@@ -5180,7 +5212,7 @@ function buildHist(aid){
     +'<button class="btn-p" style="padding:8px 13px;font-size:12px;flex:none" onclick="startTest(\''+aid+'\')">&#9889; New Test</button></div>';
   h+=AthleteProfileCard(a,'athlete-profile-'+aid);
 
-  if(!sessions.length){h+='<div class="empty-state"><div class="empty-p">No sessions recorded yet.</div></div>';cont.innerHTML=h;return;}
+  if(!sessions.length){h+='<div class="empty-state"><div class="empty-p">No sessions recorded yet.</div></div>';cont.innerHTML=h;setTimeout(function(){animateRadarCharts(cont);},40);return;}
 
   h+='<div class="hist-tabs">'
     +'<button class="hist-tab act" id="hist-tab-sessions" onclick="switchHistoryTab(\'sessions\',\''+aid+'\')">Sessions</button>'
@@ -5271,6 +5303,7 @@ function buildHist(aid){
     +'<button class="btn-p" onclick="startTest(\''+aid+'\')">&#9889; New Test</button>'
     +'</div>';
   cont.innerHTML=h;
+  setTimeout(function(){animateRadarCharts(cont);},40);
 }
 
 function saveNote(aid,sid){
