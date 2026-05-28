@@ -1410,6 +1410,8 @@ select option{background:var(--dk3)}
 //   4. Session data schema: { id, ts, date, raw:{vj,bj,rsi,f5,f10,gps,threeConeTime,fivetenFiveTime,pro_agility_5_10_5}, sc:{vp,hp,rs,ac,mv,cod,gps,ft}, bkt, bktName, defType, focus, cnt, apeScore, agilityScore, note }
 //   5. Athlete schema: { id, name, nk, tier, sport, position, age, team (team id), gradYear, notes, created, s:[] }
 //   6. Team schema: { id, name, color, created }
+//   7. Program schema: { id, athleteId, groupId, seasonPhase, bucketPrimary, bucketSecondary, weeks, lastEditedBy, lastEditedAt, createdFromDefault }
+//   8. Program group schema: { id, name, label, coachId, athleteIds, seasonPhase, sharedProgramId, createdAt }
 var DB = (function(){
   var K = 'ape_v1';
   function isUuid(id){return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(id||''));}
@@ -1420,8 +1422,10 @@ var DB = (function(){
     });
   }
   function migrateIds(data){
-    var changed=false,teamMap={};
+    var changed=false,teamMap={},athleteMap={},programMap={};
     if(!data.t)data.t={};
+    if(!data.p)data.p={};
+    if(!data.g)data.g={};
     var newTeams={};
     Object.keys(data.t).forEach(function(oldId){
       var t=data.t[oldId];if(!t)return;
@@ -1432,12 +1436,30 @@ var DB = (function(){
     var newAthletes={};
     Object.keys(data.a||{}).forEach(function(oldId){
       var a=data.a[oldId];if(!a)return;
-      var newId=isUuid(a.id)?a.id:uid();a.id=newId;
+      var newId=isUuid(a.id)?a.id:uid();athleteMap[oldId]=newId;a.id=newId;
       if(a.team&&teamMap[a.team]){a.team=teamMap[a.team];changed=true;}
       (a.s||[]).forEach(function(s){if(s&&!isUuid(s.id)){s.id=uid();changed=true;}});
       newAthletes[newId]=a;if(newId!==oldId)changed=true;
     });
     data.a=newAthletes;
+    var newPrograms={};
+    Object.keys(data.p||{}).forEach(function(oldId){
+      var p=data.p[oldId];if(!p)return;
+      var newId=isUuid(p.id)?p.id:uid();p.id=newId;
+      programMap[oldId]=newId;
+      if(p.athleteId&&athleteMap[p.athleteId]){p.athleteId=athleteMap[p.athleteId];changed=true;}
+      newPrograms[newId]=p;if(newId!==oldId)changed=true;
+    });
+    data.p=newPrograms;
+    var newGroups={};
+    Object.keys(data.g||{}).forEach(function(oldId){
+      var g=data.g[oldId];if(!g)return;
+      var newId=isUuid(g.id)?g.id:uid();g.id=newId;
+      g.athleteIds=(g.athleteIds||[]).map(function(aid){return athleteMap[aid]||aid;});
+      if(g.sharedProgramId&&programMap[g.sharedProgramId]){g.sharedProgramId=programMap[g.sharedProgramId];changed=true;}
+      newGroups[newId]=g;if(newId!==oldId)changed=true;
+    });
+    data.g=newGroups;
     if(data.v!==3){data.v=3;changed=true;}
     return changed;
   }
@@ -1445,16 +1467,20 @@ var DB = (function(){
   function r(){
     try{
       var d=localStorage.getItem(K);
-      var data=d?JSON.parse(d):{v:2,a:{},t:{}};
+      var data=d?JSON.parse(d):{v:2,a:{},t:{},p:{},g:{}};
       if(!data.t){data.t={};data.v=2;try{localStorage.setItem(K,JSON.stringify(data));}catch(e){}}
+      if(!data.p)data.p={};
+      if(!data.g)data.g={};
       if(migrateIds(data)){try{localStorage.setItem(K,JSON.stringify(data));}catch(e){}}
       return data;
-    }catch(e){return{v:2,a:{},t:{}};}
+    }catch(e){return{v:2,a:{},t:{},p:{},g:{}};}
   }
   function w(d){try{localStorage.setItem(K,JSON.stringify(d));return true;}catch(e){return false;}}
   function nk(s){return s.trim().toLowerCase().replace(/\s+/g,' ');}
   function td(){return new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});}
   function list(d){return Object.keys(d.a).map(function(k){return d.a[k];});}
+  function listPrograms(d){return Object.keys(d.p||{}).map(function(k){return d.p[k];});}
+  function listGroups(d){return Object.keys(d.g||{}).map(function(k){return d.g[k];});}
   return {
     getAll: function(){
       var d=r(),al=list(d);
@@ -1508,6 +1534,53 @@ var DB = (function(){
     last: function(aid){var a=r().a[aid];if(!a||!a.s.length)return null;return a.s[a.s.length-1];},
     prev: function(aid){var a=r().a[aid];if(!a||a.s.length<2)return null;return a.s[a.s.length-2];},
     history: function(aid){var a=r().a[aid];return a?a.s.slice():[];},
+    getPrograms: function(filter){
+      var ps=listPrograms(r()).sort(function(a,b){return(b.lastEditedAt||0)-(a.lastEditedAt||0);});
+      filter=filter||{};
+      return ps.filter(function(p){
+        if(filter.athleteId&&p.athleteId!==filter.athleteId)return false;
+        if(filter.groupId&&p.groupId!==filter.groupId)return false;
+        if(filter.seasonPhase&&p.seasonPhase!==filter.seasonPhase)return false;
+        return true;
+      });
+    },
+    getProgram: function(id){var d=r();return(d.p||{})[id]||null;},
+    saveProgram: function(program){
+      var d=r();if(!d.p)d.p={};
+      var now=Date.now(),id=program.id||uid('p');
+      var p={
+        id:id,
+        athleteId:program.athleteId||null,
+        groupId:program.groupId||null,
+        seasonPhase:program.seasonPhase||'off',
+        bucketPrimary:program.bucketPrimary||'',
+        bucketSecondary:program.bucketSecondary||'',
+        weeks:Array.isArray(program.weeks)?program.weeks:[],
+        lastEditedBy:program.lastEditedBy||((typeof SupaDB!=='undefined'&&SupaDB.getUser&&SupaDB.getUser())?SupaDB.getUser().id:'local'),
+        lastEditedAt:program.lastEditedAt||now,
+        createdFromDefault:program.createdFromDefault!==false
+      };
+      d.p[id]=p;var ok=w(d);if(ok)_cloudSyncSoon();return p;
+    },
+    deleteProgram: function(id){var d=r();if(!d.p||!d.p[id])return false;delete d.p[id];var ok=w(d);if(ok)_cloudSyncSoon();return ok;},
+    getGroups: function(){return listGroups(r()).sort(function(a,b){return(a.name||'').localeCompare(b.name||'');});},
+    getGroup: function(id){var d=r();return(d.g||{})[id]||null;},
+    saveGroup: function(group){
+      var d=r();if(!d.g)d.g={};
+      var now=Date.now(),id=group.id||uid('g');
+      var g={
+        id:id,
+        name:(group.name||'Training Group').trim(),
+        label:group.label||group.name||'Training Group',
+        coachId:group.coachId||((typeof SupaDB!=='undefined'&&SupaDB.getUser&&SupaDB.getUser())?SupaDB.getUser().id:'local'),
+        athleteIds:Array.isArray(group.athleteIds)?group.athleteIds.slice():[],
+        seasonPhase:group.seasonPhase||'off',
+        sharedProgramId:group.sharedProgramId||null,
+        createdAt:group.createdAt||now
+      };
+      d.g[id]=g;var ok=w(d);if(ok)_cloudSyncSoon();return g;
+    },
+    deleteGroup: function(id){var d=r();if(!d.g||!d.g[id])return false;delete d.g[id];var ok=w(d);if(ok)_cloudSyncSoon();return ok;},
     auto: function(name,tier,raw,comp,sport,position,age,team,gradYear,notes,bodyweight,height,verification){
       try{
         var a=DB.find(name,tier);
@@ -4367,12 +4440,104 @@ function buildComp(prev,curr){
 }
 
 // ─── PROGRAM GENERATOR ────────────────────────────────────────────────────────
+function programExercise(name,sets,reps,duration,load,rest,notes,isCustom){
+  return{
+    name:name||'',
+    sets:sets||'',
+    reps:reps||'',
+    duration:duration||'',
+    load:load||'',
+    rest:rest||'',
+    notes:notes||'',
+    isCustom:!!isCustom,
+    isDefault:!isCustom
+  };
+}
+function defaultProgramExercises(bucketKey,phase,weekNumber){
+  var deload=weekNumber===6,build=weekNumber>=3&&weekNumber<=5;
+  var common=[
+    programExercise('Dynamic warm-up','1','','10 min','','','Mobility, skips, build-ups, and landing prep.',false),
+    programExercise('Core / trunk stability','2-3','8-12','','bodyweight','45-60 sec','Keep reps crisp and posture tall.',false)
+  ];
+  var pools={
+    1:[
+      programExercise('Pogo hop progression',deload?'2':'3','10-20 contacts','','bodyweight','60 sec','Low amplitude. Stop if stiffness or landing quality drops.',false),
+      programExercise('Snap-down to stick','3','4-5','','bodyweight','60 sec','Own landing position before progressing intensity.',false),
+      programExercise('Low hurdle hop',build?'3':'2','4-5','','low hurdle','75-90 sec','Fast ground contact with clean posture.',false)
+    ],
+    2:[
+      programExercise('Trap bar deadlift',deload?'2':'4',build?'3-5':'5','','moderate-heavy','2-3 min','Primary force production lift.',false),
+      programExercise('Loaded jump',deload?'2':'3','3-4','','light-moderate','90 sec','Move fast. Stop before velocity fades.',false),
+      programExercise('Broad jump series','3','3','','bodyweight','90 sec','Full reset between jumps.',false)
+    ],
+    3:[
+      programExercise('Wall drive series','3','6 each','','bodyweight','45 sec','Shin angle and front-side posture.',false),
+      programExercise('Resisted sled sprint',deload?'2':'4','10-15 yd','','10-20% BW','2 min','Push hard without changing mechanics.',false),
+      programExercise('Falling start sprint','3','10 yd','','bodyweight','2 min','Quality over volume.',false)
+    ],
+    4:[
+      programExercise('Fly sprint build-up',deload?'2':'4','20-30 yd fly','','bodyweight','3-4 min','Relax at top speed. Full recovery.',false),
+      programExercise('Wicket run','2-3','20-30 yd','','bodyweight','2 min','Tall posture and rhythm.',false),
+      programExercise('Stride-out exposure','3','30-40 yd','','90-95%','2-3 min','Smooth, not strained.',false)
+    ],
+    5:[
+      programExercise('Heavy lift to sprint contrast','3','3 + 10 yd','','heavy + bodyweight','3 min','Pair strength with immediate sprint expression.',false),
+      programExercise('Bound-to-sprint transition','3','3 bounds + 10 yd','','bodyweight','2-3 min','Convert projection into acceleration.',false),
+      programExercise('Med ball throw to sprint','3','3 + 10 yd','','med ball','2 min','Intentful throw, clean first step.',false)
+    ],
+    6:[
+      programExercise('Shuffle-to-stick deceleration','3','4 each side','','bodyweight','60 sec','Brake with hips low and chest controlled.',false),
+      programExercise('Lateral bound to stick','3','4 each side','','bodyweight','75 sec','Control before re-acceleration.',false),
+      programExercise('5-10-5 technique reps',deload?'2':'4','1 rep','','submax to fast','2 min','Quality cuts. Do not chase fatigue.',false)
+    ],
+    base:[
+      programExercise('Compound lift pattern','3','6-8','','moderate','90 sec','Build general strength capacity.',false),
+      programExercise('Jump variation','3','3-5','','bodyweight','75 sec','Clean takeoff and landing.',false),
+      programExercise('Sprint exposure','3','10-20 yd','','bodyweight','2 min','Keep acceleration mechanics sharp.',false)
+    ]
+  };
+  return common.concat(pools[bucketKey]||pools.base);
+}
+function buildDefaultProgramModel(S,days,phase,groupId){
+  S=S||{};days=parseInt(days,10)||3;
+  var bKey=S.bkt||'base',dayNames=days===2?['Day 1','Day 2']:days===3?['Day 1','Day 2','Day 3']:['Day 1','Day 2','Day 3','Day 4'];
+  var weeks=[];
+  for(var w=1;w<=6;w++){
+    weeks.push({
+      weekNumber:w,
+      days:dayNames.map(function(dayName,idx){
+        return{
+          day:dayName,
+          exercises:defaultProgramExercises(bKey,phase,w).map(function(ex){
+            var copy={};for(var k in ex)if(ex.hasOwnProperty(k))copy[k]=ex[k];
+            if(idx===0&&copy.notes)copy.notes+=' Primary focus day.';
+            return copy;
+          })
+        };
+      })
+    });
+  }
+  return{
+    athleteId:S.aid||null,
+    groupId:groupId||null,
+    seasonPhase:phase||'off',
+    bucketPrimary:S.bktName||S.defLimiter||'',
+    bucketSecondary:S.focus||S.defType||'',
+    weeks:weeks,
+    lastEditedBy:(typeof SupaDB!=='undefined'&&SupaDB.getUser&&SupaDB.getUser())?SupaDB.getUser().id:'local',
+    lastEditedAt:Date.now(),
+    createdFromDefault:true
+  };
+}
 function genProg(){
   var phase=el('inp-phase').value,days=parseInt(el('inp-days').value);
   if(!phase||!days){el('err-pg').style.display='block';return;}
   el('err-pg').style.display='none';
   if(phase==='in'&&days>3)days=3;
-  el('prog-out').innerHTML=buildProg(_S,days,phase);
+  var savedProgram=DB.saveProgram(buildDefaultProgramModel(_S,days,phase,null));
+  _S.programId=savedProgram?savedProgram.id:null;
+  el('prog-out').innerHTML=buildProg(_S,days,phase)
+    +(_S.programId?'<div style="font-size:11px;color:var(--mt);margin-top:8px">Program saved locally as structured data: '+esc(_S.programId)+'</div>':'');
   el('prog-btns').style.display='block';
   el('prog-out').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -6845,7 +7010,7 @@ if ('serviceWorker' in navigator) {
     window.location.reload();
   });
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=20260528-gender-benchmarks').then(function(reg) {
+    navigator.serviceWorker.register('sw.js?v=20260528-program-model').then(function(reg) {
       if (reg && reg.update) reg.update();
       console.log('[APE] Service worker registered:', reg.scope);
     }).catch(function(err) {

@@ -10,6 +10,7 @@ All notable changes to APE will be documented here.
 - Added benchmark notes covering current assumptions, position context, and validation flags.
 - Aligned athlete Supabase upsert naming with the `nk` schema column.
 - Added migration for athlete `height` field used by the profile UI.
+- Added a structured programs and training groups data model foundation for generated 6-week plans.
 
 ## Earlier History
 
