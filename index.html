@@ -78,20 +78,23 @@ body{font-family:var(--font);background:
 .landing-logo{display:flex;align-items:center}
 .landing-logo img{height:50px;width:auto;display:block;object-fit:contain;filter:drop-shadow(0 0 24px rgba(91,233,255,.22))}
 .landing-brand-title{font-family:var(--font);font-size:22px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#fff;line-height:1}
+.landing-brand-title span{color:var(--or)}
 .landing-brand-sub{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--or);margin-top:4px}
 .landing-nav-links{display:flex;align-items:center;gap:28px;margin-left:auto}
 .landing-nav-links a{font-size:12px;font-weight:700;color:#8d96a8;text-decoration:none;transition:color .18s;letter-spacing:.04em}
 .landing-nav-links a:hover{color:#fff}
 .landing-nav-note{font-family:var(--font);font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--sb);border:1px solid rgba(255,255,255,.1);border-radius:999px;padding:8px 13px;background:rgba(255,255,255,.035);cursor:pointer;transition:all .18s}
 .landing-nav-note:hover{color:#fff;border-color:rgba(91,233,255,.36);background:rgba(91,233,255,.08)}
-.landing-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,430px);grid-template-rows:auto auto auto;gap:26px 44px;align-items:center;text-align:center;flex:1;padding-top:8px}
-.landing-copy{grid-column:1;max-width:840px;margin:0 auto}
+.landing-main{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;flex:1;min-height:calc(100vh - 128px);gap:0;padding:32px 0 82px}
+.landing-copy{order:2;max-width:920px;margin:0 auto}
 .landing-kicker{font-size:11px;font-weight:800;letter-spacing:.24em;text-transform:uppercase;color:var(--or);margin-bottom:16px;text-shadow:0 0 18px rgba(91,233,255,.28)}
 .landing-title{font-family:var(--font);font-size:clamp(52px,7.2vw,92px);font-weight:900;line-height:.9;letter-spacing:-.02em;text-transform:uppercase;color:#fff;max-width:920px;margin:0 auto;background:linear-gradient(180deg,#fff 0%,#dfefff 46%,#60a5fa 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;text-shadow:none}
 .landing-title em{font-style:normal;background:linear-gradient(180deg,#ffffff 0%,#5BE9FF 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 26px rgba(91,233,255,.34))}
 .landing-text{font-size:clamp(17px,2vw,22px);color:#a8b2c6;line-height:1.55;max-width:700px;margin:22px auto 0}
-.landing-video-wrap{grid-column:1;width:100%;max-width:430px;margin:0 auto;border-radius:22px;overflow:hidden;box-shadow:0 0 72px rgba(91,233,255,.22),0 34px 90px rgba(0,0,0,.72);border:1px solid rgba(91,233,255,.18);background:#000;position:relative}
+.landing-video-wrap{order:1;width:100%;max-width:390px;margin:0 auto 34px;border-radius:22px;overflow:hidden;box-shadow:0 0 72px rgba(91,233,255,.22),0 34px 90px rgba(0,0,0,.72);border:1px solid rgba(91,233,255,.18);background:#000;position:relative}
 .landing-video-wrap::after{content:'';position:absolute;inset:auto 8% -34px;height:80px;background:rgba(91,233,255,.22);filter:blur(32px);border-radius:50%;pointer-events:none}
+.landing-hero-actions{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:36px}
+.landing-hero-actions .btn-p,.landing-hero-actions .btn-s{padding:14px 24px;font-size:13px;letter-spacing:.12em}
 
 /* ── Athlete Portal ──────────────────────────────────────────────── */
 .athlete-portal{display:none;min-height:100vh;background:var(--bg);flex-direction:column}
@@ -105,13 +108,33 @@ body{font-family:var(--font);background:
 .aph-actions{display:flex;align-items:center;gap:10px}
 .ap-body{max-width:820px;margin:0 auto;padding:24px 18px 60px;width:100%;display:flex;flex-direction:column;gap:20px}
 .ap-score-hero{background:linear-gradient(145deg,#0a1a28,#061420);border:1px solid rgba(127,160,184,.18);border-radius:20px;padding:28px 24px;display:flex;align-items:center;gap:24px}
-.ap-score-ring{position:relative;width:110px;height:110px;flex-shrink:0}
-.ap-score-ring svg{width:110px;height:110px;transform:rotate(-90deg)}
-.ap-score-ring-bg{fill:none;stroke:rgba(127,160,184,.14);stroke-width:8}
-.ap-score-ring-fill{fill:none;stroke-width:8;stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.4,0,.2,1)}
-.ap-score-num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
-.ap-score-val{font-family:var(--font);font-size:32px;font-weight:800;color:#fff}
-.ap-score-max{font-size:11px;color:var(--mt);margin-top:1px}
+.ape-score-gauge{--gauge-size:240px;--gauge-color:#5BE9FF;position:relative;width:var(--gauge-size);height:var(--gauge-size);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ape-score-gauge .ape-gauge-halo{position:absolute;inset:6%;border-radius:50%;background:var(--gauge-color);opacity:.2;filter:blur(28px);pointer-events:none}
+.ape-score-gauge .ape-gauge-svg{position:relative;width:100%;height:100%;transform:rotate(-225deg);overflow:visible;z-index:1}
+.ape-score-gauge .ape-gauge-track{fill:none;stroke:rgba(255,255,255,.055);stroke-width:16;stroke-linecap:round}
+.ape-score-gauge .ape-gauge-fill{fill:none;stroke:var(--gauge-color);stroke-width:16;stroke-linecap:round;filter:drop-shadow(0 0 8px var(--gauge-color));transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)}
+.ape-score-gauge .ape-gauge-center{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;line-height:1}
+.ape-score-gauge .ape-gauge-label{font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:#8B92A8;margin-bottom:7px}
+.ape-score-gauge .ape-gauge-value{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--gauge-color);text-shadow:0 0 30px color-mix(in srgb,var(--gauge-color) 35%,transparent);letter-spacing:-.04em}
+.ape-score-gauge .ape-gauge-pill{margin-top:10px;padding:7px 14px;border-radius:999px;background:color-mix(in srgb,var(--gauge-color) 12%,transparent);border:1px solid color-mix(in srgb,var(--gauge-color) 28%,transparent);color:var(--gauge-color);font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+.ape-score-gauge .ape-gauge-tier{margin-top:9px;font-family:var(--mono);font-size:10px;color:#8B92A8;text-transform:uppercase;letter-spacing:.15em}
+.ape-score-gauge.gauge-lg{--gauge-size:240px}
+.ape-score-gauge.gauge-md{--gauge-size:158px}
+.ape-score-gauge.gauge-md .ape-gauge-track,.ape-score-gauge.gauge-md .ape-gauge-fill{stroke-width:14}
+.ape-score-gauge.gauge-md .ape-gauge-label{font-size:9px;margin-bottom:4px}
+.ape-score-gauge.gauge-md .ape-gauge-value{font-size:38px}
+.ape-score-gauge.gauge-md .ape-gauge-pill{font-size:9px;padding:5px 9px;margin-top:6px}
+.ape-score-gauge.gauge-md .ape-gauge-tier{font-size:8px;margin-top:6px}
+.ape-score-gauge.gauge-sm{--gauge-size:74px}
+.ape-score-gauge.gauge-sm .ape-gauge-track,.ape-score-gauge.gauge-sm .ape-gauge-fill{stroke-width:18}
+.ape-score-gauge.gauge-sm .ape-gauge-halo{filter:blur(14px);opacity:.18}
+.ape-score-gauge.gauge-sm .ape-gauge-label,.ape-score-gauge.gauge-sm .ape-gauge-pill,.ape-score-gauge.gauge-sm .ape-gauge-tier{display:none}
+.ape-score-gauge.gauge-sm .ape-gauge-value{font-size:22px;letter-spacing:0}
+.ape-score-gauge.gauge-report{--gauge-size:150px}
+.ape-score-gauge.gauge-report .ape-gauge-label{font-size:8px;margin-bottom:4px}
+.ape-score-gauge.gauge-report .ape-gauge-value{font-size:38px}
+.ape-score-gauge.gauge-report .ape-gauge-pill{font-size:9px;padding:5px 9px;margin-top:6px}
+.ape-score-gauge.gauge-report .ape-gauge-tier{display:none}
 .ap-score-info{flex:1;min-width:0}
 .ap-score-label{font-family:var(--font);font-size:26px;font-weight:700;color:#fff;letter-spacing:-.01em}
 .ap-score-pct{font-size:13px;color:var(--or);font-weight:600;margin-top:4px}
@@ -170,7 +193,7 @@ body{font-family:var(--font);background:
   .aph{flex-wrap:wrap}
 }
 .landing-video{width:100%;height:auto;display:block;object-fit:cover}
-.landing-proof{grid-column:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:8px auto 0;max-width:760px}
+.landing-proof{display:none}
 .proof-item{border:1px solid rgba(91,233,255,.12);background:linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.008));border-radius:16px;padding:16px;backdrop-filter:blur(12px);transition:transform .2s,border-color .2s,background .2s,box-shadow .2s;text-align:left;position:relative;overflow:hidden}
 .proof-item::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(91,233,255,.12),transparent 55%);opacity:0;transition:opacity .2s}
 .proof-item:hover{transform:translateY(-5px);border-color:rgba(91,233,255,.42);background:rgba(255,255,255,.05);box-shadow:0 18px 42px rgba(0,0,0,.34)}
@@ -178,7 +201,7 @@ body{font-family:var(--font);background:
 .proof-num{position:relative;font-family:var(--font);font-size:24px;font-weight:900;color:#fff;line-height:1}
 .proof-lbl{position:relative;font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--sb);margin-top:6px}
 .login-card{
-  grid-column:2;grid-row:1 / span 2;align-self:center;
+  order:3;align-self:center;scroll-margin-top:92px;margin-top:62px;
   width:100%;max-width:430px;text-align:left;
   background:linear-gradient(180deg,rgba(26,35,44,.76),rgba(11,16,23,.88));
   border:1px solid rgba(127,160,184,.26);border-radius:18px;padding:26px;
@@ -202,7 +225,7 @@ body{font-family:var(--font);background:
 .landing-link:hover{color:var(--or)}
 .landing-demo{width:100%;margin-top:12px}
 .role-note{font-size:11px;color:var(--mt);line-height:1.55;margin-top:16px;padding-top:14px;border-top:1px solid rgba(127,160,184,.14)}
-.feature-preview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:40px}
+.feature-preview{order:4;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:40px}
 .feature-card{
   min-height:128px;border:1px solid rgba(255,255,255,.1);border-radius:18px;
   background:linear-gradient(135deg,rgba(255,255,255,.055),rgba(255,255,255,.006));padding:18px;
@@ -619,7 +642,7 @@ select option{background:var(--dk3)}
 .viewer-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:12px}
 .viewer-name{font-family:var(--font);font-size:22px;font-weight:800;text-transform:uppercase;color:#fff;letter-spacing:.03em}
 .viewer-meta{font-size:12px;color:var(--mt);margin-top:3px;line-height:1.45}
-.viewer-score{min-width:86px;text-align:center;border:1px solid rgba(91,233,255,.22);border-radius:10px;padding:10px 12px;background:rgba(91,233,255,.08)}
+.viewer-score{min-width:86px;display:flex;align-items:center;justify-content:center;border:1px solid rgba(91,233,255,.22);border-radius:12px;padding:9px;background:rgba(91,233,255,.06)}
 .viewer-score-num{font-family:var(--font);font-size:32px;font-weight:800;line-height:1;color:var(--or)}
 .viewer-score-lbl{font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--sb);margin-top:4px}
 .viewer-focus{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:10px}
@@ -648,7 +671,7 @@ select option{background:var(--dk3)}
 .landing-role-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:14px 0 12px;padding:4px;border:1px solid var(--bd);border-radius:10px;background:rgba(255,255,255,.025)}
 .landing-role-tab{border:none;border-radius:7px;background:transparent;color:var(--mt);font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:9px 6px;cursor:pointer;transition:all .18s}
 .landing-role-tab.act{background:rgba(91,233,255,.12);color:var(--or);box-shadow:inset 0 0 0 1px rgba(91,233,255,.28)}
-@media(max-width:760px){.viewer-grid{grid-template-columns:1fr}.viewer-title{font-size:23px}.viewer-card-head{flex-direction:column}.viewer-score{width:100%;text-align:left}.landing-role-tabs{grid-template-columns:1fr}.analytics-viz-grid{grid-template-columns:1fr}.analytics-viz-chart{height:214px}}
+@media(max-width:760px){.viewer-grid{grid-template-columns:1fr}.viewer-title{font-size:23px}.viewer-card-head{flex-direction:column}.viewer-score{width:100%;justify-content:flex-start}.landing-role-tabs{grid-template-columns:1fr}.analytics-viz-grid{grid-template-columns:1fr}.analytics-viz-chart{height:214px}}
 .prog-6wk-row{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--bd)}
 .prog-6wk-row:last-child{border-bottom:none}
 .prog-6wk-lbl{flex:0 0 64px;font-family:var(--font);font-size:13px;font-weight:700;color:var(--or);padding-top:1px}
@@ -757,15 +780,17 @@ select option{background:var(--dk3)}
   .landing-nav{padding:12px 14px;align-items:center}
   .landing-nav-links{display:none}
   .landing-nav-note{display:inline-flex;font-size:10px;padding:7px 10px}
-  .landing-logo img{height:52px}
-  .landing-brand-title{font-size:18px}
-  .landing-main{gap:28px;justify-content:flex-start;text-align:left;align-items:stretch}
+  .landing-logo img{height:44px}
+  .landing-brand-title{font-size:16px}
+  .landing-main{gap:0;justify-content:center;text-align:center;align-items:center;min-height:calc(100vh - 102px);padding-bottom:54px}
   .landing-title{font-size:42px;line-height:.98}
   .landing-text{font-size:15px;margin:16px 0 0}
+  .landing-hero-actions{margin-top:24px;gap:10px}
+  .landing-hero-actions .btn-p,.landing-hero-actions .btn-s{width:100%;justify-content:center}
   .landing-proof{grid-template-columns:1fr 1fr;gap:9px;margin:22px 0 0}
-  .landing-video-wrap{max-width:none}
+  .landing-video-wrap{max-width:320px;margin-bottom:26px}
   .proof-item{padding:11px 12px}
-  .login-card{padding:20px;border-radius:14px}
+  .login-card{padding:20px;border-radius:14px;margin-top:40px}
   .login-card-head{flex-direction:column;gap:10px;margin-bottom:17px}
   .feature-preview{grid-template-columns:1fr;gap:10px;margin-top:24px}
   .feature-card{min-height:0}
@@ -883,20 +908,26 @@ select option{background:var(--dk3)}
     <div class="landing-nav">
       <div class="landing-brand">
         <div class="landing-logo" aria-label="APE logo"><img src="assets/ape-logo-stacked.png" alt="APE — Athlete Performance Evaluator"></div>
+        <div class="landing-brand-title">APE <span>INTEL</span></div>
       </div>
       <div class="landing-nav-links" aria-label="Landing navigation">
-        <a href="#landing-metrics">Metrics</a>
+        <a href="#landing-features">Features</a>
+        <a href="#landing-metrics">Teams</a>
         <a href="#landing-features">Reports</a>
-        <a href="#landing-login">Login</a>
+        <a href="#landing-login">Pricing</a>
       </div>
-      <button class="landing-nav-note" onclick="document.getElementById('landing-login').scrollIntoView({behavior:'smooth',block:'center'})">Coach Access</button>
+      <button class="landing-nav-note" onclick="document.getElementById('landing-login').scrollIntoView({behavior:'smooth',block:'center'})">Login</button>
     </div>
 
     <div class="landing-main">
       <div class="landing-copy">
         <div class="landing-kicker">APE Intelligence Platform</div>
         <h1 class="landing-title">Unlock Athletic <em>Potential</em></h1>
-        <p class="landing-text">Data-driven athletic performance evaluation for coaches, teams, combines, athletes, and parents. Test, interpret, report, and track progress from one premium sports-tech dashboard.</p>
+        <p class="landing-text">Data-driven athletic performance evaluation and development platform.</p>
+        <div class="landing-hero-actions">
+          <button class="btn-p" onclick="document.getElementById('landing-login').scrollIntoView({behavior:'smooth',block:'center'})">Start Evaluation &rarr;</button>
+          <button class="btn-s" onclick="startDemoCoach()">View Demo Report</button>
+        </div>
         <div class="landing-proof">
           <div class="proof-item"><div class="proof-num">01</div><div class="proof-lbl">Test</div></div>
           <div class="proof-item"><div class="proof-num">02</div><div class="proof-lbl">Score</div></div>
@@ -2323,6 +2354,48 @@ function el(id){return document.getElementById(id);}
 function gn(id){var v=parseFloat(el(id).value);return(isNaN(v)||v<=0)?null:v;}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function _normEmail(s){return String(s||'').trim().toLowerCase();}
+function getAPEGaugeColor(score){
+  score=Number(score);
+  if(isNaN(score))return'#5BE9FF';
+  if(score>=90)return'#00F5A0';
+  if(score>=80)return'#5BE9FF';
+  if(score>=70)return'#0A84FF';
+  if(score>=60)return'#F5881F';
+  return'#FF5470';
+}
+function getAPEGaugeLabel(score){
+  score=Number(score);
+  if(isNaN(score))return'Untested';
+  if(score>=90)return'Elite';
+  if(score>=80)return'Advanced';
+  if(score>=70)return'Proficient';
+  if(score>=60)return'Developing';
+  return'Baseline';
+}
+function renderAPEScoreGauge(score,opt){
+  opt=opt||{};
+  var hasScore=score!==null&&score!==undefined&&!isNaN(Number(score));
+  var n=hasScore?Math.max(0,Math.min(100,Math.round(Number(score)))):0;
+  var color=opt.color||getAPEGaugeColor(n);
+  var cls='ape-score-gauge '+(opt.className||'gauge-md');
+  var radius=112,circ=2*Math.PI*radius,arc=circ*.75,dash=arc-(arc*(n/100));
+  var label=opt.label===false?'':(opt.label||'APE Score');
+  var pill=opt.pill===false?'':(opt.pill||getAPEGaugeLabel(n));
+  var tier=opt.tier||'';
+  return '<div class="'+cls+'" style="--gauge-color:'+color+'" aria-label="APE Score '+(hasScore?n:'not tested')+' out of 100">'
+    +'<div class="ape-gauge-halo"></div>'
+    +'<svg class="ape-gauge-svg" viewBox="0 0 240 240" aria-hidden="true">'
+    +'<circle class="ape-gauge-track" cx="120" cy="120" r="'+radius+'" stroke-dasharray="'+arc+' '+circ+'"/>'
+    +'<circle class="ape-gauge-fill" cx="120" cy="120" r="'+radius+'" stroke-dasharray="'+arc+' '+circ+'" stroke-dashoffset="'+dash+'"/>'
+    +'</svg>'
+    +'<div class="ape-gauge-center">'
+    +(label?'<div class="ape-gauge-label">'+esc(label)+'</div>':'')
+    +'<div class="ape-gauge-value">'+(hasScore?n:'-')+'</div>'
+    +(pill?'<div class="ape-gauge-pill">'+esc(pill)+'</div>':'')
+    +(tier?'<div class="ape-gauge-tier">'+esc(tier)+'</div>':'')
+    +'</div>'
+    +'</div>';
+}
 function iconSvg(name){
   var icons={
     trophy:'<svg class="icon-inline" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v4a5 5 0 0 1-10 0V4Z"/><path d="M17 5h3a2 2 0 0 1-2 4h-1"/><path d="M7 5H4a2 2 0 0 0 2 4h1"/></svg>',
@@ -2557,7 +2630,7 @@ function buildViewerDashboard(user){
     var team=a.team&&teamMap[a.team]?teamMap[a.team].name:'Unassigned';
     h+='<div class="viewer-card">'
       +'<div class="viewer-card-head"><div><div class="viewer-name">'+esc(a.name)+'</div><div class="viewer-meta">'+[team,a.sport,a.position,gradeDisplay(a.grade)].filter(Boolean).map(esc).join(' &middot; ')+'</div></div>'
-      +'<div class="viewer-score"><div class="viewer-score-num" style="'+(meta?'color:'+meta.color:'')+'">'+(ape!=null?ape:'--')+'</div><div class="viewer-score-lbl">APE Score</div></div></div>'
+      +'<div class="viewer-score">'+renderAPEScoreGauge(ape,{className:'gauge-sm',label:false,pill:false,color:ape!=null?getAPEGaugeColor(ape):'var(--or)'})+'</div></div>'
       +'<div class="viewer-focus"><div class="viewer-focus-box"><div class="viewer-label">Primary Focus</div><div class="viewer-value">'+esc(focus.primary)+'</div></div>'
       +'<div class="viewer-focus-box"><div class="viewer-label">Area of Improvement</div><div class="viewer-value">'+esc(focus.weakest)+'</div></div>'
       +'<div class="viewer-focus-box"><div class="viewer-label">Classification</div><div class="viewer-value">'+esc(focus.deficiency)+'</div></div></div>'
@@ -3074,45 +3147,12 @@ function build(vj,bj,rsi,s5,s10,gps,pa505){
   var apeMeta  = getAPELabel(apeScore, tier);
   var apeType  = getAthleteType(vp, hp, rs, ac, mv, gv);
 
-  // ── SVG ring gauge ────────────────────────────────────────────────────────
-  function _buildApeGauge(score, color) {
-    var cx=100,cy=104,r=78,sw=13;
-    var startDeg=135,totalDeg=270;
-    var startRad=startDeg*Math.PI/180;
-    var fillDeg=Math.min(score/100*totalDeg, 269.9);
-    var fillRad=fillDeg*Math.PI/180;
-    function pt(a){return{x:Math.round((cx+r*Math.cos(a))*10)/10,y:Math.round((cy+r*Math.sin(a))*10)/10};}
-    var s=pt(startRad);
-    var e=pt((startDeg+totalDeg)*Math.PI/180);
-    var f=pt(startRad+fillRad);
-    var lg=fillDeg>180?1:0;
-    var trackD='M '+s.x+' '+s.y+' A '+r+' '+r+' 0 1 1 '+e.x+' '+e.y;
-    var fillD=score<=0?'':('M '+s.x+' '+s.y+' A '+r+' '+r+' 0 '+lg+' 1 '+f.x+' '+f.y);
-    return '<svg viewBox="0 0 200 188" width="200" height="188" style="display:block;overflow:visible" aria-label="APE Score '+score+' out of 100">'
-      +'<defs>'
-      +'<filter id="ape-ring-glow" x="-60%" y="-60%" width="220%" height="220%">'
-      +'<feGaussianBlur stdDeviation="4" result="blur"/>'
-      +'<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>'
-      +'</filter>'
-      +'</defs>'
-      // Track ring (background)
-      +'<path d="'+trackD+'" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="'+sw+'" stroke-linecap="round"/>'
-      // Faint color outline on track
-      +'<path d="'+trackD+'" fill="none" stroke="'+color+'" stroke-width="1.5" stroke-linecap="round" opacity="0.14"/>'
-      // Score fill arc
-      +(fillD?'<path d="'+fillD+'" fill="none" stroke="'+color+'" stroke-width="'+sw+'" stroke-linecap="round" filter="url(#ape-ring-glow)"/>':'')
-      // Score number
-      +'<text x="100" y="100" text-anchor="middle" dominant-baseline="middle" font-family="Inter,sans-serif" font-size="54" font-weight="700" fill="'+color+'">'+score+'</text>'
-      // /100 label
-      +'<text x="100" y="125" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="rgba(255,255,255,0.28)" letter-spacing="2">/100</text>'
-      +'</svg>';
-  }
-
-  var apeGaugeHTML = apeScore !== null ? _buildApeGauge(apeScore, apeMeta.color) : '';
+  var apeGaugeColor = apeScore !== null ? getAPEGaugeColor(apeScore) : 'var(--or)';
+  var apeGaugeHTML = apeScore !== null ? renderAPEScoreGauge(apeScore,{className:'gauge-lg',tier:tl,color:apeGaugeColor,pill:apeMeta.label}) : '';
 
   var apeCard = apeScore !== null
-    ? '<div class="card" style="padding:26px 22px 20px;border-top:3px solid '+apeMeta.color+';text-align:center;box-shadow:0 0 0 1px '+apeMeta.color+'1A,0 8px 48px '+apeMeta.color+'14">'
-      + '<div style="font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:'+apeMeta.color+';margin-bottom:18px;opacity:.8">APE Intelligence Score</div>'
+    ? '<div class="card" style="padding:26px 22px 20px;border-top:3px solid '+apeGaugeColor+';text-align:center;box-shadow:0 0 0 1px '+apeGaugeColor+'1A,0 8px 48px '+apeGaugeColor+'14">'
+      + '<div style="font-size:9px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:'+apeGaugeColor+';margin-bottom:18px;opacity:.8">APE Intelligence Score</div>'
       + '<div style="display:flex;flex-direction:column;align-items:center">'
       + apeGaugeHTML
       + '<div style="font-family:Inter,sans-serif;font-size:26px;font-weight:700;color:#fff;letter-spacing:.03em;margin-top:10px;line-height:1">'+apeMeta.label+'</div>'
@@ -4350,10 +4390,9 @@ function buildReport(S){
     +(S.age?' &nbsp;·&nbsp; Age '+S.age:'')
     +(S.grade?' &nbsp;·&nbsp; '+esc(gradeDisplay(S.grade)):'')
     +'</div></div>'
-    +(apeMeta?'<div style="text-align:right;flex-shrink:0">'
-      +'<div style="font-family:Inter,sans-serif;font-size:58px;font-weight:700;color:'+apeMeta.color+';line-height:1">'+Math.round(apeScore)+'</div>'
-      +'<div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+apeMeta.color+';margin-top:2px">APE SCORE</div>'
-      +'<div style="font-size:12px;color:#888;margin-top:2px">'+apeMeta.label+' &nbsp;·&nbsp; '+apeMeta.pct+'</div>'
+    +(apeMeta?'<div style="flex-shrink:0;background:#06070B;border:1px solid rgba(91,233,255,.22);border-radius:16px;padding:10px;box-shadow:0 18px 48px rgba(0,0,0,.22)">'
+      +renderAPEScoreGauge(apeScore,{className:'gauge-report',tier:tl,color:getAPEGaugeColor(apeScore),pill:apeMeta.label})
+      +'<div style="font-size:12px;color:#888;margin-top:2px;text-align:center">'+apeMeta.label+' &nbsp;·&nbsp; '+apeMeta.pct+'</div>'
       +'</div>':'')
     +'</div>';
 
@@ -4764,7 +4803,7 @@ function buildDash(){
       +'<div class="stat-card"><div class="stat-top"><div class="stat-num">'+totalAth+'</div><div class="stat-ico">&#9679;</div></div><div class="stat-lbl">Athletes</div><div class="stat-sub">Active roster</div></div>'
       +'<div class="stat-card"><div class="stat-top"><div class="stat-num">'+totalTeams+'</div><div class="stat-ico">&#9670;</div></div><div class="stat-lbl">Teams</div><div class="stat-sub">Training groups</div></div>'
       +'<div class="stat-card"><div class="stat-top"><div class="stat-num">'+testsMonth+'</div><div class="stat-ico">&#8599;</div></div><div class="stat-lbl">Tests This Month</div><div class="stat-sub">Recent activity</div></div>'
-      +'<div class="stat-card"><div class="stat-top"><div class="stat-num" style="'+(topApeMeta?'color:'+topApeMeta.color+';':'')+'">'+(topAPE!=null?topAPE:'&#8212;')+'</div><div class="stat-ico">&#9650;</div></div><div class="stat-lbl">Top APE</div>'+(topName?'<div class="stat-sub">'+esc(topName)+'</div>':'<div class="stat-sub">No scored tests</div>')+'</div>'
+      +'<div class="stat-card"><div class="stat-top">'+(topAPE!=null?renderAPEScoreGauge(topAPE,{className:'gauge-sm',label:false,pill:false,color:getAPEGaugeColor(topAPE)}):'<div class="stat-num">&#8212;</div>')+'<div class="stat-ico">&#9650;</div></div><div class="stat-lbl">Top APE</div>'+(topName?'<div class="stat-sub">'+esc(topName)+'</div>':'<div class="stat-sub">No scored tests</div>')+'</div>'
       +'</div>';
   }
 
@@ -4852,10 +4891,9 @@ function buildDash(){
       +'<span class="ath-tier-chip" style="background:'+tm2.c+'22;color:'+tm2.c+';border:1px solid '+tm2.c+'55">'+tm2.label+'</span>'
       +(apeMeta
         ?'<div class="ath-ape-block">'
-          +'<div class="ath-ape-num" style="color:'+apeMeta.color+'">'+ape+'</div>'
-          +'<div class="ath-ape-lbl" style="color:'+apeMeta.color+'">APE</div>'
+          +renderAPEScoreGauge(ape,{className:'gauge-sm',label:false,pill:false,color:getAPEGaugeColor(ape)})
           +(trendArrow?'<div style="font-size:10px;font-weight:700;color:'+trendColor+';margin-top:2px;white-space:nowrap">'+trendArrow+'</div>':'')
-          +(apeMeta.pct?'<div style="font-size:9px;font-weight:700;color:'+apeMeta.color+';opacity:.7;letter-spacing:.04em;margin-top:1px;white-space:nowrap">'+apeMeta.pct+'</div>':'')
+          +(apeMeta.pct?'<div style="font-size:9px;font-weight:700;color:'+getAPEGaugeColor(ape)+';opacity:.8;letter-spacing:.04em;margin-top:1px;white-space:nowrap">'+apeMeta.pct+'</div>':'')
           +'</div>'
         :'')
       +'</div>'
@@ -6036,9 +6074,6 @@ function buildAthletePortal(d){
 
   // ── APE Score hero ─────────────────────────────────────────────────────────
   var scoreColor=apeScore!=null?apeMeta.color:'var(--mt)';
-  var scoreNum=apeScore!=null?Math.round(apeScore):'-';
-  var circumference=Math.round(2*Math.PI*46);
-  var dash=apeScore!=null?Math.round(circumference*(apeScore/100)):0;
   var delta=null;
   if(apeScore!=null&&prev&&prev.ape!=null)delta=Math.round((apeScore-prev.ape)*10)/10;
   var trendHtml='';
@@ -6049,13 +6084,7 @@ function buildAthletePortal(d){
   }
 
   html+='<div class="ap-score-hero">'
-    +'<div class="ap-score-ring">'
-    +'<svg viewBox="0 0 100 100">'
-    +'<circle class="ap-score-ring-bg" cx="50" cy="50" r="46"/>'
-    +'<circle class="ap-score-ring-fill" cx="50" cy="50" r="46" stroke="'+scoreColor+'" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+(circumference-dash)+'"/>'
-    +'</svg>'
-    +'<div class="ap-score-num"><div class="ap-score-val">'+scoreNum+'</div><div class="ap-score-max">/100</div></div>'
-    +'</div>'
+    +renderAPEScoreGauge(apeScore,{className:'gauge-md',tier:TIERS[d.tier]||d.tier||'',color:apeScore!=null?getAPEGaugeColor(apeScore):'var(--or)',pill:apeMeta.label})
     +'<div class="ap-score-info">'
     +'<div class="ap-score-label" style="color:'+scoreColor+'">'+apeMeta.label+'</div>'
     +(apeMeta.pct?'<div class="ap-score-pct">'+apeMeta.pct+'</div>':'')
