@@ -1,5 +1,5 @@
-// APE Service Worker - v10
-const CACHE_NAME = 'ape-v10-landing-positioning';
+// APE Service Worker - v11
+const CACHE_NAME = 'ape-v11-programming-kpis';
 const PRECACHE = [
   './',
   './index.html',

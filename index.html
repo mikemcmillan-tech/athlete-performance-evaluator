@@ -729,6 +729,47 @@ select option{background:var(--dk3)}
 .ape-btn-danger{background:transparent;border:1px solid #ff4444;color:#ff4444;border-radius:8px;font-weight:800;padding:10px 14px;cursor:pointer;font-family:var(--font)}
 .ape-btn-danger:hover{background:rgba(255,68,68,.1)}
 .program-week{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.program-profile-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;background:#0a1628;border:1px solid rgba(0,229,255,.15);border-radius:12px;padding:16px;margin-bottom:12px}
+.program-athlete-title{font-family:var(--font);font-size:24px;font-weight:900;color:#fff;text-transform:uppercase;line-height:1}
+.program-athlete-sub{font-size:12px;color:var(--sb);margin-top:5px}
+.bucket-badge{display:inline-flex;flex-direction:column;gap:2px;border:1px solid currentColor;border-radius:12px;background:rgba(255,255,255,.035);padding:8px 11px;min-width:150px}
+.bucket-badge-name{font-family:var(--font);font-size:13px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.bucket-badge-sub{font-size:10px;line-height:1.25;color:rgba(255,255,255,.62)}
+.readiness-pill{display:inline-flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.12);border-radius:999px;background:rgba(255,255,255,.035);padding:7px 10px;font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:var(--sb)}
+.readiness-dot{display:inline-block;width:9px;height:9px;border-radius:999px;background:var(--mt);box-shadow:0 0 0 3px rgba(255,255,255,.04)}
+.readiness-dot.green{background:#22c55e;box-shadow:0 0 13px rgba(34,197,94,.65)}
+.readiness-dot.yellow{background:#eab308;box-shadow:0 0 13px rgba(234,179,8,.6)}
+.readiness-dot.red{background:#ef4444;box-shadow:0 0 13px rgba(239,68,68,.6)}
+.program-fv-card{background:#0a1628;border:1px solid rgba(0,229,255,.15);border-radius:12px;padding:14px;margin-bottom:12px}
+.program-fv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-top:10px}
+.program-fv-metric{background:#081320;border:1px solid rgba(0,229,255,.12);border-radius:10px;padding:10px}
+.program-fv-label{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--mt);margin-bottom:4px}
+.program-fv-value{font-family:var(--mono);font-size:18px;font-weight:900;color:#fff}
+.phase-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;border-radius:12px;padding:13px 14px;margin-bottom:12px}
+.phase-banner.eccentric{background:rgba(139,92,246,.15);border:1px solid #8b5cf6;color:#8b5cf6}
+.phase-banner.isometric{background:rgba(0,229,255,.1);border:1px solid #00e5ff;color:#00e5ff}
+.phase-banner.concentric{background:rgba(249,115,22,.15);border:1px solid #f97316;color:#f97316}
+.phase-banner.taper{background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.75);color:#f97316}
+.phase-banner-title{font-family:var(--font);font-size:13px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.phase-banner-copy{font-size:12px;color:rgba(255,255,255,.78);margin-top:3px}
+.week-selector{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.week-tab{background:#081320;border:1px solid rgba(0,229,255,.12);border-radius:10px;color:var(--sb);padding:9px 8px;cursor:pointer;text-align:left;transition:all .16s}
+.week-tab:hover,.week-tab.act{border-color:#00e5ff;color:#fff;background:rgba(0,229,255,.08)}
+.week-label{display:flex;align-items:center;justify-content:space-between;gap:6px;font-family:var(--font);font-size:12px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
+.week-volume{height:5px;background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden;margin:8px 0 5px}
+.week-volume-fill{height:100%;border-radius:999px;background:#475569}
+.week-volume-fill.cyan{background:#00e5ff}
+.week-volume-fill.peak{background:#00e5ff;box-shadow:0 0 16px rgba(0,229,255,.8)}
+.week-volume-fill.taper{background:#f97316}
+.week-meta{font-size:10px;color:var(--mt);line-height:1.25}
+.program-day-focus{font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:var(--mt);margin-bottom:8px}
+.program-day-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.kpi-row{background:#0a1628;border:1px solid rgba(0,229,255,.15);border-radius:12px;padding:14px;margin-top:14px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:9px;align-items:end}
+.kpi-grid label{display:block;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--mt);margin-bottom:5px}
+.kpi-grid input{width:100%;background:#081320;border:1px solid rgba(0,229,255,.2);color:#fff;border-radius:8px;padding:9px 10px;font-family:var(--font);outline:none}
+.kpi-grid input:focus{border-color:#00e5ff}
+.kpi-advice{font-size:12px;color:var(--sb);line-height:1.5;margin-top:10px}
 .program-day{background:var(--dk2);border:1px solid rgba(91,233,255,.12);border-radius:14px;padding:13px;min-height:170px;box-shadow:0 12px 28px rgba(0,0,0,.24)}
 .program-day-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
 .program-day-name{font-family:var(--font);font-size:14px;font-weight:900;text-transform:uppercase;color:#fff;letter-spacing:.06em}
@@ -742,6 +783,19 @@ select option{background:var(--dk3)}
 .program-editor-overlay{display:none;position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:18px}
 .program-editor-overlay.open{display:flex}
 .program-editor{width:min(920px,100%);max-height:90vh;overflow:auto;background:#0d1821;border:1px solid rgba(0,229,255,.2);border-radius:14px;box-shadow:0 24px 80px rgba(0,0,0,.55);padding:20px}
+.drill-picker-overlay{display:none;position:fixed;inset:0;z-index:1300;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:18px}
+.drill-picker-overlay.open{display:flex}
+.drill-picker{width:min(820px,100%);max-height:90vh;overflow:auto;background:#0d1821;border:1px solid rgba(0,229,255,.2);border-radius:16px;box-shadow:0 24px 90px rgba(0,0,0,.62)}
+.drill-picker-body{padding:16px}
+.drill-tabs{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}
+.drill-tab{background:#081320;border:1px solid rgba(0,229,255,.16);border-radius:999px;color:rgba(255,255,255,.68);font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:7px 10px;cursor:pointer}
+.drill-tab.act{border-color:#00e5ff;color:#00e5ff;background:rgba(0,229,255,.1)}
+.drill-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;max-height:340px;overflow:auto;padding-right:4px}
+.drill-item{background:#081320;border:1px solid rgba(255,255,255,.08);border-radius:10px;text-align:left;color:#fff;padding:11px;cursor:pointer}
+.drill-item:hover{border-color:#00e5ff;background:rgba(0,229,255,.08)}
+.drill-item.rec{border-color:#00e5ff;box-shadow:0 0 18px rgba(0,229,255,.12)}
+.drill-item-title{font-size:13px;font-weight:900;color:#fff}
+.drill-item-meta{font-size:11px;color:var(--mt);margin-top:4px}
 .program-edit-row{display:grid;grid-template-columns:1.25fr .55fr .55fr .7fr .75fr .75fr auto;gap:7px;align-items:end;border:1px solid var(--bd2);background:var(--dk3);border-radius:10px;padding:10px;margin-bottom:8px}
 .program-edit-row input,.program-edit-row textarea{width:100%;background:var(--dk4);border:1px solid var(--bd);border-radius:7px;color:var(--tx);font-family:var(--font);font-size:12px;padding:8px}
 .program-edit-row textarea{min-height:38px;resize:vertical}
@@ -754,7 +808,7 @@ select option{background:var(--dk3)}
 .group-card{position:relative;background:var(--dk2);border:1px solid rgba(91,233,255,.12);border-radius:14px;padding:15px;margin-bottom:12px}
 .group-roster{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 @media(max-width:760px){.program-edit-row{grid-template-columns:1fr 1fr}.program-edit-row .wide{grid-column:1/-1}.bulk-program-bar{align-items:stretch}.bulk-program-bar .btn-save-prog,.bulk-program-bar .btn-p,.bulk-program-bar .btn-s{flex:1}}
-@media(max-width:760px){.phase-dropdown-menu{position:fixed;left:12px;right:12px;top:auto;bottom:80px;min-width:0}.phase-card-grid{grid-template-columns:1fr}.ape-dialog-actions{justify-content:stretch}.ape-dialog-actions button{flex:1}}
+@media(max-width:760px){.phase-dropdown-menu{position:fixed;left:12px;right:12px;top:auto;bottom:80px;min-width:0}.phase-card-grid{grid-template-columns:1fr}.ape-dialog-actions{justify-content:stretch}.ape-dialog-actions button{flex:1}.week-selector{grid-template-columns:repeat(2,minmax(0,1fr))}.program-day-actions{grid-template-columns:1fr}}
 .progression-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
 .progression-card{position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(15,18,26,.95),rgba(22,26,36,.88));border:1px solid rgba(91,233,255,.12);border-radius:var(--radius-lg);padding:16px;min-width:0;box-shadow:0 0 0 1px rgba(91,233,255,.05) inset,0 18px 44px rgba(0,0,0,.34)}
 .progression-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
@@ -1630,6 +1684,28 @@ select option{background:var(--dk3)}
   </div>
 </div>
 
+<div class="drill-picker-overlay" id="drill-picker-overlay" onclick="if(event.target===this)closeDrillPicker()">
+  <div class="drill-picker">
+    <div class="ape-dialog-head">
+      <div>
+        <div class="ape-dialog-title">Drill Picker</div>
+        <div class="pg-sub">Add a recommended or custom drill to this training day.</div>
+      </div>
+      <button class="ape-dialog-close" onclick="closeDrillPicker()">&times;</button>
+    </div>
+    <div class="drill-picker-body">
+      <div class="field"><label>Search Drills</label><input id="drill-search" placeholder="Search drill library..." oninput="renderDrillPickerList()"></div>
+      <div class="drill-tabs" id="drill-tabs"></div>
+      <div class="drill-list" id="drill-list"></div>
+      <div class="field" style="margin-top:14px"><label>Custom Drill Name</label><input id="drill-custom" placeholder="Type a custom drill name"></div>
+      <div class="ape-dialog-actions" style="padding:0;margin-top:12px">
+        <button class="ape-btn-secondary" onclick="closeDrillPicker()">Done</button>
+        <button class="ape-btn-primary" onclick="addCustomDrillFromPicker()">Add Custom Drill</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── STORAGE ──────────────────────────────────────────────────────────────────
 // DB is a self-contained module with a clean API surface.
@@ -1778,6 +1854,7 @@ var DB = (function(){
     getProgram: function(id){var d=r();return(d.p||{})[id]||null;},
     saveProgram: function(program){
       var d=r();if(!d.p)d.p={};
+      program=normalizeProgramModel(program||{});
       var now=Date.now(),id=program.id||uid('p');
       var p={
         id:id,
@@ -2980,11 +3057,11 @@ function buildComparisonMode(prev,curr){return buildComp(prev,curr);}
 function buildLeaderboardData(){return DB.getAll().filter(function(a){return a.last;});}
 function exportAthleteData(aid){return exportAthleteXLSX(aid);}
 function exportCombineResults(){return exportEventResults();}
-var TIMING_METHODS=['Hand Timed','Timing Gates / Laser','Force Plate','Laser OVR','Vertec','Tape Measure','Laser Measure'];
+var TIMING_METHODS=['Hand Timed','Timing Gates / Laser','Force Plate','Laser OVR','Vertec','Tape Measure','Laser Measure','Laser','Brower','Freelap','Hawkin'];
 function normalizeTimingMethod(method){
   method=(method||'Hand Timed').trim();
   if(method==='Hand Time')method='Hand Timed';
-  if(method.indexOf('Timing Gates')>-1||method==='Laser')method='Timing Gates / Laser';
+  if(method.indexOf('Timing Gates')>-1)method='Timing Gates / Laser';
   return TIMING_METHODS.indexOf(method)>-1?method:'Hand Timed';
 }
 function primaryVerificationMethod(verification){
@@ -3000,8 +3077,9 @@ function primaryVerificationMethod(verification){
 function renderVerificationBadge(method){
   method=normalizeTimingMethod(method);
   if(method==='Hand Timed')return '<span class="verify-hand">Hand Timed</span>';
-  var cls=(method==='Timing Gates / Laser'||method==='Force Plate')?'blue':'navy';
-  return '<span class="verify-badge '+cls+'">'+esc(method)+'</span>';
+  var cls=(method==='Timing Gates / Laser'||method==='Force Plate'||method==='Laser')?'blue':'navy';
+  var label=method==='Laser'?'Laser Verified':method;
+  return '<span class="verify-badge '+cls+'">'+esc(label)+'</span>';
 }
 function getVerificationFields(prefix){
   prefix=prefix||'inp';
@@ -3139,12 +3217,16 @@ function latestProgramSource(a){
   if(source.bkt===undefined)source.bkt=2;
   return source;
 }
+var _programWeekByAthlete={};
 function ensureAthleteProgram(aid){
   var a=DB.get(aid);if(!a)return null;
   var ps=DB.getPrograms({athleteId:aid}),p=ps.length?ps[0]:null;
   if(!p){
     p=buildDefaultProgramModel(latestProgramSource(a),7,a.seasonPhase||'offSeason',null);
     p.athleteId=aid;
+    p=DB.saveProgram(p);
+  }else{
+    p=normalizeProgramModel(p);
     p=DB.saveProgram(p);
   }
   return p;
@@ -3182,25 +3264,104 @@ function closeAthletePhaseDropdowns(){
 }
 function selectAthletePhase(aid,phase){
   closeAthletePhaseDropdowns();
-  changeAthleteProgramPhase(aid,phase);
+  confirmAthleteProgramPhaseChange(aid,phase);
 }
 document.addEventListener('click',function(e){if(!e.target.closest||!e.target.closest('.phase-dropdown'))closeAthletePhaseDropdowns();});
-function currentProgramWeek(p){
-  return p&&p.weeks&&p.weeks.length?p.weeks[0]:{weekNumber:1,days:[]};
+function currentProgramWeek(p,aid){
+  var weeks=p&&p.weeks?p.weeks:[];
+  if(!weeks.length)return{weekNumber:1,days:[],kpis:emptyProgramKpis()};
+  var selected=aid&&_programWeekByAthlete[aid]?_programWeekByAthlete[aid]:1;
+  var wk=weeks.filter(function(w){return Number(w.weekNumber)===Number(selected);})[0]||weeks[0];
+  return normalizeProgramWeek(wk,p.seasonPhase);
 }
+function setProgramWeek(aid,weekNumber){
+  _programWeekByAthlete[aid]=parseInt(weekNumber,10)||1;
+  switchHistoryTab('program',aid);
+}
+function renderBucketBadge(bucket){
+  var b=bucketBrandByKey(bucket),color=b.color||'#00e5ff';
+  return'<div class="bucket-badge" style="color:'+color+'"><div class="bucket-badge-name">'+esc(b.name)+'</div><div class="bucket-badge-sub">'+esc(b.subtitle)+'</div></div>';
+}
+function programReadinessPill(wk){
+  var f=readinessFlag(wk&&wk.kpis?wk.kpis.readiness:null);
+  return'<span class="readiness-pill"><span class="readiness-dot '+(f?f.flag:'')+'"></span>Readiness: '+(f?f.label:'Not entered')+'</span>';
+}
+function renderProgramProfileHead(a,p,bucket,wk){
+  return'<div class="program-profile-head">'
+    +'<div><div class="program-athlete-title">'+esc(a.name||'Athlete')+'</div><div class="program-athlete-sub">'+[a.sport,a.position].filter(Boolean).map(esc).join(' / ')+'</div></div>'
+    +renderBucketBadge(bucket)
+    +'<div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">'+renderAthletePhaseDropdown(a.id,p.seasonPhase||a.seasonPhase)+'<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">'+programReadinessPill(wk)+'<span class="readiness-pill">Current Week: W'+wk.weekNumber+'</span></div></div>'
+    +'</div>';
+}
+function scoreDotHtml(score){
+  var n=Number(score),cls=isNaN(n)?'':n>=75?'green':n>=55?'yellow':'red';
+  return'<span class="readiness-dot '+cls+'" style="vertical-align:middle;margin-left:5px"></span>';
+}
+function renderForceVelocityProfileCard(a,p,bucket){
+  var s=getLatestSession(a)||{},raw=s.raw||{},sc=s.sc||{};
+  var suggested=resolveProgramBucketFromSession(s),suggestedBrand=bucketBrandByKey(suggested);
+  var cmj=raw.vj!=null?raw.vj+'in':'--',rsi=raw.rsi!=null?Number(raw.rsi).toFixed(2):'--',fly10=raw.f10!=null?Number(raw.f10).toFixed(2)+'s':'--';
+  return'<div class="program-fv-card">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><div class="viewer-label">Force-Velocity Profile Card</div><div class="pg-sub">Built from the latest evaluation. Programming remains coach-editable.</div></div><div style="display:flex;gap:7px;flex-wrap:wrap"><button class="btn-save-prog" style="padding:7px 10px;font-size:11px" onclick="assignAthleteBucketProgram(\''+a.id+'\','+suggested+')">Accept</button><button class="btn-s" style="padding:7px 10px;font-size:11px" onclick="apeAlert(\'Use the bucket dropdown to override this athlete program primary block.\',\'Override Bucket\')">Override</button></div></div>'
+    +'<div class="program-fv-grid">'
+    +'<div class="program-fv-metric"><div class="program-fv-label">CMJ</div><div class="program-fv-value">'+esc(cmj)+' '+scoreDotHtml(sessionMetricScore100(s,a,'vj'))+'</div></div>'
+    +'<div class="program-fv-metric"><div class="program-fv-label">RSI</div><div class="program-fv-value">'+esc(rsi)+' '+scoreDotHtml(_score5To100(sc.rs))+'</div></div>'
+    +'<div class="program-fv-metric"><div class="program-fv-label">Fly10</div><div class="program-fv-value">'+esc(fly10)+' '+scoreDotHtml(sessionMetricScore100(s,a,'f10'))+'</div></div>'
+    +'<div class="program-fv-metric"><div class="program-fv-label">Suggested Bucket</div><div class="program-fv-value" style="color:'+suggestedBrand.color+'">'+esc(suggestedBrand.name)+'</div></div>'
+    +'</div></div>';
+}
+function renderPhaseBanner(wk){
+  wk=normalizeProgramWeek(wk,'offSeason');
+  return'<div class="phase-banner '+esc(wk.phaseKey)+'"><div><div class="phase-banner-title">'+esc(wk.phaseLabel)+' - "'+esc(wk.phaseCue)+'"</div><div class="phase-banner-copy">W'+wk.weekNumber+': '+esc(wk.title)+' | '+wk.volumeTarget+'% Volume</div></div></div>';
+}
+function renderWeekSelector(aid,p){
+  var current=currentProgramWeek(p,aid),weeks=p.weeks||[];
+  return'<div class="week-selector">'+weeks.map(function(w){
+    w=normalizeProgramWeek(w,p.seasonPhase);
+    var active=w.weekNumber===current.weekNumber,flag=readinessFlag(w.kpis&&w.kpis.readiness),barCls=volumeFillClass(w.volumeTarget),fill=Math.max(10,Math.min(100,Math.round(w.volumeTarget/120*100)));
+    return'<button type="button" class="week-tab '+(active?'act':'')+'" onclick="setProgramWeek(\''+aid+'\','+w.weekNumber+')"><div class="week-label">W'+w.weekNumber+(flag?'<span class="readiness-dot '+flag.flag+'"></span>':'')+'</div><div class="week-volume"><div class="week-volume-fill '+barCls+'" style="width:'+fill+'%"></div></div><div class="week-meta">'+w.volumeTarget+'% &middot; '+esc(w.title||'')+'</div></button>';
+  }).join('')+'</div>';
+}
+function programDayFocus(dayName){
+  var d=String(dayName||'');
+  if(d==='Monday'||d==='Wednesday'||d==='Friday')return'Focus | Prep | Speed | Plyo | Weightroom';
+  if(d==='Tuesday'||d==='Thursday')return'Focus | Prep | Isometric | Recovery';
+  return'Focus | Recovery | Mobility';
+}
+function kpiInput(id,label,value,step){
+  return'<div><label>'+label+'</label><input id="'+id+'" type="number" step="'+(step||'0.01')+'" value="'+(value!=null?esc(value):'')+'"></div>';
+}
+function renderKpiRow(aid,p,wk){
+  var sid=programDomId(p.id+'-'+wk.weekNumber),k=Object.assign(emptyProgramKpis(),wk.kpis||{}),flag=readinessFlag(k.readiness);
+  return'<div class="kpi-row"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px"><div><div class="viewer-label">KPI Input Row</div><div class="pg-sub">Bottom-of-week tracking for speed, jumps, COD, readiness, and notes.</div></div>'+(flag?'<span class="readiness-pill"><span class="readiness-dot '+flag.flag+'"></span>'+esc(flag.label)+' - '+esc(flag.advice)+'</span>':'')+'</div>'
+    +'<div class="kpi-grid">'
+    +kpiInput('kpi-'+sid+'-fly10','Fly10',k.fly10,'0.01')
+    +kpiInput('kpi-'+sid+'-fly20','Fly20',k.fly20,'0.01')
+    +kpiInput('kpi-'+sid+'-cmj','CMJ',k.cmj,'0.1')
+    +kpiInput('kpi-'+sid+'-rsi','RSI',k.rsi,'0.01')
+    +kpiInput('kpi-'+sid+'-fiveTenFive','5-10-5',k.fiveTenFive,'0.01')
+    +kpiInput('kpi-'+sid+'-maxV','Max V',k.maxV,'0.1')
+    +kpiInput('kpi-'+sid+'-readiness','Readiness 0-10',k.readiness,'1')
+    +'<div><label>Coach Notes</label><input id="kpi-'+sid+'-coachNotes" value="'+esc(k.coachNotes||'')+'" placeholder="Optional notes"></div>'
+    +'<button class="ape-btn-primary" style="height:39px" onclick="saveProgramWeekKpis(\''+aid+'\',\''+p.id+'\','+wk.weekNumber+')">Save KPIs</button>'
+    +'</div><div class="kpi-advice">Readiness: 8+ green = train as planned, 6-7 yellow = reduce total volume 10-15%, under 6 red = technical speed only and recovery emphasis.</div></div>';
+}
+function programDomId(id){return String(id||'').replace(/[^a-zA-Z0-9_-]/g,'_');}
 function programExerciseHtml(ex){
-  return'<div class="program-ex"><div class="program-ex-name">'+esc(ex.name||'Exercise')+(ex.isCustom?' <span class="program-tag">Custom</span>':'')+'</div>'
+  return'<div class="program-ex"><div class="program-ex-name">'+esc(ex.name||'Exercise')+(ex.section?' <span class="program-tag">'+esc(ex.section)+'</span>':'')+(ex.isCustom?' <span class="program-tag">Custom</span>':'')+'</div>'
     +'<div class="program-ex-meta">'+[ex.sets?ex.sets+' sets':'',ex.reps?ex.reps+' reps':'',ex.duration||'',ex.load||'',ex.rest?'Rest '+ex.rest:''].filter(Boolean).map(esc).join(' · ')+'</div>'
     +(ex.notes?'<div class="program-note">'+esc(ex.notes)+'</div>':'')+'</div>';
 }
 function buildProgramPanel(aid){
   if(document.body.classList.contains('viewer-mode'))return'<div class="viewer-empty">Programming is coach-facing only.</div>';
   var a=DB.get(aid);if(!a)return'<div class="empty-state"><div class="empty-p">Athlete not found.</div></div>';
-  var p=ensureAthleteProgram(aid),wk=currentProgramWeek(p),bucket=programBucketKey(p);
-  var h='<div class="card"><div class="program-toolbar">'
-    +'<div><div class="card-title">Programming</div><div class="pg-sub">Coach-facing only. Athletes and parents cannot access this module.</div></div>'
+  var p=ensureAthleteProgram(aid),wk=currentProgramWeek(p,aid),bucket=programBucketKey(p);
+  var h='<div class="card">'
+    +renderProgramProfileHead(a,p,bucket,wk)
+    +renderForceVelocityProfileCard(a,p,bucket)
+    +renderPhaseBanner(wk)
+    +'<div class="program-toolbar"><div><div class="card-title">Programming</div><div class="pg-sub">Coach-facing only. Athletes and parents cannot access this module.</div></div>'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
-    +'<select class="program-phase-select" onchange="changeAthleteProgramPhase(\''+aid+'\',this.value)">'+phaseOptionsHtml(p.seasonPhase||a.seasonPhase)+'</select>'
     +'<select class="program-bucket-select" onchange="assignAthleteBucketProgram(\''+aid+'\',this.value)">'+programOptionsHtml(bucket)+'</select>'
     +'<button class="btn-save-prog" style="padding:9px 12px;font-size:12px" onclick="resetAthleteProgramDefaults(\''+aid+'\')">Reset Program</button>'
     +'</div></div>'
@@ -3209,16 +3370,19 @@ function buildProgramPanel(aid){
     +'<div class="viewer-focus-box"><div class="viewer-label">Secondary Block</div><div class="viewer-value">Tendon Code</div><div class="program-note">'+esc(bucketSubtitle(2))+'</div></div>'
     +'<div class="viewer-focus-box"><div class="viewer-label">Season Phase</div><div class="viewer-value">'+esc(programPhaseLabel(p.seasonPhase||a.seasonPhase))+'</div></div>'
     +'</div>'
+    +renderWeekSelector(aid,p)
+    +'<div class="pg-sub" style="margin:-2px 0 12px">W'+wk.weekNumber+': '+esc(wk.title)+' | '+wk.volumeTarget+'% Volume</div>'
     +'<div class="program-week">';
   (wk.days||[]).forEach(function(day,idx){
     var exs=day.exercises||[];
     h+='<div class="program-day"><div class="program-day-head"><div class="program-day-name">'+esc(day.day||('Day '+(idx+1)))+'</div>'+(day.customized?'<span class="program-tag">Customized</span>':'')+'</div>'
+      +'<div class="program-day-focus">'+esc(programDayFocus(day.day))+'</div>'
       +(exs.length?'<div class="program-ex-list">'+exs.map(programExerciseHtml).join('')+'</div>':'<div class="program-empty-day">No workout assigned.</div>')
       +(day.coachNote?'<div class="program-note"><strong>Coach note:</strong> '+esc(day.coachNote)+'</div>':'')
-      +'<button class="btn-s" style="width:100%;padding:8px 10px;font-size:12px;margin-top:8px" onclick="openProgramDayEditor(\''+p.id+'\','+idx+')">Edit Day</button>'
+      +'<div class="program-day-actions"><button class="btn-save-prog" style="padding:8px 10px;font-size:12px" onclick="openDrillPicker(\''+p.id+'\','+wk.weekNumber+','+idx+')">+ Add Drill</button><button class="btn-s" style="padding:8px 10px;font-size:12px" onclick="openProgramDayEditor(\''+p.id+'\','+wk.weekNumber+','+idx+')">Edit Day</button></div>'
       +'</div>';
   });
-  h+='</div></div>';
+  h+='</div>'+renderKpiRow(aid,p,wk)+'</div>';
   return h;
 }
 function switchHistoryTab(tab,aid){
@@ -3230,18 +3394,53 @@ function switchHistoryTab(tab,aid){
   if(tab==='progression')setTimeout(function(){renderProgressionGraphCanvases(aid);},40);
   if(tab==='program'){var panel=el('hist-panel-program');if(panel)panel.innerHTML=buildProgramPanel(aid);}
 }
+function confirmAthleteProgramPhaseChange(aid,phase){
+  var a=DB.get(aid);if(!a)return;
+  phase=normalizeProgramPhase(phase);
+  openApeDialog({
+    title:'Change Season Phase',
+    html:'<p>Changing season phase will adjust volume targets for all weeks.</p><p>This affects <strong>'+esc(a.name||'this athlete')+'</strong>&apos;s program only. Continue?</p>',
+    buttons:[{label:'Cancel',value:false,kind:'secondary'},{label:'Confirm',value:true,kind:'primary'}]
+  }).then(function(ok){if(ok)changeAthleteProgramPhase(aid,phase);});
+}
 function changeAthleteProgramPhase(aid,phase){
   var p=ensureAthleteProgram(aid),a=DB.get(aid);if(!p||!a)return;
   phase=normalizeProgramPhase(phase);DB.setAthleteSeasonPhase(aid,phase);
   p.seasonPhase=phase;
   var bucket=programBucketKey(p),fresh=buildDefaultProgramModel({aid:aid,bkt:bucket,seasonPhase:phase},7,phase,p.groupId);
+  p.weeks=(p.weeks||[]).map(function(w){return normalizeProgramWeek(w,phase);});
   (p.weeks||[]).forEach(function(w,wi){
+    var meta=programWeekMeta(phase,w.weekNumber||wi+1);
+    w.title=meta.title;w.volumeTarget=meta.volume;w.phaseKey=meta.phaseKey;w.phaseLabel=meta.phaseLabel;w.phaseCue=meta.cue;w.kpis=Object.assign(emptyProgramKpis(),w.kpis||{});
     (w.days||[]).forEach(function(d,di){
       if(!d.customized&&fresh.weeks[wi]&&fresh.weeks[wi].days[di]){d.exercises=fresh.weeks[wi].days[di].exercises;d.coachNote=d.coachNote||'';}
     });
   });
   DB.saveProgram(p);
   _toast('Program updated for '+programPhaseLabel(phase)+'. Your custom exercises were kept.','#1e6f3e');
+  switchHistoryTab('program',aid);
+}
+function saveProgramWeekKpis(aid,programId,weekNumber){
+  var p=DB.getProgram(programId);if(!p)return;
+  weekNumber=parseInt(weekNumber,10)||1;
+  var wk=(p.weeks||[]).filter(function(w){return Number(w.weekNumber)===weekNumber;})[0];if(!wk)return;
+  var sid=programDomId(p.id+'-'+weekNumber);
+  function num(key){var e=el('kpi-'+sid+'-'+key),v=e?e.value:'';return v===''?null:Number(v);}
+  function txt(key){var e=el('kpi-'+sid+'-'+key);return e?e.value.trim():'';}
+  wk.kpis={
+    fly10:num('fly10'),
+    fly20:num('fly20'),
+    cmj:num('cmj'),
+    rsi:num('rsi'),
+    fiveTenFive:num('fiveTenFive'),
+    maxV:num('maxV'),
+    readiness:num('readiness'),
+    flag:null,
+    coachNotes:txt('coachNotes')
+  };
+  var f=readinessFlag(wk.kpis.readiness);wk.kpis.flag=f?f.flag:null;
+  DB.saveProgram(p);
+  _toast('Week '+weekNumber+' KPIs saved'+(f?': '+f.label+' readiness':''),'#1e6f3e');
   switchHistoryTab('program',aid);
 }
 function assignAthleteBucketProgram(aid,bucket){
@@ -3259,13 +3458,14 @@ function resetAthleteProgramDefaults(aid){
   _toast('Program reset to default template.','#1e6f3e');
   switchHistoryTab('program',aid);
 }
-var _programEdit={programId:null,dayIndex:null};
-function openProgramDayEditor(programId,dayIndex){
-  var p=DB.getProgram(programId),day=p&&p.weeks&&p.weeks[0]&&p.weeks[0].days?p.weeks[0].days[dayIndex]:null;
+var _programEdit={programId:null,weekIndex:null,dayIndex:null};
+function openProgramDayEditor(programId,weekNumber,dayIndex){
+  if(dayIndex===undefined){dayIndex=weekNumber;weekNumber=1;}
+  var p=DB.getProgram(programId),wi=Math.max(0,(parseInt(weekNumber,10)||1)-1),day=p&&p.weeks&&p.weeks[wi]&&p.weeks[wi].days?p.weeks[wi].days[dayIndex]:null;
   if(!p||!day)return;
-  _programEdit={programId:programId,dayIndex:dayIndex};
+  _programEdit={programId:programId,weekIndex:wi,dayIndex:dayIndex};
   var ov=el('program-editor-overlay'),body=el('program-editor-body'),title=el('program-editor-title');
-  if(title)title.textContent='Edit '+(day.day||'Training Day');
+  if(title)title.textContent='Edit W'+(wi+1)+' '+(day.day||'Training Day');
   var h='<div class="field"><label>Day-Level Coach Note</label><textarea id="program-day-note" style="min-height:70px">'+esc(day.coachNote||'')+'</textarea></div><div id="program-ex-edit-list">';
   (day.exercises||[]).forEach(function(ex,i){h+=programEditRow(ex,i);});
   h+='</div><div class="btn-row"><button class="btn-save-prog" onclick="addProgramExerciseRow()">Add Custom Exercise</button><button class="btn-save-prog" onclick="replaceProgramExercisePrompt()">Replace From Library</button><button class="btn-s" onclick="resetProgramDayDefault()">Reset to Default</button></div>';
@@ -3296,7 +3496,7 @@ function programDrop(evt){
   if(rows.indexOf(_programDragRow)<rows.indexOf(target))list.insertBefore(_programDragRow,target.nextSibling);
   else list.insertBefore(_programDragRow,target);
 }
-function closeProgramEditor(){var ov=el('program-editor-overlay');if(ov)ov.classList.remove('open');_programEdit={programId:null,dayIndex:null};}
+function closeProgramEditor(){var ov=el('program-editor-overlay');if(ov)ov.classList.remove('open');_programEdit={programId:null,weekIndex:null,dayIndex:null};}
 function addProgramExerciseRow(){
   var list=el('program-ex-edit-list');if(!list)return;
   var i=list.querySelectorAll('.program-edit-row').length;
@@ -3313,8 +3513,8 @@ function collectProgramEditorExercises(){
   return out;
 }
 function saveProgramDayEditor(){
-  var p=DB.getProgram(_programEdit.programId);if(!p||!p.weeks||!p.weeks[0])return;
-  var day=p.weeks[0].days[_programEdit.dayIndex];if(!day)return;
+  var p=DB.getProgram(_programEdit.programId),wi=_programEdit.weekIndex||0;if(!p||!p.weeks||!p.weeks[wi])return;
+  var day=p.weeks[wi].days[_programEdit.dayIndex];if(!day)return;
   day.coachNote=el('program-day-note')?el('program-day-note').value.trim():'';
   day.exercises=collectProgramEditorExercises();
   day.customized=true;
@@ -3325,10 +3525,10 @@ function saveProgramDayEditor(){
   var aid=p.athleteId;if(aid)switchHistoryTab('program',aid);
 }
 function resetProgramDayDefault(){
-  var p=DB.getProgram(_programEdit.programId);if(!p||!p.weeks||!p.weeks[0])return;
-  var idx=_programEdit.dayIndex,day=p.weeks[0].days[idx],bucket=programBucketKey(p);
+  var p=DB.getProgram(_programEdit.programId),wi=_programEdit.weekIndex||0;if(!p||!p.weeks||!p.weeks[wi])return;
+  var idx=_programEdit.dayIndex,day=p.weeks[wi].days[idx],bucket=programBucketKey(p);
   if(!day)return;
-  day.exercises=defaultProgramExercises(bucket,p.seasonPhase,1,day.day);
+  day.exercises=defaultProgramExercises(bucket,p.seasonPhase,wi+1,day.day);
   day.coachNote='';
   day.customized=false;
   DB.saveProgram(p);
@@ -3350,6 +3550,71 @@ function replaceProgramExercisePrompt(){
     var list=el('program-ex-edit-list'),i=list?list.querySelectorAll('.program-edit-row').length:0;
     if(list)list.insertAdjacentHTML('beforeend',programEditRow(match||programExercise(name,'','','','','','',true),i));
   });
+}
+var DRILL_CATEGORIES=['Warmup','Wall Drills','Acceleration','Max Velocity','Bounding & Elastic','COD','Recovery'];
+var DRILL_LIBRARY=[
+  {name:'A-Skip Series',category:'Warmup',section:'Prep',buckets:[4,5]},
+  {name:'Pogo Series',category:'Warmup',section:'Prep',buckets:[2,3]},
+  {name:'Wall Drive',category:'Wall Drills',section:'Speed',buckets:[4]},
+  {name:'Wall Switches',category:'Wall Drills',section:'Speed',buckets:[4]},
+  {name:'Falling Start Sprint',category:'Acceleration',section:'Speed',buckets:[4]},
+  {name:'Resisted Start',category:'Acceleration',section:'Speed',buckets:[4]},
+  {name:'Light Sled Sprint',category:'Acceleration',section:'Speed',buckets:[4,5]},
+  {name:'Build Sprint',category:'Max Velocity',section:'Speed',buckets:[5]},
+  {name:'Fly 20',category:'Max Velocity',section:'Speed',buckets:[5]},
+  {name:'Wicket Run',category:'Max Velocity',section:'Speed',buckets:[5]},
+  {name:'Power Skip for Distance',category:'Bounding & Elastic',section:'Plyo',buckets:[3,4]},
+  {name:'Broad Jump',category:'Bounding & Elastic',section:'Plyo',buckets:[3]},
+  {name:'Lateral Bound to Stick',category:'Bounding & Elastic',section:'Plyo',buckets:[6]},
+  {name:'Shuffle-to-Stick Deceleration',category:'COD',section:'Speed',buckets:[6]},
+  {name:'5-10-5 Technique Reps',category:'COD',section:'Speed',buckets:[6]},
+  {name:'Reactive Mirror Drill',category:'COD',section:'Speed',buckets:[6]},
+  {name:'Tempo Walk / Mobility',category:'Recovery',section:'Recovery',buckets:[1,2,3,4,5,6]},
+  {name:'Breathing Reset + Tissue Work',category:'Recovery',section:'Recovery',buckets:[2]}
+];
+var _drillPicker={programId:null,weekIndex:0,dayIndex:0,category:'Warmup'};
+function openDrillPicker(programId,weekNumber,dayIndex){
+  _drillPicker={programId:programId,weekIndex:Math.max(0,(parseInt(weekNumber,10)||1)-1),dayIndex:dayIndex||0,category:'Warmup'};
+  var ov=el('drill-picker-overlay'),search=el('drill-search'),custom=el('drill-custom');
+  if(search)search.value='';
+  if(custom)custom.value='';
+  renderDrillPickerList();
+  if(ov)ov.classList.add('open');
+}
+function closeDrillPicker(){var ov=el('drill-picker-overlay');if(ov)ov.classList.remove('open');}
+function renderDrillPickerList(){
+  var tabs=el('drill-tabs'),list=el('drill-list'),p=DB.getProgram(_drillPicker.programId),bucket=programBucketKey(p),q=(el('drill-search')&&el('drill-search').value||'').toLowerCase().trim();
+  if(tabs)tabs.innerHTML=DRILL_CATEGORIES.map(function(cat){return'<button class="drill-tab '+(cat===_drillPicker.category?'act':'')+'" onclick="_drillPicker.category=\''+esc(cat)+'\';renderDrillPickerList()">'+esc(cat)+'</button>';}).join('');
+  var drills=DRILL_LIBRARY.filter(function(d){return d.category===_drillPicker.category&&(!q||d.name.toLowerCase().indexOf(q)>-1);});
+  if(list)list.innerHTML=drills.length?drills.map(function(d,i){
+    var rec=(d.buckets||[]).indexOf(bucket)>-1;
+    return'<button class="drill-item '+(rec?'rec':'')+'" onclick="addDrillToProgramDay('+i+')"><div class="drill-item-title">'+esc(d.name)+(rec?' <span class="program-tag">Recommended</span>':'')+'</div><div class="drill-item-meta">'+esc(d.category)+' &middot; '+esc(d.section||'Speed')+'</div></button>';
+  }).join(''):'<div class="program-empty-day">No drills match this search.</div>';
+}
+function addDrillToProgramDay(filteredIndex){
+  var p=DB.getProgram(_drillPicker.programId);if(!p||!p.weeks||!p.weeks[_drillPicker.weekIndex])return;
+  var q=(el('drill-search')&&el('drill-search').value||'').toLowerCase().trim();
+  var drills=DRILL_LIBRARY.filter(function(d){return d.category===_drillPicker.category&&(!q||d.name.toLowerCase().indexOf(q)>-1);});
+  var d=drills[filteredIndex];if(!d)return;
+  var day=p.weeks[_drillPicker.weekIndex].days[_drillPicker.dayIndex];if(!day)return;
+  var ex=programExercise(d.name,'','','','','','Added from '+d.category+' drill picker. Section: '+(d.section||'Speed')+'.',true);
+  ex.section=d.section||'Speed';
+  day.exercises=day.exercises||[];
+  day.exercises.push(ex);
+  day.customized=true;p.lastEditedAt=Date.now();DB.saveProgram(p);
+  _toast('Added drill: '+d.name,'#1e6f3e');
+  if(p.athleteId)switchHistoryTab('program',p.athleteId);
+}
+function addCustomDrillFromPicker(){
+  var name=(el('drill-custom')&&el('drill-custom').value||'').trim();if(!name){apeAlert('Type a custom drill name first.','Custom Drill');return;}
+  var p=DB.getProgram(_drillPicker.programId);if(!p||!p.weeks||!p.weeks[_drillPicker.weekIndex])return;
+  var day=p.weeks[_drillPicker.weekIndex].days[_drillPicker.dayIndex];if(!day)return;
+  day.exercises=day.exercises||[];
+  day.exercises.push(programExercise(name,'','','','','','Custom coach-added drill.',true));
+  day.customized=true;p.lastEditedAt=Date.now();DB.saveProgram(p);
+  if(el('drill-custom'))el('drill-custom').value='';
+  _toast('Custom drill added.','#1e6f3e');
+  if(p.athleteId)switchHistoryTab('program',p.athleteId);
 }
 function resolveViewerAthletesForEmail(athletes,email,role){
   email=_normEmail(email);
@@ -4923,18 +5188,78 @@ function normalizeProgramPhase(phase){
 }
 function programPhaseLabel(phase){phase=normalizeProgramPhase(phase);return PROGRAM_PHASES[phase].label;}
 function programLegacyPhase(phase){phase=normalizeProgramPhase(phase);return PROGRAM_PHASES[phase].legacy;}
+function programWeekVolume(phase,weekNumber){
+  var arr=PROGRAM_VOLUME_TARGETS[normalizeProgramPhase(phase)]||PROGRAM_VOLUME_TARGETS.offSeason;
+  return arr[Math.max(0,Math.min(5,(parseInt(weekNumber,10)||1)-1))]||100;
+}
+function programWeekMeta(phase,weekNumber){
+  var idx=Math.max(0,Math.min(5,(parseInt(weekNumber,10)||1)-1)),vol=programWeekVolume(phase,idx+1),ph=PROGRAM_WEEK_PHASES[idx]||PROGRAM_WEEK_PHASES[0];
+  return{weekNumber:idx+1,title:PROGRAM_WEEK_TITLES[idx]||('Week '+(idx+1)),volume:vol,phaseKey:ph.key,phaseLabel:ph.label,cue:ph.cue};
+}
+function volumeFillClass(vol){
+  vol=Number(vol)||100;
+  if(vol<100||vol===85)return'taper';
+  if(vol>=120)return'peak';
+  if(vol>=110)return'cyan';
+  return'slate';
+}
+function readinessFlag(score){
+  var n=Number(score);
+  if(isNaN(n))return null;
+  if(n>=8)return{flag:'green',label:'Green',advice:'Train as planned'};
+  if(n>=6)return{flag:'yellow',label:'Yellow',advice:'Reduce total volume 10-15%'};
+  return{flag:'red',label:'Red',advice:'Keep speed technical, remove high-impact rebounds, emphasize recovery'};
+}
+function emptyProgramKpis(){
+  return{fly10:null,fly20:null,cmj:null,rsi:null,fiveTenFive:null,maxV:null,readiness:null,flag:null,coachNotes:''};
+}
+function normalizeProgramWeek(week,phase){
+  week=week||{};var meta=programWeekMeta(phase,week.weekNumber||1);
+  week.weekNumber=meta.weekNumber;
+  week.title=week.title||meta.title;
+  week.volumeTarget=meta.volume;
+  week.phaseKey=meta.phaseKey;
+  week.phaseLabel=meta.phaseLabel;
+  week.phaseCue=meta.cue;
+  week.kpis=Object.assign(emptyProgramKpis(),week.kpis||{});
+  var flag=readinessFlag(week.kpis.readiness);
+  week.kpis.flag=flag?flag.flag:null;
+  return week;
+}
+function normalizeProgramModel(p){
+  if(!p)return p;
+  var phase=normalizeProgramPhase(p.seasonPhase||'offSeason');
+  p.seasonPhase=phase;
+  p.bucketSecondary='Tendon Code';
+  p.weeks=(p.weeks||[]).map(function(w){return normalizeProgramWeek(w,phase);});
+  return p;
+}
 var PROGRAM_PHASE_COPY={
   offSeason:'Full volume progressive overload',
   preSeason:'Speed & power expression focus',
   inSeason:'Maintenance lower volume keep intensity'
 };
+var PROGRAM_VOLUME_TARGETS={
+  offSeason:[100,105,110,115,120,85],
+  preSeason:[95,100,105,110,110,85],
+  inSeason:[85,85,85,85,85,85]
+};
+var PROGRAM_WEEK_TITLES=['Foundation Load','Tissue Prep','Elastic Build','Peak Load','Full Expression','Deload / Retest'];
+var PROGRAM_WEEK_PHASES=[
+  {key:'eccentric',label:'Eccentric Phase',cue:'Absorb force. Own range.'},
+  {key:'eccentric',label:'Eccentric Phase',cue:'Load positions. Build capacity.'},
+  {key:'isometric',label:'Isometric Phase',cue:'Hold the position. Max tension.'},
+  {key:'isometric',label:'Isometric Phase',cue:'Anchor positions. Express intent.'},
+  {key:'concentric',label:'Concentric Phase',cue:'Project force. Move fast.'},
+  {key:'taper',label:'Taper Week',cue:'Reduce volume. Retest clean.'}
+];
 var BUCKET_BRAND={
-  1:{name:'Force Foundation',subtitle:'Max force production - heavy end of the curve',legacy:['Reactive Strength','Max Force']},
-  2:{name:'Tendon Code',subtitle:'Extreme Isometrics - position strength & nervous system',legacy:['Force and Power','Extreme Isometrics','Force and Power (Base Build)']},
-  3:{name:'Power Bridge',subtitle:'Strength-speed - where force meets velocity',legacy:['Acceleration','Strength-Speed']},
-  4:{name:'Drive Phase',subtitle:'Acceleration - first step & drive mechanics',legacy:['Speed-Strength / Acceleration']},
-  5:{name:'Max Velocity',subtitle:'Top end speed - full expression of the curve',legacy:['Top End Speed','Force Transfer']},
-  6:{name:'Change of Direction',subtitle:'Deceleration, lateral force & re-acceleration',legacy:['Change of Direction']}
+  1:{id:'forceFoundation',name:'Force Foundation',color:'#8b5cf6',subtitle:'Max force production, eccentric load',legacy:['Reactive Strength','Max Force']},
+  2:{id:'tendonCode',name:'Tendon Code',color:'#00e5ff',subtitle:'Extreme Isometrics, elastic tissue',legacy:['Force and Power','Extreme Isometrics','Force and Power (Base Build)']},
+  3:{id:'powerBridge',name:'Power Bridge',color:'#22c55e',subtitle:'Strength-speed, force-to-velocity',legacy:['Acceleration','Strength-Speed']},
+  4:{id:'drivePhase',name:'Drive Phase',color:'#f97316',subtitle:'Acceleration mechanics, shin angle',legacy:['Speed-Strength / Acceleration']},
+  5:{id:'maxVelocity',name:'Max Velocity',color:'#ef4444',subtitle:'Top end speed, fly sprints',legacy:['Top End Speed','Force Transfer']},
+  6:{id:'changeOfDirection',name:'Change of Direction',color:'#00e5ff',subtitle:'Deceleration, lateral force & re-acceleration',legacy:['Change of Direction']}
 };
 function bucketBrandByKey(key){key=parseInt(key,10);return BUCKET_BRAND[key]||BUCKET_BRAND[2];}
 function bucketKeyFromName(name){
@@ -5021,7 +5346,8 @@ function buildDefaultProgramModel(S,days,phase,groupId){
   S=S||{};phase=normalizeProgramPhase(phase||S.seasonPhase||'offSeason');
   var bKey=resolveProgramBucketFromSession(S),dayNames=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'],weeks=[];
   for(var w=1;w<=6;w++){
-    weeks.push({weekNumber:w,days:dayNames.map(function(dayName){
+    var meta=programWeekMeta(phase,w);
+    weeks.push({weekNumber:w,title:meta.title,volumeTarget:meta.volume,phaseKey:meta.phaseKey,phaseLabel:meta.phaseLabel,phaseCue:meta.cue,kpis:emptyProgramKpis(),days:dayNames.map(function(dayName){
       return{day:dayName,coachNote:'',customized:false,exercises:defaultProgramExercises(bKey,phase,w,dayName)};
     })});
   }
@@ -5899,7 +6225,7 @@ function buildBulkProgramBar(){
   return'<div class="bulk-program-bar'+(count?' active':'')+'" id="bulk-program-bar">'
     +'<div style="font-size:13px;font-weight:800;color:#fff"><span id="bulk-program-count">'+count+'</span> selected</div>'
     +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
-    +'<button class="btn-save-prog" style="padding:8px 11px;font-size:12px" onclick="createGroupFromSelected()">Create Group</button>'
+    +(count>=2?'<button class="btn-save-prog" style="padding:8px 11px;font-size:12px" onclick="createGroupFromSelected()">Group Selected</button>':'')
     +'<button class="btn-save-prog" style="padding:8px 11px;font-size:12px" onclick="assignProgramToSelected()">Assign Program</button>'
     +'<button class="btn-save-prog" style="padding:8px 11px;font-size:12px" onclick="setPhaseForSelected()">Set Season Phase</button>'
     +'<button class="btn-save-prog" style="padding:8px 11px;font-size:12px" onclick="exportSelectedAthletes()">Export Selected</button>'
@@ -5907,6 +6233,7 @@ function buildBulkProgramBar(){
 }
 function createGroupFromSelected(){
   var ids=selectedAthleteIds();if(!ids.length){apeAlert('Select athletes first.','Create Group');return;}
+  if(ids.length<2){apeAlert('Select at least two athletes to create a group.','Group Selected');return;}
   apePrompt('Create Group',[
     {id:'name',label:'Group Name',placeholder:'e.g. Varsity Speed Group'},
     {id:'label',label:'Sport / Team Label',placeholder:'e.g. Football Varsity'},
@@ -7672,7 +7999,7 @@ if ('serviceWorker' in navigator) {
     window.location.reload();
   });
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=20260528-landing-positioning').then(function(reg) {
+    navigator.serviceWorker.register('sw.js?v=20260529-programming-kpis').then(function(reg) {
       if (reg && reg.update) reg.update();
       console.log('[APE] Service worker registered:', reg.scope);
     }).catch(function(err) {
