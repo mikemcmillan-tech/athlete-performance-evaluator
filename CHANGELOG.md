@@ -13,6 +13,7 @@ All notable changes to APE will be documented here.
 - Added a structured programs and training groups data model foundation for generated 6-week plans.
 - Added coach-facing Programming tabs, default Schroeder/Ryan Paul bucket templates, group assignment actions, and editable training days.
 - Renamed programming buckets with branded labels and replaced browser prompts with APE-styled dialog panels.
+- Updated the public landing page with coach-first positioning, parent/report messaging, platform audience sections, USR positioning, founder credibility, and early demo CTA.
 
 ## Earlier History
 

@@ -1,5 +1,5 @@
-// APE Service Worker - v9
-const CACHE_NAME = 'ape-v9-buckets-dialogs';
+// APE Service Worker - v10
+const CACHE_NAME = 'ape-v10-landing-positioning';
 const PRECACHE = [
   './',
   './index.html',
