@@ -15,6 +15,7 @@ All notable changes to APE will be documented here.
 - Renamed programming buckets with branded labels and replaced browser prompts with APE-styled dialog panels.
 - Updated the public landing page with coach-first positioning, parent/report messaging, platform audience sections, USR positioning, founder credibility, and early demo CTA.
 - Expanded the coach-only programming module with six-week volume bars, readiness KPI inputs, force-velocity profile cards, phase-change confirmation, and a drill picker.
+- Added internal-testing polish for dashboard search, roster import duplicate updates, achievement badges, coach alerts, speed badges, and export summaries.
 
 ## Earlier History
 

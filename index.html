@@ -868,6 +868,20 @@ select option{background:var(--dk3)}
 .verify-badge.blue{background:#1E90FF;color:#001218;box-shadow:0 0 16px rgba(30,144,255,.32)}
 .verify-badge.navy{background:#0A1F3D;border:1px solid rgba(30,144,255,.35);color:#D9F3FF}
 .verify-hand{font-size:10px;font-weight:700;color:#9AA7B4;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.achievement-wrap{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.achievement-chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;border:1px solid rgba(91,233,255,.22);background:rgba(91,233,255,.08);color:var(--or);line-height:1.2}
+.achievement-chip.major{background:rgba(201,162,39,.13);border-color:rgba(201,162,39,.5);color:#C9A227}
+.achievement-chip.elite{background:rgba(31,158,112,.13);border-color:rgba(31,158,112,.44);color:#5DCAA5}
+.achievement-chip.speed{background:rgba(30,144,255,.13);border-color:rgba(30,144,255,.42);color:#7fc4ff}
+.achievement-chip.first{background:rgba(155,127,232,.13);border-color:rgba(155,127,232,.42);color:#b9a5ff}
+.alert-stack{display:flex;flex-direction:column;gap:7px}
+.coach-alert{border-radius:10px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);padding:9px 11px;font-size:12px;line-height:1.45;color:var(--sb)}
+.coach-alert.green{border-color:rgba(34,197,94,.38);background:rgba(34,197,94,.09);color:#9df2ba}
+.coach-alert.orange{border-color:rgba(249,115,22,.42);background:rgba(249,115,22,.1);color:#ffc08d}
+.coach-alert.red{border-color:rgba(239,68,68,.42);background:rgba(239,68,68,.1);color:#ff9d9d}
+.coach-alert.blue{border-color:rgba(30,144,255,.42);background:rgba(30,144,255,.1);color:#a8d7ff}
+.coach-alert.gold{border-color:rgba(201,162,39,.48);background:rgba(201,162,39,.1);color:#f1d776}
+.coach-alert-mini{font-size:11px;color:var(--sb);line-height:1.4;margin:8px 0 0;padding:7px 9px;border-radius:8px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08)}
 .logo-preview{display:flex;align-items:center;gap:12px;background:var(--dk3);border:1px solid var(--bd);border-radius:var(--radius-sm);padding:10px;margin-top:8px}
 .logo-preview img{width:64px;height:64px;object-fit:contain;border-radius:4px;background:#06111A;border:1px solid var(--bd)}
 .logo-error{display:none;font-size:12px;color:var(--s1b);margin-top:6px;line-height:1.4}
@@ -1820,6 +1834,11 @@ var DB = (function(){
       var d=r(),a=d.a[aid];if(!a)return null;
       var s={id:uid('s'),ts:Date.now(),date:td()};
       for(var k in data)if(data.hasOwnProperty(k))s[k]=data[k];
+      var prev=a.s&&a.s.length?a.s[a.s.length-1]:null;
+      try{
+        s.badges=s.badges||getAthleteBadges(a,s,prev);
+        s.alerts=s.alerts||getSessionAlerts(a,s,prev);
+      }catch(e){console.warn('Badge/alert snapshot failed:',e);}
       a.s.push(s);w(d);_cloudSyncSoon();return s;
     },
     // Update raw + computed values on an existing session (for session editing)
@@ -3081,6 +3100,101 @@ function renderVerificationBadge(method){
   var label=method==='Laser'?'Laser Verified':method;
   return '<span class="verify-badge '+cls+'">'+esc(label)+'</span>';
 }
+function getTeamName(teamId){
+  if(!teamId)return'';
+  var teams=DB.getTeams();
+  for(var i=0;i<teams.length;i++)if(teams[i].id===teamId)return teams[i].name||'';
+  return'';
+}
+var BADGE_METRICS=[
+  {key:'vp',label:'Vertical Power',raw:'vj',higher:true},
+  {key:'hp',label:'Horizontal Power',raw:'bj',higher:true},
+  {key:'rs',label:'Reactive Strength',raw:'rsi',higher:true},
+  {key:'ac',label:'Acceleration',raw:'f5',higher:false},
+  {key:'mv',label:'Max Velocity',raw:'f10',higher:false},
+  {key:'cod',label:'Change of Direction',raw:'pro_agility_5_10_5',higher:false},
+  {key:'gps',label:'GPS Speed',raw:'gps',higher:true},
+  {key:'ft',label:'Force Transfer',raw:null,higher:true}
+];
+function _sessionApe(s){return s?(s.apeScore!=null?s.apeScore:(s.sc?calculateAPEscore(s.sc):null)):null;}
+function _metricScore(s,key){return s&&s.sc&&s.sc[key]!=null?Number(s.sc[key]):null;}
+function _rawMetricValue(s,key){
+  var r=s&&s.raw?s.raw:{};
+  if(key==='pro_agility_5_10_5')return r.pro_agility_5_10_5!=null?r.pro_agility_5_10_5:(r.fivetenFiveTime!=null?r.fivetenFiveTime:null);
+  return r[key]!=null?r[key]:null;
+}
+function _badgeObj(label,type){return{label:label,type:type||''};}
+function _alertObj(text,type){return{text:text,type:type||''};}
+function getAthleteBadges(athlete,latestSession,previousSession){
+  var badges=[],ape=_sessionApe(latestSession),prevApe=_sessionApe(previousSession);
+  if(latestSession&&!previousSession)badges.push(_badgeObj('First APE Eval','first'));
+  if(ape!=null&&prevApe!=null){
+    var diff=ape-prevApe;
+    if(diff>=10)badges.push(_badgeObj('Major APE Jump','major'));
+    else if(diff>=5)badges.push(_badgeObj('APE Score Up',''));
+  }
+  if(ape!=null&&ape>=80)badges.push(_badgeObj('Elite APE Profile','elite'));
+  else if(ape!=null&&ape>=65)badges.push(_badgeObj('Above Average Profile','elite'));
+  BADGE_METRICS.forEach(function(m){
+    var cur=_metricScore(latestSession,m.key),prev=_metricScore(previousSession,m.key);
+    if(cur!=null&&cur>=5)badges.push(_badgeObj('Elite '+m.label,'elite'));
+    if(cur!=null&&prev!=null&&cur-prev>=1)badges.push(_badgeObj(m.label+' Improved',''));
+  });
+  var f5=_rawMetricValue(latestSession,'f5'),pf5=_rawMetricValue(previousSession,'f5'),f10=_rawMetricValue(latestSession,'f10'),pf10=_rawMetricValue(previousSession,'f10');
+  var acc=f5!=null&&pf5!=null&&(Number(pf5)-Number(f5))>=0.05;
+  var max=f10!=null&&pf10!=null&&(Number(pf10)-Number(f10))>=0.05;
+  if(acc)badges.push(_badgeObj('Acceleration Improved','speed'));
+  if(max)badges.push(_badgeObj('Max Velocity Improved','speed'));
+  if(acc&&max)badges.push(_badgeObj('Speed Badge','speed'));
+  var seen={};
+  return badges.filter(function(b){var k=b.label.toLowerCase();if(seen[k])return false;seen[k]=true;return true;});
+}
+function getSessionAlerts(athlete,latestSession,previousSession){
+  var alerts=[],ape=_sessionApe(latestSession),prevApe=_sessionApe(previousSession);
+  if(ape!=null&&prevApe!=null){
+    var diff=ape-prevApe;
+    if(diff>0)alerts.push(_alertObj('APE Score improved from previous session.','green'));
+    if(diff<=-5)alerts.push(_alertObj('APE Score decreased by 5+ points. Review fatigue, testing context, and recent training load.','orange'));
+  }
+  var raw=latestSession&&latestSession.raw?latestSession.raw:{};
+  if(raw.rsi!=null&&Number(raw.rsi)<1.5)alerts.push(_alertObj('Reactive strength risk - keep plyos low intensity.','red'));
+  if(previousSession&&previousSession.ts&&latestSession&&latestSession.ts&&latestSession.ts-previousSession.ts>30*86400000)alerts.push(_alertObj('Athlete had not been tested in 30+ days before this session.','blue'));
+  var pbs=[];
+  ['vj','bj','rsi','f5','f10','gps','threeConeTime','pro_agility_5_10_5'].forEach(function(k){
+    var cur=_rawMetricValue(latestSession,k);if(cur==null)return;
+    var hist=(athlete&&athlete.s||[]).filter(function(s){return !latestSession||s.id!==latestSession.id;});
+    if(!hist.length)return;
+    var vals=hist.map(function(s){return _rawMetricValue(s,k);}).filter(function(v){return v!=null&&!isNaN(Number(v));}).map(Number);
+    if(!vals.length)return;
+    var meta=METRIC_META[k]||METRIC_META[k==='pro_agility_5_10_5'?'fivetenFiveTime':k]||{},higher=meta.higherBetter!==false;
+    var best=higher?Math.max.apply(null,vals):Math.min.apply(null,vals);
+    if((higher&&Number(cur)>best)||(!higher&&Number(cur)<best))pbs.push(meta.label||METRIC_NAMES[k]||k);
+  });
+  if(pbs.length)alerts.push(_alertObj('New personal best: '+pbs.slice(0,3).join(', ')+(pbs.length>3?' +'+(pbs.length-3)+' more':''),'gold'));
+  var f5=_rawMetricValue(latestSession,'f5'),pf5=_rawMetricValue(previousSession,'f5'),f10=_rawMetricValue(latestSession,'f10'),pf10=_rawMetricValue(previousSession,'f10');
+  var acc=f5!=null&&pf5!=null&&(Number(pf5)-Number(f5))>=0.05;
+  var max=f10!=null&&pf10!=null&&(Number(pf10)-Number(f10))>=0.05;
+  if(acc&&max)alerts.push(_alertObj('Speed Badge earned: acceleration and max velocity both improved.','blue'));
+  else if(acc)alerts.push(_alertObj('Acceleration Improved: 5-10 Fly improved by at least 0.05 seconds.','blue'));
+  else if(max)alerts.push(_alertObj('Max Velocity Improved: 10-10 Fly improved by at least 0.05 seconds.','blue'));
+  var powerSame=previousSession&&latestSession&&['vp','hp'].every(function(k){var c=_metricScore(latestSession,k),p=_metricScore(previousSession,k);return c!=null&&p!=null&&c<=p;});
+  if((acc||max)&&powerSame)alerts.push(_alertObj('Speed transfer improving.','blue'));
+  return alerts;
+}
+function renderBadgeChips(badges,limit){
+  badges=badges||[];if(limit)badges=badges.slice(0,limit);
+  if(!badges.length)return'';
+  return'<div class="achievement-wrap">'+badges.map(function(b){return'<span class="achievement-chip '+esc(b.type||'')+'">'+esc(b.label)+'</span>';}).join('')+'</div>';
+}
+function renderAlertList(alerts,limit){
+  alerts=alerts||[];if(limit)alerts=alerts.slice(0,limit);
+  if(!alerts.length)return'';
+  return'<div class="alert-stack">'+alerts.map(function(a){return'<div class="coach-alert '+esc(a.type||'')+'">'+esc(a.text||a)+'</div>';}).join('')+'</div>';
+}
+function renderLatestAlertMini(alerts){
+  alerts=alerts||[];if(!alerts.length)return'';
+  var a=alerts[0];return'<div class="coach-alert-mini">'+esc(a.text||a)+'</div>';
+}
 function getVerificationFields(prefix){
   prefix=prefix||'inp';
   var verifiedEl=el(prefix+'-verified'),methodEl=el(prefix+'-timing-method'),testerEl=el(prefix+'-tester-name'),eventEl=el(prefix+'-event-name');
@@ -4035,17 +4149,18 @@ function _combineTeamMaps(){var teams=DB.getTeams(),byId={},byName={};teams.forE
 function _combineTeamNameById(id){if(!id)return'';var maps=_combineTeamMaps();return maps.byId[id]?maps.byId[id].name:'';}
 function _combineFallbackTeamName(){var newEl=el('combine-import-team-new');if(newEl&&newEl.value.trim())return newEl.value.trim();var sel=el('combine-import-team');return sel?_combineTeamNameById(sel.value):'';}
 function _combineTeamOptions(selectedId,includeBlank){var teams=DB.getTeams();var h=includeBlank?'<option value="">Select team</option>':'';return h+teams.map(function(t){return'<option value="'+t.id+'"'+(selectedId===t.id?' selected':'')+'>'+esc(t.name)+'</option>';}).join('');}
-function _combineKey(name,level,teamName){return _combineNorm(name)+'|'+_combineNorm(level)+'|'+_combineNorm(teamName);}
+function _combineKey(name,level,teamName){return _combineNorm(name)+'|'+_combineNorm(level);}
 function _combineExistingByKey(){var maps=_combineTeamMaps(),out={};DB.getAll().forEach(function(a){var tn=a.team&&maps.byId[a.team]?maps.byId[a.team].name:'';out[_combineKey(a.name,a.levelLabel||a.tier||'',tn)]=a;});return out;}
 function _combineEnsureTeam(name){name=String(name||'').trim();if(!name)return null;var maps=_combineTeamMaps(),existing=maps.byName[_combineNorm(name)];if(existing)return existing;return DB.createTeam(name,'#5be9ff');}
 function _combineCsvDownload(rows,filename){if(!rows.length)return;var headers=Object.keys(rows[0]);var csv=headers.join(',')+'\n'+rows.map(function(r){return headers.map(function(h){var v=String(r[h]===null||r[h]===undefined?'':r[h]);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',');}).join('\n');var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);if(a.parentNode)a.parentNode.removeChild(a);},0);}
 function _combineWriteRows(rows,filename,sheetName){if(!rows.length){apeAlert('No rows to export.','Export');return;}if(typeof XLSX!=='undefined'){var cfg=DB.loadSettings(),wb=XLSX.utils.book_new();var summary=[{'Section':'Coach Branding','Value':cfg.gymName||'Athlete Performance Evaluator'},{'Section':'Coach','Value':cfg.coachName||''},{'Section':'Contact','Value':cfg.contact||''},{'Section':'Export Date','Value':new Date().toLocaleDateString('en-US')},{'Section':'Rows','Value':rows.length},{'Section':'Logo','Value':cfg.logoBase64?'Logo included in HTML/PDF reports; XLSX stores branding text only.':''}];XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(summary),'Summary');var ws=XLSX.utils.json_to_sheet(rows);ws['!cols']=Object.keys(rows[0]||{}).map(function(){return{wch:18};});XLSX.utils.book_append_sheet(wb,ws,(sheetName||'Raw Data').substring(0,31));XLSX.writeFile(wb,filename.replace(/\.csv$/i,'.xlsx'));return;}_combineCsvDownload(rows,filename.replace(/\.xlsx$/i,'.csv'));}
 function downloadRosterTemplate(){_combineWriteRows([{'Athlete Name':'Jordan Smith','Team':'13 Gold','Sport':'Volleyball','Position':'Outside Hitter','Gender':'Female','Grade':'9th','Level':'13U','Age':'13','Grad Year':'2031','Bodyweight':'115','Height':'5-5','Athlete Email':'athlete@example.com','Parent Email':'parent@example.com','Notes':''}],'APE_Roster_Template.xlsx','Roster Template');}
 function parseRosterFile(file){return new Promise(function(resolve,reject){if(!file){resolve([]);return;}if(typeof XLSX==='undefined'){reject(new Error('XLSX library is not loaded.'));return;}var reader=new FileReader();reader.onload=function(e){try{var wb=XLSX.read(e.target.result,{type:'array'}),sheet=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(sheet,{defval:'',raw:false});resolve(rows||[]);}catch(err){reject(err);}};reader.onerror=function(){reject(new Error('Could not read roster file.'));};reader.readAsArrayBuffer(file);});}
-function normalizeRosterRow(src,idx){var first=String(_combineField(src,['First Name','first_name'])||'').trim(),last=String(_combineField(src,['Last Name','last_name'])||'').trim(),full=String(_combineField(src,['Athlete Name','athlete_name','Full Name','full_name','Name'])||'').trim();var name=full||(first||last?[first,last].filter(Boolean).join(' '):''),teamName=String(_combineField(src,['Team','Team Name'])||'').trim(),hadTeam=!!teamName;if(!teamName)teamName=_combineFallbackTeamName();var level=String(_combineField(src,['Level','Tier','Level / Tier','Tier / Level'])||'').trim(),age=_combineNum(_combineField(src,['Age']));return{idx:idx,name:name,nameKey:_combineNorm(name),teamName:teamName,hadTeam:hadTeam,club:String(_combineField(src,['Club','Club Team'])||'').trim(),age:age,gender:normalizeGender(_combineField(src,['Gender','Sex'])),grade:String(_combineField(src,['Grade','Class'])||'').trim(),gradYear:_combineNum(_combineField(src,['Grad Year','GradYear','Graduation Year'])),sport:String(_combineField(src,['Sport'])||'').trim(),position:String(_combineField(src,['Position','Pos'])||'').trim(),levelLabel:level,tier:_combineTier(level,age),bodyweight:_combineNum(_combineField(src,['Bodyweight','Body Weight','Weight'])),height:String(_combineField(src,['Height'])||'').trim(),athleteEmail:String(_combineField(src,['Athlete Email','AthleteEmail'])||'').trim(),parentEmail:String(_combineField(src,['Parent Email','ParentEmail'])||'').trim(),notes:String(_combineField(src,['Notes','Note'])||'').trim(),invalid:!name};}
-function handleRosterUpload(input){var file=input&&input.files&&input.files[0];if(!file)return;parseRosterFile(file).then(function(rows){_combineState.rawRows=rows;_combineState.fileName=file.name;previewRosterImport(rows,file.name);}).catch(function(err){console.error('[Event Mode] roster parse failed:',err);apeAlert('Could not parse roster: '+err.message,'Roster Import');});}
+function normalizeRosterRow(src,idx){var first=String(_combineField(src,['First Name','first_name'])||'').trim(),last=String(_combineField(src,['Last Name','last_name'])||'').trim(),full=String(_combineField(src,['Athlete Name','athlete_name','Full Name','full_name','Name','name'])||'').trim();var name=full||(first||last?[first,last].filter(Boolean).join(' '):''),teamName=String(_combineField(src,['Team','Team Name','team'])||'').trim(),hadTeam=!!teamName;if(!teamName)teamName=_combineFallbackTeamName();var level=String(_combineField(src,['Level','Tier','Level / Tier','Tier / Level','level','tier'])||'').trim(),age=_combineNum(_combineField(src,['Age','age']));return{idx:idx,name:name,nameKey:_combineNorm(name),teamName:teamName,hadTeam:hadTeam,club:String(_combineField(src,['Club','Club Team','club'])||'').trim(),age:age,gender:normalizeGender(_combineField(src,['Gender','Sex','gender'])),grade:String(_combineField(src,['Grade','Class','grade'])||'').trim(),gradYear:_combineNum(_combineField(src,['Grad Year','GradYear','Graduation Year','grad_year','gradYear'])),sport:String(_combineField(src,['Sport','sport'])||'').trim(),position:String(_combineField(src,['Position','Pos','position'])||'').trim(),levelLabel:level,tier:_combineTier(level,age),bodyweight:_combineNum(_combineField(src,['Bodyweight','Body Weight','Weight','bodyweight'])),height:String(_combineField(src,['Height','height'])||'').trim(),athleteEmail:String(_combineField(src,['Athlete Email','AthleteEmail','athleteEmail','athlete_email'])||'').trim(),parentEmail:String(_combineField(src,['Parent Email','ParentEmail','parentEmail','parent_email'])||'').trim(),notes:String(_combineField(src,['Notes','Note','notes'])||'').trim(),invalid:!name};}
+function importRosterFile(file){return parseRosterFile(file);}
+function handleRosterUpload(input){var file=input&&input.files&&input.files[0];if(!file)return;importRosterFile(file).then(function(rows){_combineState.rawRows=rows;_combineState.fileName=file.name;var dm=el('combine-duplicate-mode');if(dm)dm.value='update';previewRosterImport(rows,file.name);}).catch(function(err){console.error('[Event Mode] roster parse failed:',err);apeAlert('Could not parse roster: '+err.message,'Roster Import');});}
 function previewRosterImport(rows,fileName){rows=rows||_combineState.rawRows||[];var out=el('combine-import-preview');if(!out)return;var fallbackName=_combineFallbackTeamName(),normalized=rows.map(function(r,i){return normalizeRosterRow(r,i+2);}),hasTeamColumn=normalized.some(function(r){return r.hadTeam;}),existing=_combineExistingByKey(),seen={},newCount=0,dupes=0,missing=0,skipped=0,createTeams={};var maps=_combineTeamMaps();normalized.forEach(function(r){if(r.invalid){missing++;skipped++;return;}if(!hasTeamColumn&&!fallbackName){r.needsTeam=true;skipped++;return;}var key=_combineKey(r.name,r.levelLabel||r.tier,r.teamName);if(seen[key]){r.fileDuplicate=true;dupes++;return;}seen[key]=true;if(existing[key]){r.duplicate=true;r.existingId=existing[key].id;dupes++;}else newCount++;if(r.teamName&&!maps.byName[_combineNorm(r.teamName)])createTeams[r.teamName]=true;});var teamsToCreate=Object.keys(createTeams).sort();_combineState.rows=normalized;_combineState.summary={total:rows.length,newCount:newCount,dupes:dupes,missing:missing,skipped:skipped,teamsToCreate:teamsToCreate,hasTeamColumn:hasTeamColumn};var h='<div class="combine-stat-grid"><div class="combine-stat"><div class="combine-stat-num">'+rows.length+'</div><div class="combine-stat-lbl">Rows Found</div></div><div class="combine-stat"><div class="combine-stat-num">'+newCount+'</div><div class="combine-stat-lbl">New Athletes</div></div><div class="combine-stat"><div class="combine-stat-num">'+dupes+'</div><div class="combine-stat-lbl">Duplicates</div></div><div class="combine-stat"><div class="combine-stat-num">'+missing+'</div><div class="combine-stat-lbl">Missing Names</div></div></div>';if(!hasTeamColumn)h+='<div class="combine-status">'+(fallbackName?'No Team column found. Import will assign valid athletes to '+esc(fallbackName)+'.':'No Team column found. Pick or type a team before confirming import.')+'</div>';if(teamsToCreate.length)h+='<div class="combine-status"><span class="combine-chip good">'+teamsToCreate.length+' team'+(teamsToCreate.length!==1?'s':'')+' will be created</span> '+teamsToCreate.map(esc).join(', ')+'</div>';if(!rows.length){out.innerHTML='<div class="empty-state"><div class="empty-p">No roster rows found in this file.</div></div>';return;}h+='<div class="combine-table-wrap" style="margin-top:12px;max-height:330px"><table class="combine-table"><thead><tr><th>Row</th><th class="combine-sticky">Athlete</th><th>Team</th><th>Level</th><th>Sport</th><th>Position</th><th>Status</th></tr></thead><tbody>';normalized.slice(0,120).forEach(function(r){var status=r.invalid?'<span class="combine-chip bad">Missing name</span>':r.needsTeam?'<span class="combine-chip bad">Needs team</span>':r.fileDuplicate?'<span class="combine-chip warn">File duplicate</span>':r.duplicate?'<span class="combine-chip warn">Possible duplicate</span>':'<span class="combine-chip good">Ready</span>';h+='<tr class="'+(r.invalid||r.needsTeam?'combine-row-error':(r.duplicate||r.fileDuplicate?'combine-row-warn':''))+'"><td>'+r.idx+'</td><td class="combine-sticky">'+esc(r.name||'')+'</td><td>'+esc(r.teamName||'')+'</td><td>'+esc(r.levelLabel||TIERS[r.tier]||r.tier)+'</td><td>'+esc(r.sport)+'</td><td>'+esc(r.position)+'</td><td>'+status+'</td></tr>';});h+='</tbody></table></div>';if(normalized.length>120)h+='<div class="combine-status">Showing first 120 rows for preview.</div>';h+='<div class="btn-row" style="margin-top:14px"><button class="btn-p" style="padding:10px 16px;font-size:13px" onclick="confirmRosterImport()">Confirm Import</button></div>';out.innerHTML=h;}
-function confirmRosterImport(){var rows=_combineState.rows||[];if(!rows.length){apeAlert('Upload a roster first.','Roster Import');return;}var modeEl=el('combine-duplicate-mode'),mode=modeEl?modeEl.value:'skip',created=0,updated=0,skipped=0;var existing=_combineExistingByKey();rows.forEach(function(r){if(r.invalid||r.needsTeam||(r.fileDuplicate&&mode!=='import')){skipped++;return;}var team=_combineEnsureTeam(r.teamName),teamId=team?team.id:'',key=_combineKey(r.name,r.levelLabel||r.tier,r.teamName),dup=existing[key]||null,extra={club:r.club,levelLabel:r.levelLabel,athleteEmail:r.athleteEmail,parentEmail:r.parentEmail,gender:r.gender,grade:r.grade};if(dup&&mode==='skip'){skipped++;return;}if(dup&&mode==='update'){DB.updateAthlete(dup.id,r.name||dup.name,r.tier||dup.tier,r.sport||dup.sport,r.position||dup.position,r.age||dup.age,teamId||dup.team,r.gradYear||dup.gradYear,r.notes||dup.notes,r.bodyweight||dup.bodyweight,r.height||dup.height,extra);updated++;return;}DB.create(r.name,r.tier,r.sport,r.position,r.age,teamId,r.gradYear,r.notes,r.bodyweight,r.height,extra);created++;});_cloudSyncSoon();_toast('Roster import: '+created+' created, '+updated+' updated, '+skipped+' skipped.','#1e6f3e');buildEventMode();var msg=el('combine-import-result');if(msg)msg.innerHTML='<span class="combine-chip good">'+created+' created</span> <span class="combine-chip good">'+updated+' updated</span> <span class="combine-chip warn">'+skipped+' skipped</span>';}
+function confirmRosterImport(){var rows=_combineState.rows||[];if(!rows.length){apeAlert('Upload a roster first.','Roster Import');return;}var modeEl=el('combine-duplicate-mode'),mode=modeEl?modeEl.value:'update',created=0,updated=0,skipped=0,teamsCreated=0,errors=[];var existing=_combineExistingByKey();rows.forEach(function(r){if(r.invalid||r.needsTeam||(r.fileDuplicate&&mode!=='import')){skipped++;if(r.invalid)errors.push('Row '+r.idx+': missing athlete name');return;}var before=_combineTeamMaps().byName[_combineNorm(r.teamName)],team=_combineEnsureTeam(r.teamName);if(!before&&team)teamsCreated++;var teamId=team?team.id:'',key=_combineKey(r.name,r.levelLabel||r.tier,r.teamName),dup=existing[key]||null,extra={club:r.club,levelLabel:r.levelLabel,athleteEmail:r.athleteEmail,parentEmail:r.parentEmail,gender:r.gender,grade:r.grade};if(dup&&mode==='skip'){skipped++;return;}if(dup&&mode==='update'){DB.updateAthlete(dup.id,r.name||dup.name,r.tier||dup.tier,r.sport||dup.sport,r.position||dup.position,r.age||dup.age,teamId||dup.team,r.gradYear||dup.gradYear,r.notes||dup.notes,r.bodyweight||dup.bodyweight,r.height||dup.height,extra);updated++;return;}DB.create(r.name,r.tier,r.sport,r.position,r.age,teamId,r.gradYear,r.notes,r.bodyweight,r.height,extra);created++;existing[key]=DB.find(r.name,r.tier)||true;});_cloudSyncSoon();_toast('Roster import: '+created+' created, '+updated+' updated, '+teamsCreated+' teams, '+skipped+' skipped.','#1e6f3e');buildEventMode();var msg=el('combine-import-result');if(msg)msg.innerHTML='<span class="combine-chip good">'+created+' athletes created</span> <span class="combine-chip good">'+updated+' athletes updated</span> <span class="combine-chip good">'+teamsCreated+' teams created</span> <span class="combine-chip warn">'+skipped+' rows skipped</span>'+(errors.length?'<div style="margin-top:8px;color:var(--s1b)">'+errors.slice(0,5).map(esc).join('<br>')+'</div>':'');}
 function _combineMetricSpecs(){return[{k:'vj',label:'Vertical Jump',short:'VJ',step:'0.1'},{k:'bj',label:'Broad Jump',short:'BJ',step:'0.01'},{k:'rsi',label:'RSI',short:'RSI',step:'0.01'},{k:'f5',label:'5-10 Fly',short:'5-10',step:'0.01'},{k:'f10',label:'10-10 Fly',short:'10-10',step:'0.01'},{k:'threeConeTime',label:'3-Cone L Drill',short:'3-Cone',step:'0.01'},{k:'pro_agility_5_10_5',label:'5-10-5 Pro Agility',short:'5-10-5',step:'0.01'},{k:'gps',label:'GPS Max Velocity',short:'GPS',step:'0.1'}];}
 function _combineStationMetrics(){var st=_combineState.station||'full',all=_combineMetricSpecs();if(st==='power')return all.filter(function(m){return m.k==='vj'||m.k==='bj'||m.k==='rsi';});if(st==='speed')return all.filter(function(m){return m.k==='f5'||m.k==='f10'||m.k==='gps';});if(st==='agility')return all.filter(function(m){return m.k==='threeConeTime'||m.k==='pro_agility_5_10_5';});return all;}
 function _combineComputeSession(a,raw){var t=a.tier||'hs',b=BENCH[t]||BENCH.hs,g=normalizeGender(a.gender);raw.fivetenFiveTime=raw.fivetenFiveTime!=null?raw.fivetenFiveTime:raw.pro_agility_5_10_5;var vp=raw.vj!==null?calculateMetricScore5(raw.vj,'vj',t,g,a.age,b.vj,false):null,hp=raw.bj!==null?calculateMetricScore5(raw.bj,'bj',t,g,a.age,b.bj,false):null,rs=raw.rsi!==null?sRSI(raw.rsi,t):null,ac=raw.f5!==null?calculateMetricScore5(raw.f5,'f5',t,g,a.age,b.f5,true):null,mv=raw.f10!==null?calculateMetricScore5(raw.f10,'f10',t,g,a.age,b.f10,true):null,threeConeScore=calculateAgilityTestScore('threeCone',raw.threeConeTime,t,a.age,g),fivetenFiveScore=calculateAgilityTestScore('fivetenFive',raw.fivetenFiveTime,t,a.age,g),agilityScore=calculateAgilityScore100(raw.threeConeTime,raw.fivetenFiveTime,t,a.age,g),cod=score100ToScore5(agilityScore),gv=raw.gps!==null?scv(raw.gps,b.gps,false):null;var metricScore100={vj:calculateMetricScore100(raw.vj,'vj',t,g,a.age),bj:calculateMetricScore100(raw.bj,'bj',t,g,a.age),f5:calculateMetricScore100(raw.f5,'f5',t,g,a.age),f10:calculateMetricScore100(raw.f10,'f10',t,g,a.age),threeConeTime:threeConeScore,fivetenFiveTime:fivetenFiveScore,pro_agility_5_10_5:fivetenFiveScore,agility:agilityScore};var pa=avg([vp,hp]),sa=avg([ac,mv,gv]),ft=null;if(pa!==null&&sa!==null){var off=sa-pa;ft=off>=1.5?5:off>=0.5?4:off>=-1.0?3:2;if(pa<3&&sa<3)ft=2;}var dp=[vp,hp].filter(function(x){return x!==null;}),ds=[ac,mv,gv,cod].filter(function(x){return x!==null;});var dpa=dp.length?dp.reduce(function(x,y){return x+y;},0)/dp.length:null,dsa=ds.length?ds.reduce(function(x,y){return x+y;},0)/ds.length:null,defType='Incomplete Data',focus='Not enough metrics';if(dpa!==null&&dsa!==null){if(dpa<3&&dsa>=3){defType='Force Deficient';focus='Force production';}else if(dsa<3&&dpa>=3){defType='Form Deficient';focus='Sprint mechanics';}else if(dpa<3&&dsa<3){defType='Mixed Deficiency';focus='General athletic development';}else{defType='Well Developed';focus='Refinement';}}var bkt='base';if(rs!==null&&rs<=2)bkt=1;else if(cod!==null&&cod<=2)bkt=6;else if((vp!==null&&vp<=2)||(hp!==null&&hp<=2)){if(rs===null||rs>=3)bkt=2;}else if(ac!==null&&ac<=2&&pa!==null&&pa>=3)bkt=3;else if(((mv!==null&&mv<=2)||(gv!==null&&gv<=2))&&ac!==null&&ac>=3)bkt=4;else if(ft!==null&&ft<=2&&pa!==null&&pa>=4)bkt=5;var BK={1:{n:'Force Foundation',pri:'Max force production'},2:{n:'Tendon Code',pri:'Extreme isometrics and position strength'},base:{n:'Tendon Code',pri:'General force and tendon capacity'},3:{n:'Power Bridge',pri:'Strength-speed expression'},4:{n:'Drive Phase',pri:'Acceleration and drive mechanics'},5:{n:'Max Velocity',pri:'Top end speed expression'},6:{n:'Change of Direction',pri:'Deceleration and lateral re-acceleration'}};var sc={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gps:gv,ft:ft},ape=calculateAPEscore(sc),adj=computeAdjustedScores(sc,resolvePosGroup(a.sport,a.position));return{raw:raw,sc:sc,bkt:bkt,bktName:BK[bkt].n,defType:defType,focus:BK[bkt].pri||focus,cnt:Object.keys(raw).filter(function(k){return raw[k]!==null;}).length,apeScore:ape,posAdjScore:adj?adj.ape:null,threeConeScore:threeConeScore,fivetenFiveScore:fivetenFiveScore,agilityScore:agilityScore,metricScore100:metricScore100};}
@@ -4060,7 +4175,7 @@ function _combineExportRow(a,s,maps){var raw=s.raw||{},sc=s.sc||{},prev=_combine
 var _combineExportRowBase=_combineExportRow;
 _combineExportRow=function(a,s,maps){var row=_combineExportRowBase(a,s,maps),raw=s.raw||{},sc=s.sc||{},prev=_combinePrevSession(a,s),f505=raw.fivetenFiveTime!=null?raw.fivetenFiveTime:raw.pro_agility_5_10_5;row['Benchmark Gender']=normalizeGender(a.gender);row['3-Cone L Drill']=raw.threeConeTime!=null?raw.threeConeTime:'';row['3-Cone Score']=s.threeConeScore!=null?s.threeConeScore:(raw.threeConeTime!=null?calculateAgilityTestScore('threeCone',raw.threeConeTime,a.tier,a.age,a.gender):'');row['3-Cone Tier']=raw.threeConeTime!=null?getAgilityBenchmarkTier('threeCone',raw.threeConeTime,a.tier,a.age,a.gender):'';row['3-Cone Change']=_combineDelta(s,prev,'threeConeTime');row['5-10-5 Pro Agility']=f505!=null?f505:'';row['5-10-5 Score']=s.fivetenFiveScore!=null?s.fivetenFiveScore:(f505!=null?calculateAgilityTestScore('fivetenFive',f505,a.tier,a.age,a.gender):'');row['5-10-5 Tier']=f505!=null?get505BenchmarkTier(f505,a.tier,a.age,a.gender):'';row['5-10-5 Percentile']=sc.cod?calculatePercentiles(sc.cod):'';row['Agility Score']=s.agilityScore!=null?s.agilityScore:'';row['COD Score']=sc.cod!=null?sc.cod:'';row['5-10-5 Change']=_combineDelta(s,prev,'pro_agility_5_10_5');row['Raw APE Score']=s.apeScore!=null?s.apeScore:calculateAPEscore(sc);return row;};
 var _combineExportRowVerified=_combineExportRow;
-_combineExportRow=function(a,s,maps){var row=_combineExportRowVerified(a,s,maps),v=getSessionVerification(s),profile=getAthletePositionProfile(a),cfg=DB.loadSettings();row['Gender']=genderLabel(a.gender);row['Benchmark Gender']=normalizeGender(a.gender);row['Grade/Class']=gradeDisplay(a.grade);row['Verification']=v.timingMethod;row['Verified Test']=v.verified?'Yes':'No';row['Tester Name']=v.testerName;row['Speed Method']=v.verification.speed;row['Jump Method']=v.verification.jump;row['RSI Method']=v.verification.rsi;row['Broad Jump Method']=v.verification.broadJump;row['Position Group']=profile.positionGroup;row['Priority Metrics']=profile.priorityMetrics.map(function(k){return METRIC_NAMES[k]||k;}).join(', ');row['Position Context']=profile.whyItMatters;row['Gym Name']=cfg.gymName||'';row['Coach Name']=cfg.coachName||'';row['Contact']=cfg.contact||'';row['Export Date']=new Date().toLocaleDateString('en-US');return row;};
+_combineExportRow=function(a,s,maps){var row=_combineExportRowVerified(a,s,maps),v=getSessionVerification(s),profile=getAthletePositionProfile(a),cfg=DB.loadSettings(),idx=(a.s||[]).findIndex(function(ss){return ss.id===s.id;}),prev=idx>0?a.s[idx-1]:null,badges=getAthleteBadges(a,s,prev),alerts=getSessionAlerts(a,s,prev);row['Gender']=genderLabel(a.gender);row['Benchmark Gender']=normalizeGender(a.gender);row['Grade/Class']=gradeDisplay(a.grade);row['Verification']=v.timingMethod;row['Verified Test']=v.verified?'Yes':'No';row['Tester Name']=v.testerName;row['Speed Method']=v.verification.speed;row['Jump Method']=v.verification.jump;row['RSI Method']=v.verification.rsi;row['Broad Jump Method']=v.verification.broadJump;row['Badges']=badges.map(function(b){return b.label;}).join(', ');row['Alerts']=alerts.map(function(a){return a.text;}).join(' | ');row['Position Group']=profile.positionGroup;row['Priority Metrics']=profile.priorityMetrics.map(function(k){return METRIC_NAMES[k]||k;}).join(', ');row['Position Context']=profile.whyItMatters;row['Gym Name']=cfg.gymName||'';row['Coach Name']=cfg.coachName||'';row['Contact']=cfg.contact||'';row['Export Date']=new Date().toLocaleDateString('en-US');return row;};
 function exportLatestTeamResults(){var tid=el('combine-test-team')?el('combine-test-team').value:'';if(!tid){apeAlert('Select a team first.','Export');return;}var maps=_combineTeamMaps(),rows=[];DB.getAll().filter(function(a){return a.team===tid;}).forEach(function(a){if(a.s&&a.s.length)rows.push(_combineExportRow(a,a.s[a.s.length-1],maps));});if(!rows.length){apeAlert('No sessions found for this team.','Export');return;}_combineWriteRows(rows,'APE_Latest_Team_Results.xlsx','Latest Results');}
 function exportTeamHistory(){var tid=el('combine-test-team')?el('combine-test-team').value:'';if(!tid){apeAlert('Select a team first.','Export');return;}var maps=_combineTeamMaps(),rows=[];DB.getAll().filter(function(a){return a.team===tid;}).forEach(function(a){(a.s||[]).forEach(function(s){rows.push(_combineExportRow(a,s,maps));});});if(!rows.length){apeAlert('No history found for this team.','Export');return;}_combineWriteRows(rows,'APE_Full_Team_History.xlsx','Team History');}
 function exportEventResults(){var tid=el('combine-test-team')?el('combine-test-team').value:'',eventName=el('combine-event-name')?el('combine-event-name').value.trim():'';if(!eventName){apeAlert('Enter the event name to export.','Export');return;}var maps=_combineTeamMaps(),rows=[];DB.getAll().filter(function(a){return!tid||a.team===tid;}).forEach(function(a){(a.s||[]).forEach(function(s){if(_combineNorm(s.eventName)===_combineNorm(eventName))rows.push(_combineExportRow(a,s,maps));});});if(!rows.length){apeAlert('No sessions found for this event name.','Export');return;}_combineWriteRows(rows,'APE_'+eventName.replace(/[^a-z0-9]/gi,'_')+'_Results.xlsx','Event Results');}
@@ -4547,11 +4662,16 @@ function build(vj,bj,rsi,s5,s10,gps,threeCone,pa505){
   var _posGroupKey=posProfile.positionGroup;
   var _adjResult=computeAdjustedScores({vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gps:gv,ft:ft},_posGroupKey);
 
-  DB.auto(name,tier,
+  var savedEval=DB.auto(name,tier,
     {vj:vj,bj:bj,rsi:rsi,f5:s5,f10:s10,gps:gps,threeConeTime:threeCone,fivetenFiveTime:pa505,pro_agility_5_10_5:pa505},
     {sc:{vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gps:gv,ft:ft},bkt:bkt,bktName:bk.n,defType:dT,focus:bk.pri,cnt:cnt,apeScore:apeScore,threeConeScore:threeConeScore,fivetenFiveScore:fivetenFiveScore,agilityScore:agilityScore,metricScore100:metricScore100},
     sport,position,age,team,gradYear,notes,bodyweight,height,verification
   );
+  if(savedEval&&savedEval.s){
+    var savedPrev=DB.prev(savedEval.a.id),resultBadges=getAthleteBadges(savedEval.a,savedEval.s,savedPrev),resultAlerts=getSessionAlerts(savedEval.a,savedEval.s,savedPrev);
+    var resultBox=(resultBadges.length||resultAlerts.length)?'<div class="card"><div class="card-title">Achievements & Coach Alerts</div>'+(resultBadges.length?'<div style="margin-bottom:12px">'+renderBadgeChips(resultBadges)+'</div>':'')+(resultAlerts.length?renderAlertList(resultAlerts):'')+'</div>':'';
+    if(resultBox&&el('rc'))el('rc').insertAdjacentHTML('afterbegin',resultBox);
+  }
 
   var ce=el('rc-cmp');if(ce)ce.innerHTML='';
   if(_S.aid){var prev=DB.prev(_S.aid);if(prev&&ce)ce.innerHTML=buildComp(prev,{raw:{vj:vj,bj:bj,rsi:rsi,f5:s5,f10:s10,gps:gps,threeConeTime:threeCone,fivetenFiveTime:pa505,pro_agility_5_10_5:pa505},sc:_S,bkt:bkt,bktName:bk.n,defType:dT,ts:Date.now(),threeConeScore:threeConeScore,fivetenFiveScore:fivetenFiveScore,agilityScore:agilityScore});}
@@ -6334,7 +6454,7 @@ function buildDash(){
     +'<div class="dash-actions">'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildLeaderboard()">'+iconSvg('trophy')+' Leaderboard</button>'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildTeamStats()">'+iconSvg('bar-chart-3')+' Team Stats</button>'
-    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildEventMode()">Event Mode</button>'
+    +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="buildEventMode()">Import Roster / Event Mode</button>'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="toggleProgramSelectMode()">'+(_programSelect.mode?'Done Selecting':'Select')+'</button>'
     +'<button class="btn-save-prog" style="padding:9px 14px;font-size:13px" onclick="exportAllAthletesXLSX()">'+iconSvg('download')+' Export All</button>'
     +'<button class="btn-p" style="padding:9px 16px;font-size:13px;flex:none" onclick="goNew()">'+iconSvg('user-plus')+' New Athlete</button>'
@@ -6349,7 +6469,7 @@ function buildDash(){
   // Filter bar
   var anyFilter=_dashFilter.team||_dashFilter.sport||_dashFilter.level||_dashFilter.grade||_dashFilter.q;
   h+='<div class="filter-bar">'
-    +'<input class="filter-sel'+(_dashFilter.q?' filter-active':'')+'" style="min-width:220px" value="'+esc(_dashFilter.q||'')+'" placeholder="Search athlete name..." oninput="_dashFilter.q=this.value;buildDash()">'
+    +'<input class="filter-sel'+(_dashFilter.q?' filter-active':'')+'" style="min-width:260px" value="'+esc(_dashFilter.q||'')+'" placeholder="Search name, sport, position, or team..." oninput="_dashFilter.q=this.value;buildDash()">'
     +'<select class="filter-sel'+(_dashFilter.team?' filter-active':'')+'" onchange="_dashFilter.team=this.value;buildDash()">'+teamOpts+'</select>'
     +'<select class="filter-sel'+(_dashFilter.sport?' filter-active':'')+'" onchange="_dashFilter.sport=this.value;buildDash()">'+sportOpts+'</select>'
     +'<select class="filter-sel'+(_dashFilter.level?' filter-active':'')+'" onchange="_dashFilter.level=this.value;buildDash()">'+levelOpts+'</select>'
@@ -6363,7 +6483,11 @@ function buildDash(){
     if(_dashFilter.sport&&a.sport!==_dashFilter.sport)return false;
     if(_dashFilter.level&&a.tier!==_dashFilter.level)return false;
     if(_dashFilter.grade&&a.grade!==_dashFilter.grade)return false;
-    if(_dashFilter.q&&String(a.name||'').toLowerCase().indexOf(_dashFilter.q.toLowerCase().trim())===-1)return false;
+    if(_dashFilter.q){
+      var q=_dashFilter.q.toLowerCase().trim(),teamName=a.team&&teamMap[a.team]?teamMap[a.team].name:'';
+      var hay=[a.name,a.sport,a.position,teamName,a.levelLabel,gradeDisplay(a.grade)].filter(Boolean).join(' ').toLowerCase();
+      if(hay.indexOf(q)===-1)return false;
+    }
     return true;
   });
 
@@ -6386,6 +6510,9 @@ function buildDash(){
     var ape=last?(last.apeScore!=null?last.apeScore:(last.sc?getAPEScore(last.sc):null)):null;
     var apeMeta=ape!=null?getAPELabel(ape, a.tier):null;
     var teamTm=a.team&&teamMap[a.team]?teamMap[a.team]:null;
+    var prevCard=(a.s&&a.s.length>=2)?a.s[a.s.length-2]:null;
+    var cardBadges=getAthleteBadges(a,last,prevCard);
+    var cardAlerts=getSessionAlerts(a,last,prevCard);
     // Trend: compare last 2 sessions APE scores
     var trendArrow='',trendColor='var(--mt)';
     if(a.s&&a.s.length>=2){
@@ -6437,6 +6564,8 @@ function buildDash(){
           +'<div class="ath-last-bkt" style="flex:1;min-width:0">'+esc(bucketDisplay(last.bktName,last.bkt))+(apeMeta&&apeMeta.label?' &middot; '+esc(apeMeta.label):'')+'</div>'
           +'</div>'
           +'<div class="ath-last-def">'+esc(last.defType||'')+'</div></div>'
+          +renderBadgeChips(cardBadges,3)
+          +renderLatestAlertMini(cardAlerts)
         :'<div style="font-size:12px;color:var(--mt);font-style:italic;margin-bottom:12px">No test data yet — add first evaluation.</div>')
       // ── Action buttons ──
       +'<div class="ath-actions">'
@@ -6536,6 +6665,14 @@ function buildHist(aid){
     +'<button class="btn-save-prog" style="padding:8px 13px;font-size:12px;flex:none" onclick="exportAthleteXLSX(\''+aid+'\')">&#8681; Export</button>'
     +'<button class="btn-p" style="padding:8px 13px;font-size:12px;flex:none" onclick="startTest(\''+aid+'\')">&#9889; New Test</button></div>';
   h+=AthleteProfileCard(a,'athlete-profile-'+aid);
+  var latestHist=sessions.length?sessions[sessions.length-1]:null,prevHist=sessions.length>1?sessions[sessions.length-2]:null;
+  var latestBadges=getAthleteBadges(a,latestHist,prevHist),latestAlerts=getSessionAlerts(a,latestHist,prevHist);
+  if(latestBadges.length||latestAlerts.length){
+    h+='<div class="card"><div class="card-title">Badges & Coach Alerts</div>'
+      +(latestBadges.length?'<div style="margin-bottom:12px">'+renderBadgeChips(latestBadges)+'</div>':'')
+      +(latestAlerts.length?renderAlertList(latestAlerts):'<div class="pg-sub">No current alerts.</div>')
+      +'</div>';
+  }
 
   if(!sessions.length){
     h+='<div class="hist-tabs">'
@@ -6605,6 +6742,8 @@ function buildHist(aid){
   for(var li=0;li<rev.length;li++){
     var s3=rev[li],bc3=s3.bkt!==undefined?(bkC[s3.bkt]||'var(--or)'):'var(--or)';
     var ver3=getSessionVerification(s3);
+    var s3Idx=sessions.findIndex(function(ss){return ss.id===s3.id;}),s3Prev=s3Idx>0?sessions[s3Idx-1]:null;
+    var s3Badges=getAthleteBadges(a,s3,s3Prev),s3Alerts=getSessionAlerts(a,s3,s3Prev);
     var sVals=[],sKeys=['vp','hp','rs','ac','mv','cod','gps'];
     if(s3.sc){for(var k=0;k<sKeys.length;k++){var sv2=s3.sc[sKeys[k]];if(sv2!=null)sVals.push(sv2);}}
     var avgS=sVals.length?(sVals.reduce(function(a,b){return a+b;},0)/sVals.length).toFixed(1):'—';
@@ -6617,6 +6756,8 @@ function buildHist(aid){
       +'<div style="font-size:11px;color:var(--sb);margin-top:2px">'+esc(s3.defType||'—')+'</div></div>'
       +'<button class="del-btn" id="delsess-'+s3.id+'" onclick="confirmDelSess(\''+aid+'\',\''+s3.id+'\')" style="padding:4px 9px;font-size:11px">&#128465; Delete Session</button>'
       +'</div></div>'
+      +(s3Badges.length?'<div style="margin:7px 0">'+renderBadgeChips(s3Badges)+'</div>':'')
+      +(s3Alerts.length?'<div style="margin:8px 0">'+renderAlertList(s3Alerts)+'</div>':'')
       +'<div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mt)">Coach Notes</div>'
       +'<textarea class="notes-ta" id="nt-'+s3.id+'" placeholder="Add session notes...">'+esc(s3.note||'')+'</textarea>'
       +'<button class="save-note" onclick="saveNote(\''+aid+'\',\''+s3.id+'\')">Save note</button>'
@@ -6712,6 +6853,8 @@ function _sesRow(a,s){
   var raw=s.raw||{};
   var ape=s.apeScore!=null?s.apeScore:getAPEScore(s.sc||{});
   var cfg=DB.loadSettings(),v=getSessionVerification(s),profile=getAthletePositionProfile(a);
+  var idx=(a.s||[]).findIndex(function(ss){return ss.id===s.id;}),prev=idx>0?a.s[idx-1]:null;
+  var badges=getAthleteBadges(a,s,prev),alerts=getSessionAlerts(a,s,prev);
   // Resolve team name from stored team id
   var teamName='';
   if(a.team){var tms=DB.getTeams();for(var ti=0;ti<tms.length;ti++){if(tms[ti].id===a.team){teamName=tms[ti].name;break;}}}
@@ -6762,6 +6905,8 @@ function _sesRow(a,s){
     'APE Score':ape!=null?ape:'',
     'Classification':s.defType||'',
     'Training Bucket':bucketDisplay(s.bktName,s.bkt)||'',
+    'Badges':badges.map(function(b){return b.label;}).join(', '),
+    'Alerts':alerts.map(function(a){return a.text;}).join(' | '),
     'Position Group':profile.positionGroup,
     'Priority Metrics':profile.priorityMetrics.map(function(k){return METRIC_NAMES[k]||k;}).join(', '),
     'Position Context':profile.whyItMatters,
@@ -7999,7 +8144,7 @@ if ('serviceWorker' in navigator) {
     window.location.reload();
   });
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=20260529-programming-kpis').then(function(reg) {
+    navigator.serviceWorker.register('sw.js?v=20260530-internal-testing').then(function(reg) {
       if (reg && reg.update) reg.update();
       console.log('[APE] Service worker registered:', reg.scope);
     }).catch(function(err) {
