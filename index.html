@@ -324,6 +324,9 @@ body{font-family:var(--font);background:
 }
 .hdr-in{max-width:1120px;margin:0 auto;padding:0 24px;height:60px;display:flex;align-items:center;gap:16px}
 .hdr-logo{height:38px;width:auto;display:block;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 0 14px rgba(91,233,255,.28))}
+.hdr-logo-btn{display:flex;align-items:center;justify-content:center;background:transparent;border:0;padding:0;margin:0;cursor:pointer;flex-shrink:0}
+.hdr-logo-btn:hover .hdr-logo{filter:drop-shadow(0 0 18px rgba(91,233,255,.48))}
+.hdr-logo-btn:focus-visible{outline:2px solid var(--or);outline-offset:4px;border-radius:8px}
 .hdr-mid{flex:1;min-width:0}
 .hdr-title{font-family:var(--font);font-size:17px;font-weight:800;color:#fff;letter-spacing:.08em;text-transform:uppercase;line-height:1}
 .hdr-sub{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--or);font-weight:700;margin-top:2px;opacity:.85}
@@ -1337,7 +1340,9 @@ select option{background:var(--dk3)}
 <div class="app-shell" id="app-shell">
 <div class="hdr">
   <div class="hdr-in">
-    <img src="assets/ape-logo-horizontal.png" class="hdr-logo" alt="APE — Athlete Performance Evolution">
+    <button type="button" class="hdr-logo-btn" onclick="showLanding()" aria-label="Back to APE landing page">
+      <img src="assets/ape-logo-horizontal.png" class="hdr-logo" alt="APE — Athlete Performance Evaluator">
+    </button>
     <div class="hdr-mid"><div class="hdr-title" style="display:none">APE</div><div class="hdr-sub">ATHLETE PERFORMANCE EVOLUTION</div></div>
     <div class="hdr-nav">
       <button class="nav-btn" id="nav-dash" onclick="goDash()">Athletes</button>

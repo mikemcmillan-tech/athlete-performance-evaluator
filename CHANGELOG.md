@@ -18,6 +18,7 @@ All notable changes to APE will be documented here.
 - Added internal-testing polish for dashboard search, roster import duplicate updates, achievement badges, coach alerts, speed badges, and export summaries.
 - Upgraded Event Mode with dropdown filters, sport-specific positions, active station setup, station completion counters, partial station saves, and event export status fields.
 - Fixed Event Mode station highlighting so every checked station remains visible and highlighted while station navigation stays independent.
+- Made the app header logo clickable so coaches can return to the landing page from inside the app.
 
 ## Earlier History
 

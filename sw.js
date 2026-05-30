@@ -1,5 +1,5 @@
-// APE Service Worker - v14
-const CACHE_NAME = 'ape-v14-event-station-highlight';
+// APE Service Worker - v15
+const CACHE_NAME = 'ape-v15-clickable-logo-home';
 const PRECACHE = [
   './',
   './index.html',
