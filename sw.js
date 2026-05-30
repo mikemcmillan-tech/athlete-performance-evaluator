@@ -1,5 +1,5 @@
-// APE Service Worker - v12
-const CACHE_NAME = 'ape-v12-internal-testing';
+// APE Service Worker - v13
+const CACHE_NAME = 'ape-v13-event-mode-stations';
 const PRECACHE = [
   './',
   './index.html',
