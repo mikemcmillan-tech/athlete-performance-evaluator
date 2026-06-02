@@ -1,5 +1,5 @@
-// APE Service Worker - v18
-const CACHE_NAME = 'ape-v18-sample-experience-label';
+// APE Service Worker - v19
+const CACHE_NAME = 'ape-v19-demo-pages-wired';
 const PRECACHE = [
   './',
   './index.html',

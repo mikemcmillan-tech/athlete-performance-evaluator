@@ -22,6 +22,7 @@ All notable changes to APE will be documented here.
 - Added a public Sample Experience with read-only mock dashboard and client report previews before login.
 - Repositioned the landing page around APE as a standalone coach-built platform with Why APE, founder/methodology, philosophy, and sample output sections.
 - Aligned the public preview section label with the Sample Experience naming.
+- Wired demo dashboard, athlete report, and combine previews into visible landing/header navigation and real app page containers.
 
 ## Earlier History
 
