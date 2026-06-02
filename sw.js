@@ -1,5 +1,5 @@
-// APE Service Worker - v15
-const CACHE_NAME = 'ape-v15-clickable-logo-home';
+// APE Service Worker - v16
+const CACHE_NAME = 'ape-v16-sample-experience';
 const PRECACHE = [
   './',
   './index.html',

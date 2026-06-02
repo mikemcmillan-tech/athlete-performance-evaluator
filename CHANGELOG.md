@@ -19,6 +19,7 @@ All notable changes to APE will be documented here.
 - Upgraded Event Mode with dropdown filters, sport-specific positions, active station setup, station completion counters, partial station saves, and event export status fields.
 - Fixed Event Mode station highlighting so every checked station remains visible and highlighted while station navigation stays independent.
 - Made the app header logo clickable so coaches can return to the landing page from inside the app.
+- Added a public Sample Experience with read-only mock dashboard and client report previews before login.
 
 ## Earlier History
 
