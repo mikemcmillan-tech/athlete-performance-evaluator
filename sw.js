@@ -1,5 +1,5 @@
-// APE Service Worker - v19
-const CACHE_NAME = 'ape-v19-demo-pages-wired';
+// APE Service Worker - v20
+const CACHE_NAME = 'ape-v20-demo-startup-fix';
 const PRECACHE = [
   './',
   './index.html',

@@ -1175,7 +1175,7 @@ select option{background:var(--dk3)}
         <a href="#landing-parents">For Parents</a>
         <a href="#landing-about">About</a>
       </div>
-      <button class="landing-nav-note" onclick="document.getElementById('landing-login').scrollIntoView({behavior:'smooth',block:'center'})">Login</button>
+      <button class="landing-nav-note" onclick="document.getElementById('landing-login').scrollIntoView({behavior:'smooth',block:'center'})">Coach Login</button>
     </div>
 
     <div class="landing-main">
@@ -1184,7 +1184,7 @@ select option{background:var(--dk3)}
         <h1 class="landing-title">Reports parents understand.<br><em>Programs coaches trust.</em></h1>
         <p class="landing-text">APE is a coaching operating system that turns athletic testing into actionable training direction, parent-facing reports, and athlete progress tracking. Built from real coaching experience inside modern performance environments.</p>
         <div class="landing-hero-actions">
-          <button class="btn-p" onclick="startDemoCoach()">Try the Demo &rarr;</button>
+          <button class="btn-p" onclick="startDemoCoach()">Try Demo Evaluation &rarr;</button>
           <button class="btn-s" onclick="goSampleDashboard()">View Sample Dashboard</button>
           <button class="btn-s" onclick="goSampleReport()">View Sample Athlete Report</button>
           <button class="btn-s" onclick="goDemoCombine()">View Sample Combine</button>
@@ -1440,9 +1440,9 @@ select option{background:var(--dk3)}
         <p class="landing-section-copy">No signup required. Run a sample athlete through the full evaluation flow and see the report APE generates. Takes about 90 seconds.</p>
       </div>
       <div class="landing-hero-actions" style="margin-top:0">
-        <button class="btn-p" onclick="startDemoCoach()">Try the Demo &rarr;</button>
+        <button class="btn-p" onclick="startDemoCoach()">Try Demo Evaluation &rarr;</button>
         <button class="btn-s" onclick="goSampleDashboard()">View Sample Dashboard</button>
-        <button class="btn-s" onclick="goSampleReport()">View Sample Client Report</button>
+        <button class="btn-s" onclick="goSampleReport()">View Sample Athlete Report</button>
       </div>
       <div class="landing-alpha">Want to join the alpha cohort? Email <a href="mailto:mike@apeperformance.com">mike@apeperformance.com</a></div>
     </div>
@@ -2408,12 +2408,16 @@ function _activateDemoPage(pageId){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 function showLanding(){
-  var l=el('landing-screen'),a=el('app-shell'),s=el('sample-screen');
+  var l=el('landing-screen'),a=el('app-shell'),s=el('sample-screen'),p=el('athlete-portal'),sw=el('sw');
   document.body.classList.remove('viewer-mode','demo-report-mode');
   if(l)l.classList.add('active');
   if(a)a.classList.remove('active');
   if(s)s.classList.remove('active');
+  if(p)p.classList.remove('active');
+  if(sw)sw.style.display='none';
   document.querySelectorAll('.page').forEach(function(pg){pg.classList.remove('active');});
+  ['nav-dash','nav-teams','nav-demo-dashboard','nav-demo-report','nav-demo-combine'].forEach(function(id){var b=el(id);if(b)b.classList.remove('act');});
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 function goLanding(){showLanding();}
 function enterCoachApp(){
@@ -8323,10 +8327,11 @@ function shareAthletePortal(){
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
-// On load: populate team dropdown, then go to dashboard.
+// On load: default to the public landing page, then promote authenticated users.
 populateSportOptions('');
 updatePositionOptions('');
 refreshTeamSelect('');
+showLanding();
 // Restore Supabase session if one exists from a previous page load
 (function(){
   var supa=_supaClient();
@@ -8461,7 +8466,7 @@ if ('serviceWorker' in navigator) {
     window.location.reload();
   });
   window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js?v=20260530-internal-testing').then(function(reg) {
+    navigator.serviceWorker.register('sw.js?v=20260602-demo-startup-fix').then(function(reg) {
       if (reg && reg.update) reg.update();
       console.log('[APE] Service worker registered:', reg.scope);
     }).catch(function(err) {
