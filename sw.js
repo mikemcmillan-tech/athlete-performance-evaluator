@@ -1,5 +1,5 @@
-// APE Service Worker - v17
-const CACHE_NAME = 'ape-v17-landing-repositioning';
+// APE Service Worker - v18
+const CACHE_NAME = 'ape-v18-sample-experience-label';
 const PRECACHE = [
   './',
   './index.html',
