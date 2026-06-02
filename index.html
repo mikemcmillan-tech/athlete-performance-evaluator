@@ -279,14 +279,16 @@ body{font-family:var(--font);background:
 .feature-title{font-family:var(--font);font-size:15px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#fff;line-height:1.1}
 .feature-copy{font-size:11px;color:var(--mt);line-height:1.45;margin-top:6px}
 .landing-error{display:none;font-size:12px;color:var(--s1b);background:rgba(201,59,59,.11);border:1px solid rgba(201,59,59,.32);border-radius:var(--radius-sm);padding:9px 11px;margin-bottom:14px;line-height:1.5}
-.landing-section{scroll-margin-top:90px;margin-top:54px;padding:34px;border:1px solid rgba(255,255,255,.08);border-radius:22px;background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.008));box-shadow:0 24px 70px rgba(0,0,0,.22);backdrop-filter:blur(16px)}
+.landing-section{scroll-margin-top:90px;margin-top:54px;padding:34px;border:1px solid rgba(255,255,255,.08);border-radius:22px;background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.008));box-shadow:0 24px 70px rgba(0,0,0,.22);backdrop-filter:blur(16px);animation:landingReveal .7s ease both;animation-timeline:view();animation-range:entry 8% cover 24%}
+@keyframes landingReveal{from{opacity:.35;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
 .landing-section-head{max-width:760px;margin-bottom:24px}
-.landing-section-kicker{font-size:10px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:var(--or);margin-bottom:10px}
-.landing-section-title{font-family:var(--font);font-size:clamp(32px,4vw,52px);font-weight:900;line-height:.96;letter-spacing:-.01em;text-transform:uppercase;color:#fff;margin:0}
-.landing-section-copy{font-size:15px;color:#a8b2c6;line-height:1.7;margin:14px 0 0;max-width:880px}
+.landing-section-kicker{font-size:10px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:#1E90FF;margin-bottom:10px}
+.landing-section-title{font-family:var(--font);font-size:clamp(36px,4.5vw,60px);font-weight:900;line-height:.94;letter-spacing:-.01em;text-transform:uppercase;color:#fff;margin:0}
+.landing-section-copy{font-size:15px;color:#a8b2c6;line-height:1.72;margin:14px 0 0;max-width:760px}
 .landing-card-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.landing-feature-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:24px}
 .landing-benefit-card,.landing-platform-card{position:relative;overflow:hidden;border:1px solid rgba(91,233,255,.14);border-radius:18px;background:linear-gradient(145deg,rgba(8,19,32,.88),rgba(5,8,13,.72));padding:20px;min-height:240px;transition:transform .2s,border-color .2s,box-shadow .2s}
-.landing-benefit-card:hover,.landing-platform-card:hover{transform:translateY(-4px);border-color:rgba(91,233,255,.38);box-shadow:0 20px 54px rgba(0,0,0,.3),0 0 36px rgba(91,233,255,.08)}
+.landing-benefit-card:hover,.landing-platform-card:hover{transform:translateY(-6px);border-color:rgba(91,233,255,.44);box-shadow:0 24px 60px rgba(0,0,0,.34),0 0 42px rgba(30,144,255,.12)}
 .landing-benefit-card::before,.landing-platform-card::before{content:'';position:absolute;inset:-70px -90px auto auto;width:180px;height:180px;background:radial-gradient(circle,rgba(91,233,255,.16),transparent 66%);pointer-events:none}
 .landing-card-num{width:38px;height:38px;border-radius:12px;border:1px solid rgba(91,233,255,.26);background:rgba(91,233,255,.08);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:900;color:var(--or);margin-bottom:18px}
 .landing-card-title{position:relative;font-family:var(--font);font-size:21px;font-weight:900;line-height:1.05;text-transform:uppercase;color:#fff;letter-spacing:.02em}
@@ -300,6 +302,12 @@ body{font-family:var(--font);background:
 .landing-inline-cta:hover{color:#fff}
 .landing-founder-row{display:grid;grid-template-columns:minmax(0,.55fr) minmax(0,1.45fr);gap:24px;align-items:center}
 .landing-founder-name{font-family:var(--font);font-size:clamp(30px,4vw,52px);font-weight:900;text-transform:uppercase;color:#fff;line-height:1}
+.landing-profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:20px}
+.landing-profile-card{border:1px solid rgba(91,233,255,.14);border-radius:18px;background:linear-gradient(145deg,rgba(8,19,32,.9),rgba(5,8,13,.76));padding:22px;transition:transform .2s,border-color .2s,box-shadow .2s}
+.landing-profile-card:hover{transform:translateY(-5px);border-color:rgba(30,144,255,.42);box-shadow:0 22px 54px rgba(0,0,0,.32),0 0 34px rgba(30,144,255,.1)}
+.landing-profile-role{font-size:11px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#1E90FF;margin:8px 0 12px}
+.landing-philosophy-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-top:22px}
+.landing-philosophy-pill{border:1px solid rgba(30,144,255,.2);border-radius:999px;background:rgba(30,144,255,.07);color:#dfefff;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-align:center;padding:10px 12px}
 .landing-demo-cta{text-align:center}
 .landing-demo-cta .landing-section-head{margin:0 auto 22px}
 .landing-alpha{font-size:12px;color:var(--mt);margin-top:14px}
@@ -859,7 +867,7 @@ select option{background:var(--dk3)}
 .landing-role-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:14px 0 12px;padding:4px;border:1px solid var(--bd);border-radius:10px;background:rgba(255,255,255,.025)}
 .landing-role-tab{border:none;border-radius:7px;background:transparent;color:var(--mt);font-family:var(--font);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:9px 6px;cursor:pointer;transition:all .18s}
 .landing-role-tab.act{background:rgba(91,233,255,.12);color:var(--or);box-shadow:inset 0 0 0 1px rgba(91,233,255,.28)}
-@media(max-width:760px){.viewer-grid{grid-template-columns:1fr}.viewer-title{font-size:23px}.viewer-card-head{flex-direction:column}.viewer-score{width:100%;justify-content:flex-start}.landing-role-tabs{grid-template-columns:1fr}.analytics-viz-grid{grid-template-columns:1fr}.analytics-viz-chart{height:214px}}
+@media(max-width:760px){.viewer-grid{grid-template-columns:1fr}.viewer-title{font-size:23px}.viewer-card-head{flex-direction:column}.viewer-score{width:100%;justify-content:flex-start}.landing-role-tabs{grid-template-columns:1fr}.analytics-viz-grid{grid-template-columns:1fr}.analytics-viz-chart{height:214px}.landing-profile-grid,.landing-philosophy-list,.landing-feature-grid{grid-template-columns:1fr}}
 .prog-6wk-row{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--bd)}
 .prog-6wk-row:last-child{border-bottom:none}
 .prog-6wk-lbl{flex:0 0 64px;font-family:var(--font);font-size:13px;font-weight:700;color:var(--or);padding-top:1px}
@@ -1317,53 +1325,106 @@ select option{background:var(--dk3)}
       <div class="landing-small-note">Coach Mode is available now. Family Mode (parent + athlete accounts) ships 30-60 days after launch.</div>
     </div>
 
-    <div class="landing-section landing-wide-band" id="landing-usr">
+    <div class="landing-section landing-wide-band" id="landing-why">
       <div class="landing-section-head">
-        <div class="landing-section-kicker">Where APE fits</div>
-        <h2 class="landing-section-title">USR rates athletes. APE produces the coaching layer USR doesn't.</h2>
+        <div class="landing-section-kicker">Why APE</div>
+        <h2 class="landing-section-title">Coaches don't need more data. They need better decisions.</h2>
       </div>
-      <p class="landing-section-copy">If you use Universal Speed Rating at your facility, APE works alongside it. USR gives every athlete a universal rating, useful for recruiting context. APE produces the parent-facing report, the deficiency classification, and the training direction that USR doesn't try to provide.</p>
-      <p class="landing-section-copy">A coach using both gets the rating for recruiting and the operating system for daily coaching work. They're different jobs.</p>
-      <a class="landing-inline-cta" href="#landing-usr">Read the full positioning &rarr;</a>
+      <p class="landing-section-copy">APE transforms testing results into athlete classifications, progress tracking, and actionable coaching direction.</p>
+      <p class="landing-section-copy">Built for performance coaches, private facilities, schools, and combines, APE helps coaches evaluate athletes faster, communicate value to parents, and create a clear roadmap for improvement.</p>
+      <div class="landing-feature-grid">
+        <div class="landing-benefit-card">
+          <div class="landing-card-title">Athlete Performance Score</div>
+          <div class="landing-card-copy">Generate a standardized performance score across key athletic qualities.</div>
+        </div>
+        <div class="landing-benefit-card">
+          <div class="landing-card-title">Deficiency Classification</div>
+          <div class="landing-card-copy">Identify whether athletes are force deficient, form deficient, mixed, or well developed.</div>
+        </div>
+        <div class="landing-benefit-card">
+          <div class="landing-card-title">Client Reports</div>
+          <div class="landing-card-copy">Deliver professional athlete and parent reports in seconds.</div>
+        </div>
+        <div class="landing-benefit-card">
+          <div class="landing-card-title">Progress Tracking</div>
+          <div class="landing-card-copy">Monitor development over time with visual trends and historical testing data.</div>
+        </div>
+        <div class="landing-benefit-card">
+          <div class="landing-card-title">Training Recommendations</div>
+          <div class="landing-card-copy">Provide clear next steps based on athlete limitations and evaluation results.</div>
+        </div>
+        <div class="landing-benefit-card">
+          <div class="landing-card-title">Combine &amp; Team Analytics</div>
+          <div class="landing-card-copy">Analyze entire rosters and testing events from a single dashboard.</div>
+        </div>
+      </div>
+      <a class="landing-inline-cta" href="#landing-features">Learn how APE works &rarr;</a>
     </div>
 
     <div class="landing-section landing-founder" id="landing-about">
-      <div class="landing-founder-row">
-        <div>
-          <div class="landing-section-kicker">Who built this</div>
+      <div class="landing-section-head">
+        <div class="landing-section-kicker">Who's Behind APE</div>
+        <h2 class="landing-section-title">Mike McMillan</h2>
+      </div>
+      <div class="landing-profile-grid">
+        <div class="landing-profile-card">
           <div class="landing-founder-name">Mike McMillan</div>
+          <div class="landing-profile-role">Founder of APE and Performance Coach at New Athlete</div>
+          <p class="landing-section-copy">APE was built from years of hands-on experience evaluating athletes, coaching performance, and solving the real problems coaches face every day.</p>
+          <p class="landing-section-copy">Designed to help coaches deliver better evaluations, clearer communication, and measurable athlete development.</p>
         </div>
-        <div>
-          <p class="landing-section-copy">4-1 professional boxer. Coach at New Athlete (Vancouver, WA). Built APE because the tools coaches were using weren't solving the actual problems we have at the gym.</p>
-          <a class="landing-inline-cta" href="#landing-about">Read the full story &rarr;</a>
+        <div class="landing-profile-card">
+          <div class="landing-founder-name">Ryan Paul</div>
+          <div class="landing-profile-role">Performance Director at New Athlete</div>
+          <p class="landing-section-copy">Provides performance methodology insight and practical coaching feedback that helps shape how APE serves coaches and athletes.</p>
         </div>
       </div>
+      <p class="landing-section-copy" style="margin-top:20px">Built with input from coaches, athletes, and performance professionals working in the field every day.</p>
+    </div>
+
+    <div class="landing-section landing-wide-band" id="landing-philosophy">
+      <div class="landing-section-head">
+        <div class="landing-section-kicker">Our Philosophy</div>
+        <h2 class="landing-section-title">Built in the field. Not in a boardroom.</h2>
+      </div>
+      <p class="landing-section-copy">APE wasn't created by software developers guessing what coaches need.</p>
+      <p class="landing-section-copy">It was built from real testing sessions, real athlete evaluations, and real conversations with coaches working with athletes every day.</p>
+      <p class="landing-section-copy">Every feature exists to solve an actual coaching problem:</p>
+      <div class="landing-philosophy-list">
+        <div class="landing-philosophy-pill">Faster evaluations</div>
+        <div class="landing-philosophy-pill">Better athlete communication</div>
+        <div class="landing-philosophy-pill">Professional reporting</div>
+        <div class="landing-philosophy-pill">Clear training direction</div>
+        <div class="landing-philosophy-pill">Long-term progress tracking</div>
+      </div>
+      <p class="landing-section-copy" style="font-weight:900;color:#fff;margin-top:24px">The goal isn't more data.</p>
+      <p class="landing-section-copy" style="font-weight:900;color:#1E90FF">The goal is better athlete outcomes.</p>
     </div>
 
     <div class="landing-section landing-wide-band" id="landing-samples">
       <div class="landing-section-head">
-        <div class="landing-section-kicker">Sample Experience</div>
-        <h2 class="landing-section-title">Preview the coach dashboard and parent-ready report.</h2>
-        <p class="landing-section-copy">Open APE with sample athletes and a polished client report before creating an account. These previews are read-only and never touch your real athlete database.</p>
+        <div class="landing-section-kicker">Sample Output</div>
+        <h2 class="landing-section-title">See what coaches deliver.</h2>
+        <p class="landing-section-copy">Preview the artifacts APE helps coaches put in front of athletes, parents, teams, and event organizers. These previews are read-only and never touch your real athlete database.</p>
       </div>
       <div class="landing-platform-grid">
         <div class="landing-platform-card">
-          <div class="landing-cost-chip">Coach Preview</div>
-          <div class="landing-card-title">Sample Dashboard</div>
-          <div class="landing-card-copy">See athlete cards, team stats, latest scores, and a leaderboard using mock data.</div>
+          <div class="landing-cost-chip">Report Output</div>
+          <div class="landing-card-title">Athlete Evaluation Report</div>
+          <div class="landing-card-copy">Professional multi-page athlete report with scores, classifications, strengths, weaknesses, and recommendations.</div>
+          <button class="btn-s" style="margin-top:18px" onclick="goSampleReport()">View Sample Report</button>
+        </div>
+        <div class="landing-platform-card">
+          <div class="landing-cost-chip">Coach Output</div>
+          <div class="landing-card-title">Team Dashboard</div>
+          <div class="landing-card-copy">Monitor team trends, strengths, weaknesses, and testing history.</div>
           <button class="btn-s" style="margin-top:18px" onclick="goSampleDashboard()">View Sample Dashboard</button>
         </div>
         <div class="landing-platform-card">
-          <div class="landing-cost-chip">Report Preview</div>
-          <div class="landing-card-title">Sample Client Report</div>
-          <div class="landing-card-copy">Preview the APE Score, position context, training priorities, and six-week recommendation layout.</div>
-          <button class="btn-s" style="margin-top:18px" onclick="goSampleReport()">View Sample Client Report</button>
-        </div>
-        <div class="landing-platform-card">
-          <div class="landing-cost-chip">No Login Needed</div>
-          <div class="landing-card-title">Preview Only</div>
-          <div class="landing-card-copy">Sample pages are hardcoded, read-only, and separate from localStorage, Supabase, and real coach data.</div>
-          <button class="btn-p" style="margin-top:18px" onclick="startDemoCoach()">Start Your First Evaluation</button>
+          <div class="landing-cost-chip">Event Output</div>
+          <div class="landing-card-title">Combine Event Analytics</div>
+          <div class="landing-card-copy">Mass testing and ranking for camps, schools, and organizations.</div>
+          <button class="btn-s" style="margin-top:18px" onclick="goSampleCombine()">View Sample Combine</button>
         </div>
       </div>
     </div>
@@ -2358,8 +2419,19 @@ function buildSampleReport(){
   h+='<section class="sample-report-grid"><div class="sample-report-panel"><h3>Raw Testing Data</h3>'+rawRows+'</div><div class="sample-report-panel"><h3>1–5 Metric Scores</h3>'+scoreRows+'</div><div class="sample-report-panel"><h3>Deficiency Profile</h3><p>'+esc(r.deficiency)+'</p><p>Classification: <strong>'+esc(r.classification)+'</strong></p></div><div class="sample-report-panel"><h3>Position Profile</h3><p>For a football WR, acceleration and max velocity are priority qualities because separation, route breaks, and open-field speed are position-critical. Horizontal power and force transfer show whether that speed can be repeated through contact and fatigue.</p></div><div class="sample-report-panel"><h3>Training Priorities</h3><ul>'+r.priorities.map(function(p){return'<li>'+esc(p)+'</li>';}).join('')+'</ul></div><div class="sample-report-panel"><h3>6-Week Recommendation Preview</h3><ol>'+r.weeks.map(function(w){return'<li>'+esc(w)+'</li>';}).join('')+'</ol></div></section>';
   h+='</div></article>';out.innerHTML=h;return h;
 }
+function buildSampleCombine(){
+  var out=el('sample-out');if(!out)return;var athletes=SAMPLE_DATA.athletes.slice().sort(function(a,b){return b.ape-a.ape;});
+  var h='<div class="sample-top"><div><div class="sample-badge">Sample Combine — Preview Only</div><h1 class="sample-title">Sample Event Analytics</h1><p class="sample-sub">A mock mass-testing view for camps, schools, clubs, and organizations. Track active stations, roster completion, leaderboards, and event-level insights without adding anything to real athlete data.</p><div class="sample-actions"><button class="btn-p" onclick="startDemoCoach();setTimeout(buildEventMode,80)">Start an Event</button><button class="btn-s" onclick="showLanding()">Back to Landing Page</button><button class="btn-s" onclick="goSampleDashboard()">View Sample Dashboard</button></div></div><img src="assets/ape-logo-stacked.png" alt="APE" style="height:86px;width:auto;filter:drop-shadow(0 0 26px rgba(91,233,255,.28))"></div>';
+  h+='<div class="sample-grid"><div class="stat-card"><div class="stat-top"><div class="stat-num">42</div></div><div class="stat-lbl">Event Athletes</div></div><div class="stat-card"><div class="stat-top"><div class="stat-num">38/42</div></div><div class="stat-lbl">Speed Complete</div></div><div class="stat-card"><div class="stat-top"><div class="stat-num">35/42</div></div><div class="stat-lbl">Power Complete</div></div><div class="stat-card"><div class="stat-top"><div class="stat-num">31/42</div></div><div class="stat-lbl">Agility Complete</div></div></div>';
+  h+='<div class="sample-section"><div class="sample-section-title">Event Leaderboards</div><div class="sample-card-grid">';
+  [['Top APE Score',athletes[0].name,athletes[0].ape],['Fastest WR / Skill',athletes[0].name,'1.04s 10-10'],['Best Power Output',athletes[4].name,'92 Power'],['Top COD Athlete',athletes[3].name,'91 COD'],['Most Improved',athletes[5].name,'+11 APE'],['Team Average','Football Varsity','82.4 APE']].forEach(function(x){h+='<div class="sample-athlete-card"><div class="sample-card-title" style="font-family:var(--font);font-size:18px;font-weight:900;text-transform:uppercase;color:#fff">'+esc(x[0])+'</div><div style="font-size:22px;font-weight:900;color:var(--or);margin-top:10px">'+esc(x[1])+'</div><div class="sample-meta">'+esc(x[2])+' · Sample event data</div></div>';});
+  h+='</div></div><div class="sample-section"><div class="sample-section-title">Roster Ranking Preview</div><div class="sample-leaderboard">';
+  athletes.forEach(function(a,i){h+='<div class="sample-lb-row"><strong style="color:var(--or)">#'+(i+1)+'</strong><div><div style="font-weight:900;color:#fff">'+esc(a.name)+'</div><div style="font-size:12px;color:var(--sb)">'+esc(a.team)+' · '+esc(a.sport)+' · '+esc(a.position)+'</div></div><div style="font-family:var(--mono);font-size:22px;font-weight:900;color:'+getAPEGaugeColor(a.ape)+'">'+a.ape+'</div></div>';});
+  h+='</div></div>';out.innerHTML=h;return h;
+}
 function goSampleDashboard(){buildSampleDashboard();_showSampleShell();}
 function goSampleReport(){buildSampleReport();_showSampleShell();}
+function goSampleCombine(){buildSampleCombine();_showSampleShell();}
 function showSampleReport(){goSampleReport();}
 function isViewerRole(role){return role==='athlete_viewer'||role==='parent_viewer';}
 function getAccountRole(user){

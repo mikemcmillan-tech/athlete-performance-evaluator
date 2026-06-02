@@ -20,6 +20,7 @@ All notable changes to APE will be documented here.
 - Fixed Event Mode station highlighting so every checked station remains visible and highlighted while station navigation stays independent.
 - Made the app header logo clickable so coaches can return to the landing page from inside the app.
 - Added a public Sample Experience with read-only mock dashboard and client report previews before login.
+- Repositioned the landing page around APE as a standalone coach-built platform with Why APE, founder/methodology, philosophy, and sample output sections.
 
 ## Earlier History
 
