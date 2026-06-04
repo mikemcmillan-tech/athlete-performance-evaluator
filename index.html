@@ -431,7 +431,7 @@ select option{background:var(--dk3)}
 .notes-ta:focus{border-color:var(--or);box-shadow:0 0 0 3px var(--or-glow)}
 
 /* ── Tier buttons ── */
-.tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:10px}
+.tier-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px;margin-top:10px}
 .tier-btn{
   padding:14px 8px 12px;border:1px solid var(--bd);border-radius:var(--radius);
   background:var(--dk3);color:var(--mt);cursor:pointer;text-align:center;
@@ -1565,8 +1565,13 @@ select option{background:var(--dk3)}
         </div>
         <div class="field">
           <label>Grade / Class</label>
-          <select id="inp-grade">
+          <select id="inp-grade" onchange="applyGradeTierSuggestion()">
             <option value="">Select grade/class</option>
+            <optgroup label="Middle School">
+              <option value="6th">6th - Middle School</option>
+              <option value="7th">7th - Middle School</option>
+              <option value="8th">8th - Middle School</option>
+            </optgroup>
             <optgroup label="High School">
               <option value="9th">9th - Freshman</option>
               <option value="10th">10th - Sophomore</option>
@@ -1620,7 +1625,8 @@ select option{background:var(--dk3)}
       <div class="field">
         <label>Athlete Level <span style="font-size:10px;font-weight:500;text-transform:none;letter-spacing:0;color:var(--mt)">— scores are benchmarked within this level only</span></label>
         <div class="tier-grid" style="margin-top:12px">
-          <button class="tier-btn" data-tier="youth" onclick="selTier('youth',this)"><span class="t-ico">&#127807;</span>Youth<span class="t-sub">Under 14</span></button>
+          <button class="tier-btn" data-tier="youth" onclick="selTier('youth',this)"><span class="t-ico">&#127807;</span>Youth<span class="t-sub">8–11 / Elementary</span></button>
+          <button class="tier-btn" data-tier="middle" onclick="selTier('middle',this)"><span class="t-ico">&#127979;</span>Middle School<span class="t-sub">6th–8th</span></button>
           <button class="tier-btn" data-tier="hs" onclick="selTier('hs',this)"><span class="t-ico">&#127979;</span>High School<span class="t-sub">14–18</span></button>
           <button class="tier-btn" data-tier="college" onclick="selTier('college',this)"><span class="t-ico">&#127891;</span>College<span class="t-sub">18–22</span></button>
           <button class="tier-btn" data-tier="pro" onclick="selTier('pro',this)"><span class="t-ico">&#9889;</span>Pro / Elite<span class="t-sub">22+</span></button>
@@ -2820,13 +2826,21 @@ function clearProgramLogo(){
 var tier=null, _S={}, _dashFilter={team:'',sport:'',level:'',grade:'',q:''}, _lbState={metric:'ape',team:'',sport:'',pos:'',level:'',gender:'separate',limit:10};
 var _programSelect={mode:false,ids:{}};
 var _combineState={rawRows:[],rows:[],summary:null,fileName:'',station:'speed',activeStations:{speed:true,power:true,agility:true}};
-var TIERS={youth:'Youth (U14)',hs:'High School',college:'College',pro:'Pro / Elite'};
+var LEVEL_OPTIONS=[
+  {k:'youth',l:'Youth (8-11)'},
+  {k:'middle',l:'Middle School (6th-8th)'},
+  {k:'hs',l:'High School'},
+  {k:'college',l:'College'},
+  {k:'pro',l:'Pro / Elite'}
+];
+var TIERS={youth:'Youth (8-11)',middle:'Middle School (6th-8th)',hs:'High School',college:'College',pro:'Pro / Elite'};
 // Sprint benchmarks (f5 = 5-10 fly, f10 = 10-10 fly) — lower time = better (lb:true).
 // Array format: [unused_floor, avg_max, solid_max, strong_max, elite_max]
 // Thresholds represent real training-environment distributions, not combine-only data.
 // HS & College middle bands intentionally widened so "Average" reflects actual averages.
 var BENCH={
   youth: {vj:[14,14,18,22,26],bj:[5.0,5.0,5.7,6.4,7.1],f5:[1.42,1.42,1.33,1.25,1.17],f10:[1.35,1.35,1.27,1.19,1.11],pro_agility_5_10_5:[5.60,5.60,5.25,4.95,4.65],gps:[15.0,15.0,16.5,17.5,18.5]},
+  middle:{vj:[16,16,20,24,28],bj:[5.5,5.5,6.2,6.9,7.6],f5:[1.50,1.46,1.36,1.28,1.20],f10:[1.40,1.36,1.28,1.20,1.12],pro_agility_5_10_5:[5.45,5.45,5.10,4.80,4.50],gps:[15.8,15.8,17.2,18.2,19.2]},
   hs:    {vj:[18,18,23,27,31],bj:[6.0,6.0,6.8,7.5,8.2],f5:[1.42,1.38,1.28,1.20,1.12],f10:[1.35,1.30,1.20,1.13,1.05],pro_agility_5_10_5:[5.25,5.25,4.95,4.65,4.35],gps:[16.5,16.5,18.0,19.0,20.5]},
   // College sprints — widened bands to reflect real training-population distributions.
   // 5-10 Fly avg band: 1.34–1.46s · Solid: 1.22–1.34s · Strong: 1.10–1.22s · Elite: ≤1.10s
@@ -2873,11 +2887,12 @@ var PCTL=['',' Bottom 20%','20th–40th','40th–60th','70th–85th','Top 10%'];
 // RSI benchmarks by tier. t1=Below Avg ceiling, t2=Solid, t3=Strong, t4=Elite floor.
 var RSI_BENCH={
   youth:  {t1:0.9, t2:1.3, t3:1.8, t4:2.3},
+  middle: {t1:1.0, t2:1.4, t3:1.9, t4:2.4},
   hs:     {t1:1.1, t2:1.5, t3:2.0, t4:2.5},
   college:{t1:1.3, t2:1.8, t3:2.3, t4:2.8},
   pro:    {t1:1.5, t2:2.0, t3:2.5, t4:3.0}
 };
-var TM={youth:{label:'Youth (U14)',c:'#6B9A2A'},hs:{label:'High School',c:'#BA7517'},college:{label:'College',c:'#1F9E70'},pro:{label:'Pro / Elite',c:'#5BE9FF'}};
+var TM={youth:{label:'Youth (8-11)',c:'#6B9A2A'},middle:{label:'Middle School',c:'#1AB4E8'},hs:{label:'High School',c:'#BA7517'},college:{label:'College',c:'#1F9E70'},pro:{label:'Pro / Elite',c:'#5BE9FF'}};
 var DC=['','#C93B3B','#BA7517','#6B9A2A','#1F9E70','#0F7A54'];
 var SPORT_OPTIONS=['Football','Basketball','Soccer','Baseball','Softball','Track & Field','Volleyball','Lacrosse','Flag Football','General/Other'];
 var SPORT_POSITIONS={
@@ -2893,7 +2908,7 @@ var SPORT_POSITIONS={
   'Lacrosse':['Attack','Midfield','Defense','Goalie'],
   'General/Other':['Athlete']
 };
-var GRADE_LABELS={'9th':'Freshman','10th':'Sophomore','11th':'Junior','12th':'Senior'};
+var GRADE_LABELS={'6th':'Middle School','7th':'Middle School','8th':'Middle School','9th':'Freshman','10th':'Sophomore','11th':'Junior','12th':'Senior'};
 function getSportTag(s){
   s=(s||'').toLowerCase().trim();
   if(/flag/.test(s)&&/football/.test(s))return'flag football';
@@ -2908,6 +2923,24 @@ function getSportTag(s){
   return s;
 }
 function gradeDisplay(g){return GRADE_LABELS[g]?g+' - '+GRADE_LABELS[g]:(g||'');}
+function tierForGrade(g){
+  g=String(g||'').trim().toLowerCase();
+  if(g==='6th'||g==='7th'||g==='8th')return'middle';
+  if(g==='9th'||g==='10th'||g==='11th'||g==='12th')return'hs';
+  if(g==='freshman'||g==='sophomore'||g==='junior'||g==='senior'||g==='graduate'||g==='redshirt')return'college';
+  if(g==='pro'||g==='pro / elite')return'pro';
+  return'';
+}
+function selectTierValue(t){
+  if(!t||!TIERS[t])return;
+  tier=t;
+  document.querySelectorAll('.tier-btn').forEach(function(b){b.classList.toggle('sel',b.getAttribute('data-tier')===t);});
+  var err=el('err-t1');if(err)err.style.display='none';
+}
+function applyGradeTierSuggestion(){
+  var g=el('inp-grade')?el('inp-grade').value:'',suggested=tierForGrade(g);
+  if(suggested)selectTierValue(suggested);
+}
 
 // ─── SPORT / POSITION CONTEXT ─────────────────────────────────────────────────
 // Each entry: keys to match (position + sport lowercased), priority metrics,
@@ -4353,7 +4386,7 @@ function updatePositionOptions(selected){
   if(selected&&list.indexOf(selected)===-1)opts.push('<option value="'+esc(selected)+'" selected>'+esc(selected)+'</option>');
   pos.innerHTML=opts.join('');
 }
-function selTier(t,btn){tier=t;document.querySelectorAll('.tier-btn').forEach(function(b){b.classList.remove('sel');});btn.classList.add('sel');el('err-t1').style.display='none';}
+function selTier(t,btn){selectTierValue(t);}
 function goNext(){
   if(!tier){el('err-t1').style.display='block';return;}
   // Validate name in ALL paths — prevents creating athletes with blank or empty names
@@ -4454,7 +4487,7 @@ function refreshTeamSelect(selectedId){
 function _combineNorm(s){return String(s||'').trim().toLowerCase().replace(/\s+/g,' ');}
 function _combineField(row,names){for(var i=0;i<names.length;i++){var want=String(names[i]).toLowerCase().replace(/[^a-z0-9]/g,'');for(var k in row){if(!row.hasOwnProperty(k))continue;var got=String(k).toLowerCase().replace(/[^a-z0-9]/g,'');if(got===want)return row[k];}}return '';}
 function _combineNum(v){if(v===null||v===undefined||v==='')return null;var n=parseFloat(String(v).replace(/[^0-9.\-]/g,''));return isNaN(n)?null:n;}
-function _combineTier(level,age){var l=_combineNorm(level);if(/pro|elite|national/.test(l))return'pro';if(/college|ncaa|juco/.test(l))return'college';if(/youth|u1[0-3]|12u|13u|13 /.test(l))return'youth';if(/high|hs|varsity|jv|u1[4-8]|14u|15u|16u|17u|18u/.test(l))return'hs';var a=_combineNum(age);if(a&&a<=13)return'youth';if(a&&a>=19&&a<=23)return'college';return'hs';}
+function _combineTier(level,age,grade){var l=_combineNorm(level),gt=tierForGrade(grade);if(gt)return gt;if(/pro|elite|national/.test(l))return'pro';if(/college|ncaa|juco/.test(l))return'college';if(/middle|ms|6th|7th|8th|u1[2-4]|12u|13u|14u|13 |14 /.test(l))return'middle';if(/youth|elementary|u1[0-1]|10u|11u/.test(l))return'youth';if(/high|hs|varsity|jv|u1[5-8]|15u|16u|17u|18u/.test(l))return'hs';var a=_combineNum(age);if(a&&a<=11)return'youth';if(a&&a<=14)return'middle';if(a&&a>=19&&a<=23)return'college';return'hs';}
 function _combineTeamMaps(){var teams=DB.getTeams(),byId={},byName={};teams.forEach(function(t){byId[t.id]=t;byName[_combineNorm(t.name)]=t;});return{teams:teams,byId:byId,byName:byName};}
 function _combineTeamNameById(id){if(!id)return'';var maps=_combineTeamMaps();return maps.byId[id]?maps.byId[id].name:'';}
 function _combineFallbackTeamName(){var newEl=el('combine-import-team-new');if(newEl&&newEl.value.trim())return newEl.value.trim();var sel=el('combine-import-team');return sel?_combineTeamNameById(sel.value):'';}
@@ -4466,14 +4499,20 @@ function _combineCsvDownload(rows,filename){if(!rows.length)return;var headers=O
 function _combineWriteRows(rows,filename,sheetName){if(!rows.length){apeAlert('No rows to export.','Export');return;}if(typeof XLSX!=='undefined'){var cfg=DB.loadSettings(),wb=XLSX.utils.book_new();var summary=[{'Section':'Coach Branding','Value':cfg.gymName||'Athlete Performance Evaluator'},{'Section':'Coach','Value':cfg.coachName||''},{'Section':'Contact','Value':cfg.contact||''},{'Section':'Export Date','Value':new Date().toLocaleDateString('en-US')},{'Section':'Rows','Value':rows.length},{'Section':'Logo','Value':cfg.logoBase64?'Logo included in HTML/PDF reports; XLSX stores branding text only.':''}];XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(summary),'Summary');var ws=XLSX.utils.json_to_sheet(rows);ws['!cols']=Object.keys(rows[0]||{}).map(function(){return{wch:18};});XLSX.utils.book_append_sheet(wb,ws,(sheetName||'Raw Data').substring(0,31));XLSX.writeFile(wb,filename.replace(/\.csv$/i,'.xlsx'));return;}_combineCsvDownload(rows,filename.replace(/\.xlsx$/i,'.csv'));}
 function downloadRosterTemplate(){_combineWriteRows([{'Athlete Name':'Jordan Smith','Team':'13 Gold','Sport':'Volleyball','Position':'Outside Hitter','Gender':'Female','Grade':'9th','Level':'13U','Age':'13','Grad Year':'2031','Bodyweight':'115','Height':'5-5','Athlete Email':'athlete@example.com','Parent Email':'parent@example.com','Notes':''}],'APE_Roster_Template.xlsx','Roster Template');}
 function parseRosterFile(file){return new Promise(function(resolve,reject){if(!file){resolve([]);return;}if(typeof XLSX==='undefined'){reject(new Error('XLSX library is not loaded.'));return;}var reader=new FileReader();reader.onload=function(e){try{var wb=XLSX.read(e.target.result,{type:'array'}),sheet=wb.Sheets[wb.SheetNames[0]],rows=XLSX.utils.sheet_to_json(sheet,{defval:'',raw:false});resolve(rows||[]);}catch(err){reject(err);}};reader.onerror=function(){reject(new Error('Could not read roster file.'));};reader.readAsArrayBuffer(file);});}
-function normalizeRosterRow(src,idx){var first=String(_combineField(src,['First Name','first_name'])||'').trim(),last=String(_combineField(src,['Last Name','last_name'])||'').trim(),full=String(_combineField(src,['Athlete Name','athlete_name','Full Name','full_name','Name','name'])||'').trim();var name=full||(first||last?[first,last].filter(Boolean).join(' '):''),teamName=String(_combineField(src,['Team','Team Name','team'])||'').trim(),hadTeam=!!teamName;if(!teamName)teamName=_combineFallbackTeamName();var level=String(_combineField(src,['Level','Tier','Level / Tier','Tier / Level','level','tier'])||'').trim(),age=_combineNum(_combineField(src,['Age','age']));return{idx:idx,name:name,nameKey:_combineNorm(name),teamName:teamName,hadTeam:hadTeam,club:String(_combineField(src,['Club','Club Team','club'])||'').trim(),age:age,gender:normalizeGender(_combineField(src,['Gender','Sex','gender'])),grade:String(_combineField(src,['Grade','Class','grade'])||'').trim(),gradYear:_combineNum(_combineField(src,['Grad Year','GradYear','Graduation Year','grad_year','gradYear'])),sport:String(_combineField(src,['Sport','sport'])||'').trim(),position:String(_combineField(src,['Position','Pos','position'])||'').trim(),levelLabel:level,tier:_combineTier(level,age),bodyweight:_combineNum(_combineField(src,['Bodyweight','Body Weight','Weight','bodyweight'])),height:String(_combineField(src,['Height','height'])||'').trim(),athleteEmail:String(_combineField(src,['Athlete Email','AthleteEmail','athleteEmail','athlete_email'])||'').trim(),parentEmail:String(_combineField(src,['Parent Email','ParentEmail','parentEmail','parent_email'])||'').trim(),notes:String(_combineField(src,['Notes','Note','notes'])||'').trim(),invalid:!name};}
+function normalizeRosterRow(src,idx){
+  var first=String(_combineField(src,['First Name','first_name'])||'').trim(),last=String(_combineField(src,['Last Name','last_name'])||'').trim(),full=String(_combineField(src,['Athlete Name','athlete_name','Full Name','full_name','Name','name'])||'').trim();
+  var name=full||(first||last?[first,last].filter(Boolean).join(' '):''),teamName=String(_combineField(src,['Team','Team Name','team'])||'').trim(),hadTeam=!!teamName;
+  if(!teamName)teamName=_combineFallbackTeamName();
+  var level=String(_combineField(src,['Level','Tier','Level / Tier','Tier / Level','level','tier'])||'').trim(),age=_combineNum(_combineField(src,['Age','age'])),grade=String(_combineField(src,['Grade','Class','grade'])||'').trim();
+  return{idx:idx,name:name,nameKey:_combineNorm(name),teamName:teamName,hadTeam:hadTeam,club:String(_combineField(src,['Club','Club Team','club'])||'').trim(),age:age,gender:normalizeGender(_combineField(src,['Gender','Sex','gender'])),grade:grade,gradYear:_combineNum(_combineField(src,['Grad Year','GradYear','Graduation Year','grad_year','gradYear'])),sport:String(_combineField(src,['Sport','sport'])||'').trim(),position:String(_combineField(src,['Position','Pos','position'])||'').trim(),levelLabel:level,tier:_combineTier(level,age,grade),bodyweight:_combineNum(_combineField(src,['Bodyweight','Body Weight','Weight','bodyweight'])),height:String(_combineField(src,['Height','height'])||'').trim(),athleteEmail:String(_combineField(src,['Athlete Email','AthleteEmail','athleteEmail','athlete_email'])||'').trim(),parentEmail:String(_combineField(src,['Parent Email','ParentEmail','parentEmail','parent_email'])||'').trim(),notes:String(_combineField(src,['Notes','Note','notes'])||'').trim(),invalid:!name};
+}
 function importRosterFile(file){return parseRosterFile(file);}
 function handleRosterUpload(input){var file=input&&input.files&&input.files[0];if(!file)return;importRosterFile(file).then(function(rows){_combineState.rawRows=rows;_combineState.fileName=file.name;var dm=el('combine-duplicate-mode');if(dm)dm.value='update';previewRosterImport(rows,file.name);}).catch(function(err){console.error('[Event Mode] roster parse failed:',err);apeAlert('Could not parse roster: '+err.message,'Roster Import');});}
 function previewRosterImport(rows,fileName){rows=rows||_combineState.rawRows||[];var out=el('combine-import-preview');if(!out)return;var fallbackName=_combineFallbackTeamName(),normalized=rows.map(function(r,i){return normalizeRosterRow(r,i+2);}),hasTeamColumn=normalized.some(function(r){return r.hadTeam;}),existing=_combineExistingByKey(),seen={},newCount=0,dupes=0,missing=0,skipped=0,createTeams={};var maps=_combineTeamMaps();normalized.forEach(function(r){if(r.invalid){missing++;skipped++;return;}if(!hasTeamColumn&&!fallbackName){r.needsTeam=true;skipped++;return;}var key=_combineKey(r.name,r.levelLabel||r.tier,r.teamName);if(seen[key]){r.fileDuplicate=true;dupes++;return;}seen[key]=true;if(existing[key]){r.duplicate=true;r.existingId=existing[key].id;dupes++;}else newCount++;if(r.teamName&&!maps.byName[_combineNorm(r.teamName)])createTeams[r.teamName]=true;});var teamsToCreate=Object.keys(createTeams).sort();_combineState.rows=normalized;_combineState.summary={total:rows.length,newCount:newCount,dupes:dupes,missing:missing,skipped:skipped,teamsToCreate:teamsToCreate,hasTeamColumn:hasTeamColumn};var h='<div class="combine-stat-grid"><div class="combine-stat"><div class="combine-stat-num">'+rows.length+'</div><div class="combine-stat-lbl">Rows Found</div></div><div class="combine-stat"><div class="combine-stat-num">'+newCount+'</div><div class="combine-stat-lbl">New Athletes</div></div><div class="combine-stat"><div class="combine-stat-num">'+dupes+'</div><div class="combine-stat-lbl">Duplicates</div></div><div class="combine-stat"><div class="combine-stat-num">'+missing+'</div><div class="combine-stat-lbl">Missing Names</div></div></div>';if(!hasTeamColumn)h+='<div class="combine-status">'+(fallbackName?'No Team column found. Import will assign valid athletes to '+esc(fallbackName)+'.':'No Team column found. Pick or type a team before confirming import.')+'</div>';if(teamsToCreate.length)h+='<div class="combine-status"><span class="combine-chip good">'+teamsToCreate.length+' team'+(teamsToCreate.length!==1?'s':'')+' will be created</span> '+teamsToCreate.map(esc).join(', ')+'</div>';if(!rows.length){out.innerHTML='<div class="empty-state"><div class="empty-p">No roster rows found in this file.</div></div>';return;}h+='<div class="combine-table-wrap" style="margin-top:12px;max-height:330px"><table class="combine-table"><thead><tr><th>Row</th><th class="combine-sticky">Athlete</th><th>Team</th><th>Level</th><th>Sport</th><th>Position</th><th>Status</th></tr></thead><tbody>';normalized.slice(0,120).forEach(function(r){var status=r.invalid?'<span class="combine-chip bad">Missing name</span>':r.needsTeam?'<span class="combine-chip bad">Needs team</span>':r.fileDuplicate?'<span class="combine-chip warn">File duplicate</span>':r.duplicate?'<span class="combine-chip warn">Possible duplicate</span>':'<span class="combine-chip good">Ready</span>';h+='<tr class="'+(r.invalid||r.needsTeam?'combine-row-error':(r.duplicate||r.fileDuplicate?'combine-row-warn':''))+'"><td>'+r.idx+'</td><td class="combine-sticky">'+esc(r.name||'')+'</td><td>'+esc(r.teamName||'')+'</td><td>'+esc(r.levelLabel||TIERS[r.tier]||r.tier)+'</td><td>'+esc(r.sport)+'</td><td>'+esc(r.position)+'</td><td>'+status+'</td></tr>';});h+='</tbody></table></div>';if(normalized.length>120)h+='<div class="combine-status">Showing first 120 rows for preview.</div>';h+='<div class="btn-row" style="margin-top:14px"><button class="btn-p" style="padding:10px 16px;font-size:13px" onclick="confirmRosterImport()">Confirm Import</button></div>';out.innerHTML=h;}
 function confirmRosterImport(){var rows=_combineState.rows||[];if(!rows.length){apeAlert('Upload a roster first.','Roster Import');return;}var modeEl=el('combine-duplicate-mode'),mode=modeEl?modeEl.value:'update',created=0,updated=0,skipped=0,teamsCreated=0,errors=[];var existing=_combineExistingByKey();rows.forEach(function(r){if(r.invalid||r.needsTeam||(r.fileDuplicate&&mode!=='import')){skipped++;if(r.invalid)errors.push('Row '+r.idx+': missing athlete name');return;}var before=_combineTeamMaps().byName[_combineNorm(r.teamName)],team=_combineEnsureTeam(r.teamName);if(!before&&team)teamsCreated++;var teamId=team?team.id:'',key=_combineKey(r.name,r.levelLabel||r.tier,r.teamName),dup=existing[key]||null,extra={club:r.club,levelLabel:r.levelLabel,athleteEmail:r.athleteEmail,parentEmail:r.parentEmail,gender:r.gender,grade:r.grade};if(dup&&mode==='skip'){skipped++;return;}if(dup&&mode==='update'){DB.updateAthlete(dup.id,r.name||dup.name,r.tier||dup.tier,r.sport||dup.sport,r.position||dup.position,r.age||dup.age,teamId||dup.team,r.gradYear||dup.gradYear,r.notes||dup.notes,r.bodyweight||dup.bodyweight,r.height||dup.height,extra);updated++;return;}DB.create(r.name,r.tier,r.sport,r.position,r.age,teamId,r.gradYear,r.notes,r.bodyweight,r.height,extra);created++;existing[key]=DB.find(r.name,r.tier)||true;});_cloudSyncSoon();_toast('Roster import: '+created+' created, '+updated+' updated, '+teamsCreated+' teams, '+skipped+' skipped.','#1e6f3e');buildEventMode();var msg=el('combine-import-result');if(msg)msg.innerHTML='<span class="combine-chip good">'+created+' athletes created</span> <span class="combine-chip good">'+updated+' athletes updated</span> <span class="combine-chip good">'+teamsCreated+' teams created</span> <span class="combine-chip warn">'+skipped+' rows skipped</span>'+(errors.length?'<div style="margin-top:8px;color:var(--s1b)">'+errors.slice(0,5).map(esc).join('<br>')+'</div>':'');}
 function _combineMetricSpecs(){return[{k:'vj',label:'Vertical Jump',short:'VJ',step:'0.1'},{k:'bj',label:'Broad Jump',short:'BJ',step:'0.01'},{k:'rsi',label:'RSI',short:'RSI',step:'0.01'},{k:'f5',label:'5-10 Fly',short:'5-10',step:'0.01'},{k:'f10',label:'10-10 Fly',short:'10-10',step:'0.01'},{k:'threeConeTime',label:'3-Cone L Drill',short:'3-Cone',step:'0.01'},{k:'pro_agility_5_10_5',label:'5-10-5 Pro Agility',short:'5-10-5',step:'0.01'},{k:'gps',label:'GPS Max Velocity',short:'GPS',step:'0.1'}];}
 var EVENT_SPORTS=['Football','Basketball','Baseball','Softball','Volleyball','Track','Lacrosse','Flag Football'];
-var EVENT_LEVEL_OPTIONS=[{v:'youth',l:'Youth'},{v:'hs',l:'High School'},{v:'college',l:'College'},{v:'pro',l:'Pro / Elite'}];
+var EVENT_LEVEL_OPTIONS=LEVEL_OPTIONS.map(function(x){return{v:x.k,l:x.l};});
 var EVENT_GRADE_OPTIONS=[
   {v:'6th',l:'6th'},{v:'7th',l:'7th'},{v:'8th',l:'8th'},
   {v:'9th',l:'9th / Freshman'},{v:'10th',l:'10th / Sophomore'},{v:'11th',l:'11th / Junior'},{v:'12th',l:'12th / Senior'},
@@ -6549,7 +6588,7 @@ function buildLeaderboard(){
   var posOpts='<option value="">All Positions</option>'
     +positions.map(function(p){return'<option value="'+esc(p)+'"'+(_lbState.pos===p?' selected':'')+'>'+esc(p)+'</option>';}).join('');
   var levelOpts='<option value="">All Levels</option>'
-    +[{k:'youth',l:'Youth (U14)'},{k:'hs',l:'High School'},{k:'college',l:'College'},{k:'pro',l:'Pro / Elite'}].map(function(t){return'<option value="'+t.k+'"'+(_lbState.level===t.k?' selected':'')+'>'+t.l+'</option>';}).join('');
+    +LEVEL_OPTIONS.map(function(t){return'<option value="'+t.k+'"'+(_lbState.level===t.k?' selected':'')+'>'+t.l+'</option>';}).join('');
   var genderOpts=[
     {k:'separate',l:'Separate by Gender'},
     {k:'combined',l:'Combined'},
@@ -6803,9 +6842,9 @@ function buildDash(){
   var sportOpts='<option value="">All Sports</option>'
     +sports.map(function(s){return'<option value="'+esc(s)+'"'+(_dashFilter.sport===s?' selected':'')+'>'+esc(s)+'</option>';}).join('');
   var levelOpts='<option value="">All Levels</option>'
-    +[{k:'youth',l:'Youth (U14)'},{k:'hs',l:'High School'},{k:'college',l:'College'},{k:'pro',l:'Pro / Elite'}].map(function(t){return'<option value="'+t.k+'"'+(_dashFilter.level===t.k?' selected':'')+'>'+t.l+'</option>';}).join('');
+    +LEVEL_OPTIONS.map(function(t){return'<option value="'+t.k+'"'+(_dashFilter.level===t.k?' selected':'')+'>'+t.l+'</option>';}).join('');
   var gradeOpts='<option value="">All Grades</option>'
-    +['9th','10th','11th','12th','Freshman','Sophomore','Junior','Senior','Graduate','Redshirt'].map(function(g){return'<option value="'+g+'"'+(_dashFilter.grade===g?' selected':'')+'>'+esc(gradeDisplay(g))+'</option>';}).join('');
+    +['6th','7th','8th','9th','10th','11th','12th','Freshman','Sophomore','Junior','Senior','Graduate','Redshirt'].map(function(g){return'<option value="'+g+'"'+(_dashFilter.grade===g?' selected':'')+'>'+esc(gradeDisplay(g))+'</option>';}).join('');
 
   var h='';
 
@@ -7722,7 +7761,7 @@ function buildTeamStats(){
 
   // Team options for filter
   var teamOpts='<option value="">All Teams</option>'+teams.map(function(t){return'<option value="'+t.id+'"'+(filterTeam===t.id?' selected':'')+'>'+esc(t.name)+'</option>';}).join('');
-  var levelOpts='<option value="">All Levels</option>'+[{k:'youth',l:'Youth'},{k:'hs',l:'High School'},{k:'college',l:'College'},{k:'pro',l:'Pro / Elite'}].map(function(x){return'<option value="'+x.k+'"'+(filterLevel===x.k?' selected':'')+'>'+x.l+'</option>';}).join('');
+  var levelOpts='<option value="">All Levels</option>'+LEVEL_OPTIONS.map(function(x){return'<option value="'+x.k+'"'+(filterLevel===x.k?' selected':'')+'>'+x.l+'</option>';}).join('');
 
   var h='<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:11px;margin-bottom:18px">'
     +'<div><div class="pg-title">'+iconSvg('bar-chart-3')+' Team Analytics</div>'

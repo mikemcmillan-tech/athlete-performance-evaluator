@@ -25,6 +25,7 @@ All notable changes to APE will be documented here.
 - Wired demo dashboard, athlete report, and combine previews into visible landing/header navigation and real app page containers.
 - Hardened public startup so logged-out visitors land on the landing page first and demo routes stay auth-free.
 - Added a Netlify build target that publishes only the static app files and cache-busts `index.html`/`sw.js`.
+- Added Middle School (6th-8th) as a first-class athlete level with dropdown support, Event Mode filters, roster import tiering, and separate benchmark ranges.
 
 ## Earlier History
 

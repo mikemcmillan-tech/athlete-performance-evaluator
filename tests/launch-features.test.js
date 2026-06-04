@@ -38,10 +38,22 @@ const sandbox = {
 };
 
 vm.createContext(sandbox);
-const ctxStart = script.indexOf('var SPORT_OPTIONS=');
+const ctxStart = script.indexOf('var LEVEL_OPTIONS=');
 const ctxEnd = script.indexOf('// \u2500\u2500\u2500 HELPERS', ctxStart);
 vm.runInContext(script.slice(ctxStart, ctxEnd), sandbox);
 [
+  'normalizeGender',
+  'normalize505Score',
+  '_lerpScore',
+  '_scoreLowerBetter100',
+  '_scoreHigherBetter100',
+  'score100ToScore5',
+  'scv',
+  'resolveAgilityLevel',
+  'calculateAgilityTestScore',
+  'calculateMetricScore100',
+  'calculateMetricScore5',
+  'sRSI',
   'normalizeTimingMethod',
   'renderVerificationBadge',
   '_metricMeta',
@@ -103,5 +115,12 @@ assert.equal(sandbox.resolvePosGroup('Lacrosse', 'Midfield'), 'ENDURANCE_SPD');
 assert.equal(sandbox.resolvePosGroup('Flag Football', 'Center'), 'REACTIVE');
 assert.equal(sandbox.resolvePosGroup('Softball', 'Pitcher'), 'POWER_DOM');
 assert.equal(sandbox.getAthletePositionProfile({ sport: 'Football', position: 'WR' }).positionGroup, 'SPEED_SKILL');
+assert.equal(sandbox.TIERS.middle, 'Middle School (6th-8th)');
+assert.equal(sandbox.tierForGrade('6th'), 'middle');
+assert.equal(sandbox.tierForGrade('8th'), 'middle');
+assert.equal(sandbox.resolveAgilityLevel('middle', 13), 'middle');
+assert.equal(sandbox.resolveAgilityLevel('', 12), 'middle');
+assert.equal(sandbox.sRSI(2.45, 'middle'), 5);
+assert.equal(sandbox.calculateMetricScore5(24, 'vj', 'middle', 'male', 13, sandbox.BENCH.middle.vj, false), 4);
 
 console.log('launch feature tests passed');
