@@ -1,5 +1,6 @@
 {
   "scripts": {
+    "build:netlify": "node scripts/build-netlify.cjs",
     "test": "node tests/launch-features.test.js"
   }
 }

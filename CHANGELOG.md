@@ -24,6 +24,7 @@ All notable changes to APE will be documented here.
 - Aligned the public preview section label with the Sample Experience naming.
 - Wired demo dashboard, athlete report, and combine previews into visible landing/header navigation and real app page containers.
 - Hardened public startup so logged-out visitors land on the landing page first and demo routes stay auth-free.
+- Added a Netlify build target that publishes only the static app files and cache-busts `index.html`/`sw.js`.
 
 ## Earlier History
 

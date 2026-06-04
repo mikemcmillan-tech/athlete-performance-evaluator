@@ -16,6 +16,7 @@ desktop.ini
 # Node / build (in case we add tooling later)
 node_modules/
 dist/
+dist-netlify/
 build/
 .next/
 
