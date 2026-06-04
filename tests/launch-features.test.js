@@ -54,6 +54,10 @@ vm.runInContext(script.slice(ctxStart, ctxEnd), sandbox);
   'calculateMetricScore100',
   'calculateMetricScore5',
   'sRSI',
+  '_combineNorm',
+  '_combineTier',
+  '_combineLevelKey',
+  '_combineKey',
   'normalizeTimingMethod',
   'renderVerificationBadge',
   '_metricMeta',
@@ -122,5 +126,12 @@ assert.equal(sandbox.resolveAgilityLevel('middle', 13), 'middle');
 assert.equal(sandbox.resolveAgilityLevel('', 12), 'middle');
 assert.equal(sandbox.sRSI(2.45, 'middle'), 5);
 assert.equal(sandbox.calculateMetricScore5(24, 'vj', 'middle', 'male', 13, sandbox.BENCH.middle.vj, false), 4);
+assert.equal(sandbox._combineKey('Jordan Smith', 'Middle School', 'Volleyball 13 Gold'), 'jordan smith|volleyball 13 gold|middle');
+assert.notEqual(
+  sandbox._combineKey('Jordan Smith', 'Middle School', 'Volleyball 13 Gold'),
+  sandbox._combineKey('Jordan Smith', 'Middle School', 'Volleyball 13 Blue')
+);
+assert.match(html, /First Name','Last Name','Full Name','Gender','Sport','Position','Level','Grade \/ Class','Age','Height','Weight','Team','Notes/);
+assert.match(html, /ROSTER_TEMPLATE_SPORTS=\['Football','Basketball','Baseball','Softball','Volleyball','Track & Field','Soccer','Lacrosse','Wrestling','Boxing','MMA','Flag Football'\]/);
 
 console.log('launch feature tests passed');
