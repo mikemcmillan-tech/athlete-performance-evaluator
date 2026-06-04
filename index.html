@@ -2181,6 +2181,17 @@ function _cloudSyncFailed(err){
   console.warn('[Supabase] sync failed:',err);
   if(typeof _toast==='function')_toast('Cloud sync failed. Local data is saved.','#8A3A2B');
 }
+function verifyCloudSession(){
+  if(typeof SupaDB==='undefined'||!SupaDB.getUser||!SupaDB.getUser()||!_supaClient())return Promise.resolve(false);
+  return _supaClient().auth.getSession().then(function(r){
+    if(r.data&&r.data.session)return true;
+    SupaDB.setUser(null);
+    _authUpdatePill(null);
+    showLanding();
+    _landingShowErr('Please sign in again. Supabase did not return an active session, so cloud saving cannot start.');
+    return false;
+  }).catch(function(e){_cloudSyncFailed(e);return false;});
+}
 function _cloudDelete(table,id){
   try{
     if(typeof SupaDB==='undefined'||!SupaDB.getUser||!SupaDB.getUser()||!_supaClient()||!id)return;
@@ -2569,6 +2580,12 @@ function _authSwitchTab(tab){
   var e=el('auth-err');if(e){e.style.display='none';}
 }
 function _authShowErr(msg){var e=el('auth-err');if(e){e.textContent=msg;e.style.display='block';}}
+function _authFriendlyMessage(msg){
+  msg=String(msg||'');
+  if(/invalid login credentials/i.test(msg))return 'Invalid login credentials. Create an account first, confirm your email if Supabase sent one, or reset your password.';
+  if(/email not confirmed/i.test(msg))return 'Email not confirmed yet. Open the confirmation email from Supabase, then sign in again.';
+  return msg;
+}
 function _authUpdatePill(user){
   var pill=el('profile-btn'),lbl=el('auth-pill-label'),avatar=el('profile-avatar'),menuLbl=el('profile-auth-label'),menuIco=el('profile-auth-icon');
   if(user){
@@ -2594,9 +2611,9 @@ function handleSignin(){
   var btn=el('auth-btn-si');if(btn){btn.disabled=true;btn.textContent='Signing in…';}
   supa.auth.signInWithPassword({email:email,password:pass}).then(function(r){
     if(btn){btn.disabled=false;btn.textContent='Sign In';}
-    if(r.error){_authShowErr(r.error.message);return;}
+    if(r.error){_authShowErr(_authFriendlyMessage(r.error.message));return;}
     _authOnSuccess(r.data.user,false);
-  }).catch(function(e){if(btn){btn.disabled=false;btn.textContent='Sign In';}_authShowErr(e.message||'Sign in failed.');});
+  }).catch(function(e){if(btn){btn.disabled=false;btn.textContent='Sign In';}_authShowErr(_authFriendlyMessage(e.message||'Sign in failed.'));});
 }
 function handleLandingSignin(){
   var email=el('landing-email-si')?el('landing-email-si').value.trim():'';
@@ -2606,9 +2623,9 @@ function handleLandingSignin(){
   var btn=el('landing-btn-si'),old=_setBtnLoading(btn,'Signing in...');
   supa.auth.signInWithPassword({email:email,password:pass}).then(function(r){
     _resetBtn(btn,old||'Sign In');
-    if(r.error){_landingShowErr(r.error.message);return;}
+    if(r.error){_landingShowErr(_authFriendlyMessage(r.error.message));return;}
     _authOnSuccess(r.data.user,false);
-  }).catch(function(e){_resetBtn(btn,old||'Sign In');_landingShowErr(e.message||'Sign in failed.');});
+  }).catch(function(e){_resetBtn(btn,old||'Sign In');_landingShowErr(_authFriendlyMessage(e.message||'Sign in failed.'));});
 }
 function handleSignup(){
   var email=el('auth-email-su')?el('auth-email-su').value.trim():'';
@@ -2619,9 +2636,10 @@ function handleSignup(){
   if(pass.length<6){_authShowErr('Password must be at least 6 characters.');return;}
   var supa=_supaClient();if(!supa){_authShowErr('Supabase not available.');return;}
   var btn=el('auth-btn-su');if(btn){btn.disabled=true;btn.textContent='Creating account…';}
-  supa.auth.signUp({email:email,password:pass,options:{data:{role:'coach_admin'}}}).then(function(r){
+  supa.auth.signUp({email:email,password:pass,options:{emailRedirectTo:window.location.origin+window.location.pathname,data:{role:'coach_admin'}}}).then(function(r){
     if(btn){btn.disabled=false;btn.textContent='Create Account';}
     if(r.error){_authShowErr(r.error.message);return;}
+    if(!r.data.session){_authShowErr('Account created. Check your email to confirm it, then sign in so cloud saving can start.');return;}
     _authOnSuccess(r.data.user,true);
   }).catch(function(e){if(btn){btn.disabled=false;btn.textContent='Create Account';}_authShowErr(e.message||'Sign up failed.');});
 }
@@ -2635,10 +2653,10 @@ function handleLandingSignup(){
   if(pass.length<6){_landingShowErr('Password must be at least 6 characters.');return;}
   var supa=_supaClient();if(!supa){_landingShowErr('Supabase not available.');return;}
   var btn=el('landing-btn-su'),old=_setBtnLoading(btn,'Creating account...');
-  supa.auth.signUp({email:email,password:pass,options:{data:{role:role,account_role:role,coach_profile:coachName||''}}}).then(function(r){
+  supa.auth.signUp({email:email,password:pass,options:{emailRedirectTo:window.location.origin+window.location.pathname,data:{role:role,account_role:role,coach_profile:coachName||''}}}).then(function(r){
     _resetBtn(btn,old||'Create Account');
     if(r.error){_landingShowErr(r.error.message);return;}
-    if(!r.data.user){_landingShowErr('Account created. Check your email to confirm your sign in.');return;}
+    if(!r.data.session){_landingShowErr('Account created. Check your email to confirm it, then sign in so cloud saving can start.');return;}
     _authOnSuccess(r.data.user,true,coachName);
   }).catch(function(e){_resetBtn(btn,old||'Create Account');_landingShowErr(e.message||'Sign up failed.');});
 }
@@ -2646,7 +2664,7 @@ function handlePasswordReset(){
   var email=(el('landing-email-si')&&el('landing-email-si').value.trim())||(el('landing-email-su')&&el('landing-email-su').value.trim())||'';
   if(!email){_landingShowErr('Enter your email first, then request a reset link.');return;}
   var supa=_supaClient();if(!supa){_landingShowErr('Supabase not available.');return;}
-  supa.auth.resetPasswordForEmail(email).then(function(r){
+  supa.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+window.location.pathname}).then(function(r){
     if(r.error){_landingShowErr(r.error.message);return;}
     _landingShowErr('');
     _toast('Password reset email sent.','#1e6f3e');
@@ -2695,22 +2713,25 @@ function _authOnSuccess(user,isNew,coachName){
   }
   enterCoachApp();
   setTimeout(function(){
-    var localAthletes=DB.getAll();
-    if(localAthletes.length>0){
-      SupaDB.syncAll().then(function(){
-        buildDash();
-        _toast('Synced '+localAthletes.length+' athlete'+(localAthletes.length!==1?'s':'')+'!','#1e6f3e');
-      }).catch(function(e){_cloudSyncFailed(e);});
-    }else{
-      SupaDB.pullFromSupabase(function(ok){
-        if(ok){
+    verifyCloudSession().then(function(active){
+      if(!active)return;
+      var localAthletes=DB.getAll();
+      if(localAthletes.length>0){
+        SupaDB.syncAll().then(function(){
           buildDash();
-          _toast('Data loaded from cloud!','#1e6f3e');
-        }else{
-          _toast('Connected. No cloud data yet.','#444');
-        }
-      });
-    }
+          _toast('Synced '+localAthletes.length+' athlete'+(localAthletes.length!==1?'s':'')+'!','#1e6f3e');
+        }).catch(function(e){_cloudSyncFailed(e);});
+      }else{
+        SupaDB.pullFromSupabase(function(ok){
+          if(ok){
+            buildDash();
+            _toast('Data loaded from cloud!','#1e6f3e');
+          }else{
+            _toast('Connected. No cloud data yet.','#444');
+          }
+        });
+      }
+    });
   },800);
 }
 
