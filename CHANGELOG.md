@@ -27,6 +27,7 @@ All notable changes to APE will be documented here.
 - Added a Netlify build target that publishes only the static app files and cache-busts `index.html`/`sw.js`.
 - Added Middle School (6th-8th) as a first-class athlete level with dropdown support, Event Mode filters, roster import tiering, and separate benchmark ranges.
 - Upgraded roster import with a coach-friendly Excel template, dropdown-ready columns, stricter profile validation, team-aware duplicate skipping, and downloadable error reports.
+- Added a coach-facing programming recommendation engine that returns prioritized focus, rationale, Schroeder-inspired method guidance, weekly emphasis, and progression triggers from each athlete profile.
 
 ## Earlier History
 

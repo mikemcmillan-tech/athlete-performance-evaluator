@@ -3823,6 +3823,7 @@ function buildProgramPanel(aid){
     +'<div class="viewer-focus-box"><div class="viewer-label">Assigned Bucket</div><div class="viewer-value">'+esc(bucketDisplay(p.bucketPrimary,bucket))+'</div><div class="program-note">'+esc(bucketSubtitle(bucket))+'</div></div>'
     +'<div class="viewer-focus-box"><div class="viewer-label">Secondary Block</div><div class="viewer-value">Tendon Code</div><div class="program-note">'+esc(bucketSubtitle(2))+'</div></div>'
     +'<div class="viewer-focus-box"><div class="viewer-label">Season Phase</div><div class="viewer-value">'+esc(programPhaseLabel(p.seasonPhase||a.seasonPhase))+'</div></div>'
+    +renderProgramRecommendationCard(a,p)
     +'</div>'
     +renderWeekSelector(aid,p)
     +'<div class="pg-sub" style="margin:-2px 0 12px">W'+wk.weekNumber+': '+esc(wk.title)+' | '+wk.volumeTarget+'% Volume</div>'
@@ -5905,6 +5906,135 @@ function defaultProgramExercises(bucketKey,phase,weekNumber,dayName){
   else out=[programExercise('Recovery / Mobility','1','','20-30 min','','','Coach-directed recovery, tissue work, walk, or light tempo. EI bucket remains the secondary training block on training days.',false)];
   if(weekNumber===6)out=out.map(function(ex){var c=cloneExercise(ex);c.notes=(c.notes?c.notes+' ':'')+'Week 6 deload/retest readiness.';return c;});
   return out;
+}
+function _programDemandForPhase(phase,base){
+  phase=normalizeProgramPhase(phase);
+  base=base||{cns:'moderate',volume:'moderate',intensity:'moderate'};
+  if(phase==='inSeason')return{cns_demand:'low',volume:'low',intensity:base.intensity==='low'?'low':'moderate'};
+  if(phase==='preSeason')return{cns_demand:'moderate',volume:'moderate',intensity:base.intensity||'moderate'};
+  return{cns_demand:base.cns||'moderate',volume:base.volume||'moderate',intensity:base.intensity||'moderate'};
+}
+function _programContradictions(deficiency,goal,phase){
+  var g=String(goal||'').toLowerCase(),out=[];
+  if((deficiency==='Structural Weakness'||deficiency==='Mobility Restriction')&&/(plyo|ballistic|power|max velocity|speed)/.test(g)){
+    out.push('Goal wants high-output work, but current limitation requires tissue capacity, positions, and controlled force first.');
+  }
+  if(normalizeProgramPhase(phase)==='inSeason'&&/(volume|conditioning|base|hypertrophy)/.test(g)){
+    out.push('In-season goal conflicts with fatigue management. Keep quality high and total stress low.');
+  }
+  return out;
+}
+function _programWeakestMetricLabel(s){
+  var names={vp:'vertical power',hp:'horizontal power',rs:'reactive strength',ac:'acceleration',mv:'max velocity',cod:'change of direction',gps:'GPS speed',ft:'force transfer'},sc=s&&s.sc?s.sc:{},worst=null;
+  Object.keys(names).forEach(function(k){var v=sc[k];if(v!==null&&v!==undefined&&!isNaN(v)&&(worst===null||v<worst.v))worst={k:k,v:v,label:names[k]};});
+  return worst?worst.label:'current limiting quality';
+}
+function calculateTrainingFocus(input){
+  input=input||{};
+  var s=input.session||input.test_results||{},bucket=parseInt(input.bucket||s.bkt||resolveProgramBucketFromSession(s),10)||2,phase=normalizeProgramPhase(input.current_phase||input.phase||'offSeason'),trainingAge=String(input.training_age||'').toLowerCase()||'intermediate',goal=input.athlete_goal||'',profile=input.performance_profile||'',def=input.deficiency_class||s.defType||'Incomplete Data';
+  if(trainingAge==='beginner')bucket=2;
+  var deficiency=def;
+  if(def==='Force Deficient')deficiency='Structural Weakness';
+  else if(def==='Form Deficient')deficiency='Neurological Efficiency';
+  else if(def==='Mixed Deficiency')deficiency='Structural Weakness';
+  else if(def==='Well Developed')deficiency='Power Deficit';
+  if(bucket===6)deficiency='Neurological Efficiency';
+  var brand=bucketBrandByKey(bucket),weak=_programWeakestMetricLabel(s),baseDemand={cns:'moderate',volume:'moderate',intensity:'moderate'},focus=brand.name,principle='Isometric -> eccentric -> concentric -> ballistic transfer sequence',methods=[],avoid=[],trigger='';
+  if(trainingAge==='beginner'){
+    focus='Tendon Code';
+    principle='Extreme isometrics before output work: establish positions, tension tolerance, and nervous-system efficiency first.';
+    methods=['Sprint stance iso holds','Lunge iso holds','Wall sit at 90 degrees','Single-leg RDL iso hold','Low-intensity tempo and recovery work'];
+    avoid=['Max-intent plyometrics','Depth drops','High-volume sprinting','Ballistic lifts'];
+    trigger='Advance when the athlete can hold key positions without compensation and repeat low-intensity sprint mechanics cleanly.';
+    baseDemand={cns:'low',volume:'moderate',intensity:'low'};
+  }else if(deficiency==='Structural Weakness'){
+    focus=bucket===1?'Force Foundation':'Tendon Code';
+    principle='Build connective-tissue resilience and position strength before dynamic loading.';
+    methods=['Overcoming iso wall push','Heavy prowler push','Heavy backward sled drag','Long-duration split-stance holds','Controlled eccentric lower-body strength'];
+    avoid=['Depth jumps','High-intent bounds','Reactive plyometric circuits','Uncontrolled COD work'];
+    trigger='Advance when holds stay technically stable under fatigue and force outputs no longer drop across repeated sets.';
+    baseDemand={cns:'moderate',volume:'moderate',intensity:'moderate'};
+  }else if(deficiency==='Mobility Restriction'){
+    focus='Position Capacity';
+    principle='Own range before loading range. Positional strength must precede speed or ballistic output.';
+    methods=['Long-duration loaded mobility positions','Yielding isometrics in restricted ranges','Controlled eccentric split squats','Low-amplitude acceleration mechanics'];
+    avoid=['Ballistic jumps','Aggressive COD angles','High-speed sprint exposure','Maximal plyometrics'];
+    trigger='Advance when the athlete can access and hold required sport positions without compensation.';
+    baseDemand={cns:'low',volume:'moderate',intensity:'low'};
+  }else if(bucket===3||deficiency==='Power Deficit'){
+    focus='Power Bridge';
+    principle='Convert force into velocity only after the athlete shows enough position strength to express it.';
+    methods=['Trap bar deadlift jumps at 30-40%','Moderate sled pushes','Rotational med ball slams','Broad jump with full reset','Short accelerations with full recovery'];
+    avoid=['Fatigue-based jump circuits','Random high-volume plyometrics','Max velocity work before acceleration quality is stable'];
+    trigger='Advance when jump outputs repeat within 5% across sets and acceleration mechanics stay clean.';
+    baseDemand={cns:'high',volume:'moderate',intensity:'high'};
+  }else if(bucket===4){
+    focus='Drive Phase';
+    principle='Neurological efficiency: teach force direction and first-step timing before increasing sprint volume.';
+    methods=['Wall drive series','Light sled sprint 10-15% bodyweight','Resisted starts','Power skips for distance','10-yard starts with full recovery'];
+    avoid=['Long sprint volume','Conditioning disguised as speed work','Fatigued acceleration reps'];
+    trigger='Advance when first 3-5 steps are consistent and 5-10 fly improves without jump scores dropping.';
+    baseDemand={cns:'high',volume:'low',intensity:'high'};
+  }else if(bucket===5){
+    focus='Max Velocity';
+    principle='Protect the CNS and expose the athlete to high-quality upright sprinting only when mechanics stay relaxed.';
+    methods=['Build sprints','Fly 20s','Wicket runs','Falling start sprints','Full-recovery timing exposures'];
+    avoid=['High-volume tempo before max speed','Sprints with incomplete recovery','Heavy lower-body fatigue before fly work'];
+    trigger='Advance when fly times improve and posture/relaxation hold through the timed zone.';
+    baseDemand={cns:'high',volume:'low',intensity:'high'};
+  }else if(bucket===6){
+    focus='Change of Direction';
+    principle='Deceleration is a tissue and neurological skill. Brake first, then re-accelerate.';
+    methods=['Shuffle-to-stick deceleration','Lateral bound to stick','5-10-5 technique reps','Split-stance force work','Reactive mirror drills at controlled intensity'];
+    avoid=['Chaotic reactive agility','High-impact cutting volume','Fatigued COD testing'];
+    trigger='Advance when braking positions are stable and 5-10-5 or 3-cone time improves without knee/hip collapse.';
+    baseDemand={cns:'moderate',volume:'moderate',intensity:'moderate'};
+  }else{
+    focus='Tendon Code';
+    principle='Use extreme isometrics as the default secondary block to maintain tissue capacity and CNS efficiency.';
+    methods=['Sprint stance iso holds','Wall sit at 90 degrees','Single-leg RDL iso hold','Low-volume acceleration exposures','Recovery and tissue quality work'];
+    avoid=['Adding complexity before identifying a clear limiter','Plyometric volume without readiness markers'];
+    trigger='Advance when a full retest identifies a stable limiting factor or the current weak metric improves one tier.';
+    baseDemand={cns:'moderate',volume:'moderate',intensity:'moderate'};
+  }
+  var contradictions=_programContradictions(deficiency,goal,phase);
+  var rationale='Primary limiter is '+weak+' with a '+(def||deficiency)+' profile. '+(profile?'For this '+profile+', ':'')+'The block should solve the rate-limiting factor before stacking secondary qualities.';
+  if(contradictions.length)rationale+=' Note: '+contradictions.join(' ');
+  if(phase==='inSeason'||phase==='preSeason')rationale+=' '+programPhaseLabel(phase)+' shifts the plan toward quality, lower fatigue, and readiness protection.';
+  return{
+    primary_training_focus:focus,
+    rationale:rationale,
+    schroeder_principle_applied:principle,
+    recommended_methods:methods.slice(0,5),
+    avoid_until_ready:avoid.slice(0,5),
+    weekly_emphasis:_programDemandForPhase(phase,baseDemand),
+    progression_trigger:trigger
+  };
+}
+function generateProgramRecommendations(athlete,session,program){
+  athlete=athlete||{};session=session||getLatestSession(athlete)||{};program=program||{};
+  return calculateTrainingFocus({
+    test_results:session,
+    session:session,
+    deficiency_class:session.defType||'Incomplete Data',
+    performance_profile:[athlete.sport,athlete.position].filter(Boolean).join(' '),
+    training_age:athlete.trainingAge||athlete.training_age||((athlete.s||[]).length<2?'beginner':'intermediate'),
+    current_phase:program.seasonPhase||athlete.seasonPhase||'offSeason',
+    athlete_goal:program.goal||session.focus||''
+  });
+}
+function renderProgramRecommendationCard(a,p){
+  var rec=generateProgramRecommendations(a,getLatestSession(a),p),em=rec.weekly_emphasis||{};
+  return'<div class="viewer-focus-box" style="grid-column:1/-1;border-color:rgba(0,229,255,.2)">'
+    +'<div class="viewer-label">Programming Recommendation Engine</div>'
+    +'<div class="viewer-value">'+esc(rec.primary_training_focus)+'</div>'
+    +'<div class="program-note" style="margin-top:8px">'+esc(rec.rationale)+'</div>'
+    +'<div class="program-note" style="margin-top:8px"><strong>Schroeder principle:</strong> '+esc(rec.schroeder_principle_applied)+'</div>'
+    +'<div class="ap-focus-chips">'+rec.recommended_methods.map(function(m){return'<span class="ap-focus-chip">'+esc(m)+'</span>';}).join('')+'</div>'
+    +'<div class="program-note" style="margin-top:8px"><strong>Avoid until ready:</strong> '+esc(rec.avoid_until_ready.join(', ')||'No special restrictions beyond normal readiness checks.')+'</div>'
+    +'<div class="program-note" style="margin-top:8px"><strong>Weekly emphasis:</strong> CNS '+esc(em.cns_demand)+' | Volume '+esc(em.volume)+' | Intensity '+esc(em.intensity)+'</div>'
+    +'<div class="program-note" style="margin-top:8px"><strong>Progression trigger:</strong> '+esc(rec.progression_trigger)+'</div>'
+    +'</div>';
 }
 function resolveProgramBucketFromSession(s){
   if(!s)return 2;

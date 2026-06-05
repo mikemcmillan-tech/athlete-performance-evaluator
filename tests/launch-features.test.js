@@ -41,6 +41,9 @@ vm.createContext(sandbox);
 const ctxStart = script.indexOf('var LEVEL_OPTIONS=');
 const ctxEnd = script.indexOf('// \u2500\u2500\u2500 HELPERS', ctxStart);
 vm.runInContext(script.slice(ctxStart, ctxEnd), sandbox);
+const programCtxStart = script.indexOf('var PROGRAM_PHASES=');
+const programCtxEnd = script.indexOf('var defaultPrograms=', programCtxStart);
+vm.runInContext(script.slice(programCtxStart, programCtxEnd), sandbox);
 [
   'normalizeGender',
   'normalize505Score',
@@ -54,6 +57,10 @@ vm.runInContext(script.slice(ctxStart, ctxEnd), sandbox);
   'calculateMetricScore100',
   'calculateMetricScore5',
   'sRSI',
+  '_programDemandForPhase',
+  '_programContradictions',
+  '_programWeakestMetricLabel',
+  'calculateTrainingFocus',
   '_combineNorm',
   '_combineTier',
   '_combineLevelKey',
@@ -133,5 +140,17 @@ assert.notEqual(
 );
 assert.match(html, /First Name','Last Name','Full Name','Gender','Sport','Position','Level','Grade \/ Class','Age','Height','Weight','Team','Notes/);
 assert.match(html, /ROSTER_TEMPLATE_SPORTS=\['Football','Basketball','Baseball','Softball','Volleyball','Track & Field','Soccer','Lacrosse','Wrestling','Boxing','MMA','Flag Football'\]/);
+const beginnerRecommendation = sandbox.calculateTrainingFocus({
+  bucket: 5,
+  session: { sc: { vp: 4, hp: 4, rs: 2, ac: 3, mv: 4 }, defType: 'Force Deficient' },
+  deficiency_class: 'Structural Weakness',
+  training_age: 'beginner',
+  current_phase: 'offSeason',
+  athlete_goal: 'max velocity and plyometrics'
+});
+assert.equal(beginnerRecommendation.primary_training_focus, 'Tendon Code');
+assert.match(beginnerRecommendation.schroeder_principle_applied, /Extreme isometrics/);
+assert.ok(beginnerRecommendation.avoid_until_ready.some((x) => /plyometric|Ballistic/i.test(x)));
+assert.equal(beginnerRecommendation.weekly_emphasis.cns_demand, 'low');
 
 console.log('launch feature tests passed');
