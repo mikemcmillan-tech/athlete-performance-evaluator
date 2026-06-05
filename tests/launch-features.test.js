@@ -138,8 +138,8 @@ assert.notEqual(
   sandbox._combineKey('Jordan Smith', 'Middle School', 'Volleyball 13 Gold'),
   sandbox._combineKey('Jordan Smith', 'Middle School', 'Volleyball 13 Blue')
 );
-assert.match(html, /First Name','Last Name','Full Name','Gender','Sport','Position','Level','Grade \/ Class','Age','Height','Weight','Team','Notes/);
-assert.match(html, /ROSTER_TEMPLATE_SPORTS=\['Football','Basketball','Baseball','Softball','Volleyball','Track & Field','Soccer','Lacrosse','Wrestling','Boxing','MMA','Flag Football'\]/);
+assert.match(html, /ROSTER_TEMPLATE_COLUMNS=\['First Name','Last Name','Age','Height','Weight','Team','Notes'\]/);
+assert.match(html, /No Team column found\. Athletes will import without a team unless you choose one here\./);
 const beginnerRecommendation = sandbox.calculateTrainingFocus({
   bucket: 5,
   session: { sc: { vp: 4, hp: 4, rs: 2, ac: 3, mv: 4 }, defType: 'Force Deficient' },
