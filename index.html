@@ -1888,8 +1888,8 @@ select option{background:var(--dk3)}
 //   1. Replace r()/w() with async fetch calls to your backend
 //   2. Keep all public methods (getAll, get, create, addSession, etc.) with the same signatures
 //   3. Add loading states and error handling at the call sites (buildDash, buildLeaderboard, etc.)
-//   4. Session data schema: { id, ts, date, raw:{vj,bj,rsi,f5,f10,gps,threeConeTime,fivetenFiveTime,pro_agility_5_10_5}, sc:{vp,hp,rs,ac,mv,cod,gps,ft}, bkt, bktName, defType, focus, cnt, apeScore, agilityScore, note }
-//   5. Athlete schema: { id, name, nk, tier, sport, position, age, team (team id), gradYear, notes, created, s:[] }
+//   4. Session data schema: { id, ts, date, raw:{vj,bj,rsi,f5,f10,gps,threeConeTime,fivetenFiveTime,pro_agility_5_10_5}, sc:{vp,hp,rs,ac,mv,cod,gps,ft}, bkt, bktName, defType, focus, cnt, apeScore, agilityScore, note, blockChange }
+//   5. Athlete schema: { id, name, nk, tier, sport, position, age, team (team id), gradYear, notes, created, s:[], reports:[] }
 //   6. Team schema: { id, name, color, created }
 //   7. Program schema: { id, athleteId, groupId, seasonPhase, bucketPrimary, bucketSecondary, weeks, lastEditedBy, lastEditedAt, createdFromDefault }
 //   8. Program group schema: { id, name, label, coachId, athleteIds, seasonPhase, sharedProgramId, createdAt }
@@ -1919,6 +1919,7 @@ var DB = (function(){
       var a=data.a[oldId];if(!a)return;
       var newId=isUuid(a.id)?a.id:uid();athleteMap[oldId]=newId;a.id=newId;
       if(a.team&&teamMap[a.team]){a.team=teamMap[a.team];changed=true;}
+      if(!Array.isArray(a.reports)){a.reports=[];changed=true;}
       (a.s||[]).forEach(function(s){if(s&&!isUuid(s.id)){s.id=uid();changed=true;}});
       newAthletes[newId]=a;if(newId!==oldId)changed=true;
     });
@@ -1980,7 +1981,7 @@ var DB = (function(){
              sport:sport||'',position:position||'',age:age||null,
              team:team||'',gradYear:gradYear||null,notes:notes||'',
              bodyweight:bodyweight||null,height:height||'',
-             created:Date.now(),s:[]};
+             created:Date.now(),s:[],reports:[]};
       extra=extra||{};
       if(extra.club)a.club=extra.club;
       if(extra.levelLabel)a.levelLabel=extra.levelLabel;
@@ -1997,10 +1998,54 @@ var DB = (function(){
       for(var k in data)if(data.hasOwnProperty(k))s[k]=data[k];
       var prev=a.s&&a.s.length?a.s[a.s.length-1]:null;
       try{
+        s.blockChange=s.blockChange||getBlockChange(prev,s);
         s.badges=s.badges||getAthleteBadges(a,s,prev);
         s.alerts=s.alerts||getSessionAlerts(a,s,prev);
       }catch(e){console.warn('Badge/alert snapshot failed:',e);}
       a.s.push(s);w(d);_cloudSyncSoon();return s;
+    },
+    getReports: function(aid){
+      var a=r().a[aid];if(!a)return[];
+      return (Array.isArray(a.reports)?a.reports:[]).slice().sort(function(x,y){return(y.createdAt||0)-(x.createdAt||0);});
+    },
+    getReport: function(aid,rid){
+      var a=r().a[aid];if(!a||!Array.isArray(a.reports))return null;
+      for(var i=0;i<a.reports.length;i++)if(a.reports[i].id===rid)return a.reports[i];
+      return null;
+    },
+    saveReport: function(aid,report){
+      var d=r(),a=d.a[aid];if(!a)return null;
+      if(!Array.isArray(a.reports))a.reports=[];
+      var now=Date.now(),rid=report.id||report.reportId||uid('r'),snap={
+        id:rid,
+        reportId:rid,
+        athleteId:aid,
+        sessionId:report.sessionId||'',
+        createdAt:report.createdAt||now,
+        title:report.title||report.reportTitle||'APE Client Report',
+        reportTitle:report.reportTitle||report.title||'APE Client Report',
+        reportHtml:report.reportHtml||'',
+        apeScore:report.apeScore!=null?report.apeScore:null,
+        defType:report.defType||'',
+        bucket:report.bucket||'',
+        bucketName:report.bucketName||'',
+        sport:report.sport||a.sport||'',
+        position:report.position||a.position||'',
+        notes:report.notes||'',
+        blockChange:report.blockChange||null,
+        blockAlert:report.blockAlert||''
+      };
+      a.reports.push(snap);
+      var ok=w(d);if(ok)_cloudSyncSoon();
+      // TODO: move report snapshots to a Supabase JSON/report table once the production schema includes one.
+      return ok?snap:null;
+    },
+    deleteReport: function(aid,rid){
+      var d=r(),a=d.a[aid];if(!a||!Array.isArray(a.reports))return false;
+      var before=a.reports.length;
+      a.reports=a.reports.filter(function(rp){return rp.id!==rid&&rp.reportId!==rid;});
+      if(a.reports.length===before)return false;
+      var ok=w(d);if(ok)_cloudSyncSoon();return ok;
     },
     // Update raw + computed values on an existing session (for session editing)
     updateSession: function(aid,sid,updates){
@@ -2287,13 +2332,14 @@ var SupaDB=(function(){
           sessList.forEach(function(s){if(!sessMap[s.athlete_id])sessMap[s.athlete_id]=[];sessMap[s.athlete_id].push(s);});
           var d=getRaw();
           athList.forEach(function(a){
+            var existingReports=d.a&&d.a[a.id]&&Array.isArray(d.a[a.id].reports)?d.a[a.id].reports:[];
             var rec={id:a.id,name:a.name,nk:a.name.trim().toLowerCase().replace(/\s+/g,' '),
               tier:a.tier||'',sport:a.sport||'',position:a.position||'',age:a.age||null,
               team:a.team_id||null,gradYear:a.grad_year||null,notes:a.notes||'',
               bodyweight:a.bodyweight||null,height:a.height||'',
               gender:normalizeGender(a.gender),grade:a.grade||'',athleteEmail:a.athlete_email||'',parentEmail:a.parent_email||'',
               club:a.club||'',levelLabel:a.level_label||'',
-              created:a.created_at?new Date(a.created_at).getTime():Date.now(),s:[]};
+              created:a.created_at?new Date(a.created_at).getTime():Date.now(),s:[],reports:existingReports};
             (sessMap[a.id]||[]).forEach(function(s){
               rec.s.push({id:s.id,ts:s.ts?Number(s.ts):Date.now(),
                 date:s.date_label||new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}),
@@ -2304,6 +2350,7 @@ var SupaDB=(function(){
                 testerName:s.tester_name||'',eventName:s.event_name||'',verification:s.verification||{}});
             });
             rec.s.sort(function(a,b){return(a.ts||0)-(b.ts||0);});
+            rec.s.forEach(function(sess,idx){sess.blockChange=sess.blockChange||getBlockChange(idx>0?rec.s[idx-1]:null,sess);});
             d.a[a.id]=rec;
           });
           saveRaw(d);
@@ -3496,6 +3543,8 @@ function getAthleteBadges(athlete,latestSession,previousSession){
 }
 function getSessionAlerts(athlete,latestSession,previousSession){
   var alerts=[],ape=_sessionApe(latestSession),prevApe=_sessionApe(previousSession);
+  var blockChange=(latestSession&&latestSession.blockChange)||getBlockChange(previousSession,latestSession);
+  if(blockChange&&blockChange.changed)alerts.push(_alertObj(blockProgressionAlert(blockChange),'blue'));
   if(ape!=null&&prevApe!=null){
     var diff=ape-prevApe;
     if(diff>0)alerts.push(_alertObj('APE Score improved from previous session.','green'));
@@ -3846,12 +3895,13 @@ function buildProgramPanel(aid){
   return h;
 }
 function switchHistoryTab(tab,aid){
-  ['sessions','progression','program'].forEach(function(k){
+  ['sessions','progression','reports','program'].forEach(function(k){
     var b=el('hist-tab-'+k),p=el('hist-panel-'+k);
     if(b)b.classList.toggle('act',k===tab);
     if(p)p.classList.toggle('act',k===tab);
   });
   if(tab==='progression')setTimeout(function(){renderProgressionGraphCanvases(aid);},40);
+  if(tab==='reports'){var rpanel=el('hist-panel-reports');if(rpanel)rpanel.innerHTML=buildSavedReportsPanel(aid);}
   if(tab==='program'){var panel=el('hist-panel-program');if(panel)panel.innerHTML=buildProgramPanel(aid);}
 }
 function confirmAthleteProgramPhaseChange(aid,phase){
@@ -5101,7 +5151,7 @@ function build(vj,bj,rsi,s5,s10,gps,threeCone,pa505){
     +'<div id="prog-insight" style="display:none;margin-top:12px;padding:10px 13px;background:var(--dk3);border:1px solid var(--bd);border-radius:4px;font-size:13px;color:var(--sb);line-height:1.6"></div>'
     +'</div>';
 
-  _S={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gps:gv,ft:ft,tier:tier,name:name,sport:sport,position:position,age:age,gender:gender,grade:grade,team:team,gradYear:gradYear,notes:notes,bodyweight:bodyweight,height:height,defType:dT,defLabel:dLab,defLimiter:dLim,defExplain:dExp,rawVJ:vj,rawBJ:bj,rawRSI:rsi,rawF5:s5,rawF10:s10,rawThreeCone:threeCone,raw505:pa505,threeConeScore:threeConeScore,fivetenFiveScore:fivetenFiveScore,agilityScore:agilityScore,metricScore100:metricScore100,verification:verification};
+  _S={vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gps:gv,ft:ft,tier:tier,name:name,sport:sport,position:position,age:age,gender:gender,grade:grade,team:team,gradYear:gradYear,notes:notes,bodyweight:bodyweight,height:height,defType:dT,defLabel:dLab,defLimiter:dLim,defExplain:dExp,bkt:bkt,bktName:bk.n,focus:bk.pri,apeScore:apeScore,rawVJ:vj,rawBJ:bj,rawRSI:rsi,rawF5:s5,rawF10:s10,rawThreeCone:threeCone,raw505:pa505,threeConeScore:threeConeScore,fivetenFiveScore:fivetenFiveScore,agilityScore:agilityScore,metricScore100:metricScore100,verification:verification};
   // Position-aware adjusted score — computed once here, used in companion card
   var _posGroupKey=posProfile.positionGroup;
   var _adjResult=computeAdjustedScores({vp:vp,hp:hp,rs:rs,ac:ac,mv:mv,cod:cod,gps:gv,ft:ft},_posGroupKey);
@@ -5115,6 +5165,7 @@ function build(vj,bj,rsi,s5,s10,gps,threeCone,pa505){
     var savedPrev=DB.prev(savedEval.a.id),resultBadges=getAthleteBadges(savedEval.a,savedEval.s,savedPrev),resultAlerts=getSessionAlerts(savedEval.a,savedEval.s,savedPrev);
     var resultBox=(resultBadges.length||resultAlerts.length)?'<div class="card"><div class="card-title">Achievements & Coach Alerts</div>'+(resultBadges.length?'<div style="margin-bottom:12px">'+renderBadgeChips(resultBadges)+'</div>':'')+(resultAlerts.length?renderAlertList(resultAlerts):'')+'</div>':'';
     if(resultBox&&el('rc'))el('rc').insertAdjacentHTML('afterbegin',resultBox);
+    if(el('rc'))el('rc').insertAdjacentHTML('afterbegin','<div class="card" style="border-left:3px solid var(--or)"><div class="card-title">Client Report Snapshot</div><div class="pg-sub" style="margin-bottom:12px">Save this generated report to '+esc(savedEval.a.name)+'&apos;s profile so it stays available even after future report design updates.</div><div class="btn-row"><button class="btn-p" onclick="saveCurrentReportToAthlete()">Save Report to Athlete Profile</button><button class="btn-s" onclick="window.print()">Print / Save PDF</button></div></div>');
   }
 
   var ce=el('rc-cmp');if(ce)ce.innerHTML='';
@@ -5839,6 +5890,31 @@ function bucketKeyFromName(name){
 function bucketName(keyOrName){return bucketBrandByKey(typeof keyOrName==='number'?keyOrName:bucketKeyFromName(keyOrName)).name;}
 function bucketSubtitle(keyOrName){return bucketBrandByKey(typeof keyOrName==='number'?keyOrName:bucketKeyFromName(keyOrName)).subtitle;}
 function bucketDisplay(name,key){return bucketName(key||bucketKeyFromName(name));}
+function blockBucketLabel(session){
+  if(!session)return'';
+  if(session.bkt==='base')return'Base Build';
+  return bucketDisplay(session.bktName,session.bkt)||'Base Build';
+}
+function getBlockChange(previousSession,currentSession){
+  if(!currentSession)return{from:'',to:'',changed:false};
+  var from=blockBucketLabel(previousSession),to=blockBucketLabel(currentSession);
+  return{from:from,to:to,changed:!!(from&&to&&from!==to)};
+}
+function blockProgressionAlert(change){
+  change=change||{};
+  if(!change.changed)return'';
+  var from=change.from||'Previous Block',to=change.to||'Current Block';
+  if(to==='Base Build')return'Returned to Base Build - retest or review data quality.';
+  if(/Reactive Strength|Tendon Code/i.test(from)&&/Force|Power/i.test(to))return'Reactive strength cleared - progressed to '+to+'.';
+  if(/Max Velocity|Drive Phase/i.test(to))return'Speed block reached: moved from '+from+' to '+to+'.';
+  return'Moved from '+from+' to '+to+'.';
+}
+function blockChangeForSession(sessions,index){
+  sessions=sessions||[];
+  var s=sessions[index]||null;
+  if(!s)return{from:'',to:'',changed:false};
+  return s.blockChange||getBlockChange(index>0?sessions[index-1]:null,s);
+}
 var defaultPrograms={
   1:{name:'Force Foundation',subtitle:BUCKET_BRAND[1].subtitle,primary:'Max Force',exercises:[
     programExercise('Heavy Prowler Push','4','','','20 yards','3-4 min','100% intent. Full recovery between pushes.',false),
@@ -7198,6 +7274,124 @@ function buildDash(){
   setTimeout(function(){animateRadarCharts(cont);},40);
 }
 
+// ─── REPORT SNAPSHOTS + BLOCK PROGRESSION ─────────────────────────────────────
+function _reportWindowHtml(report){
+  var title=esc(report.title||report.reportTitle||'APE Client Report');
+  return'<!doctype html><html><head><meta charset="utf-8"><title>'+title+'</title><style>body{margin:0;background:#fff;font-family:Inter,Arial,sans-serif}button{font-family:inherit}@media print{.saved-report-actions{display:none!important}}</style></head><body>'+report.reportHtml+'</body></html>';
+}
+function _openReportWindow(report,doPrint){
+  if(!report||!report.reportHtml){apeAlert('This report snapshot is missing report HTML.','Saved Report');return;}
+  var w=window.open('','_blank');
+  if(!w){apeAlert('Popup blocked. Allow popups to view saved reports.','Saved Report');return;}
+  w.document.open();w.document.write(_reportWindowHtml(report));w.document.close();
+  if(doPrint)w.onload=function(){setTimeout(function(){w.focus();w.print();},120);};
+}
+function _sessionById(athlete,sid){
+  var ss=athlete&&athlete.s||[];
+  for(var i=0;i<ss.length;i++)if(ss[i].id===sid)return ss[i];
+  return ss.length?ss[ss.length-1]:null;
+}
+function buildReportSnapshot(aid,sid,S,html){
+  var a=DB.get(aid);if(!a)return null;
+  var s=_sessionById(a,sid);
+  var score=s&&s.apeScore!=null?s.apeScore:(S&&S.apeScore!=null?S.apeScore:null);
+  if(score==null&&s&&s.sc)score=getAPEScore(s.sc);
+  var change=(s&&s.blockChange)||getBlockChange(null,s);
+  return{
+    athleteId:aid,
+    sessionId:sid||s&&s.id||'',
+    createdAt:Date.now(),
+    title:(a.name||'Athlete')+' APE Client Report',
+    reportTitle:(a.name||'Athlete')+' APE Client Report',
+    reportHtml:html||generateAthleteReport(S||{}),
+    apeScore:score,
+    defType:s&&s.defType||S&&S.defType||'',
+    bucket:s&&s.bkt||S&&S.bkt||'',
+    bucketName:blockBucketLabel(s)||S&&S.bktName||'',
+    sport:a.sport||S&&S.sport||'',
+    position:a.position||S&&S.position||'',
+    notes:s&&s.note||a.notes||'',
+    blockChange:change,
+    blockAlert:blockProgressionAlert(change)
+  };
+}
+function saveCurrentReportToAthlete(){
+  if(typeof _S==='undefined'||!_S||!_S.aid){apeAlert('Run or open an athlete evaluation before saving a report.','Save Report');return;}
+  var html=generateAthleteReport(_S),snap=buildReportSnapshot(_S.aid,_S.sid,_S,html);
+  if(!snap){apeAlert('Could not find the athlete profile for this report.','Save Report');return;}
+  var saved=DB.saveReport(_S.aid,snap);
+  if(saved){_toast('Report saved to athlete profile.','#1e6f3e');}
+  else apeAlert('Report could not be saved. Local storage may be full.','Save Report');
+}
+function viewSavedReportSnapshot(aid,rid){
+  _openReportWindow(DB.getReport(aid,rid),false);
+}
+function printSavedReportSnapshot(aid,rid){
+  _openReportWindow(DB.getReport(aid,rid),true);
+}
+function exportSavedReportSnapshot(aid,rid){
+  var r=DB.getReport(aid,rid);if(!r||!r.reportHtml){apeAlert('This report cannot be exported.','Saved Report');return;}
+  var blob=new Blob([_reportWindowHtml(r)],{type:'text/html'}),url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=(r.title||'APE_Report').replace(/[^a-z0-9]+/gi,'_')+'.html';
+  document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){URL.revokeObjectURL(url);},500);
+}
+function deleteSavedReportSnapshot(aid,rid){
+  openApeDialog({
+    title:'Delete Saved Report',
+    html:'<p>Delete this saved report snapshot? Testing sessions and athlete history will stay untouched.</p>',
+    buttons:[{label:'Cancel',value:false,kind:'secondary'},{label:'Delete Report',value:true,kind:'danger'}]
+  }).then(function(ok){if(!ok)return;if(DB.deleteReport(aid,rid)){_toast('Saved report deleted.','#8A3A2B');buildHist(aid);}});
+}
+function buildSavedReportsPanel(aid){
+  var a=DB.get(aid),reports=DB.getReports(aid);
+  if(!a)return'<div class="empty-state"><div class="empty-p">Athlete not found.</div></div>';
+  if(!reports.length)return'<div class="card"><div class="card-title">Saved Client Reports</div><div class="empty-state" style="padding:24px"><div class="empty-p">No saved reports yet. Generate a client report, then click Save Report to Athlete Profile.</div></div></div>';
+  var h='<div class="card"><div class="card-title">Saved Client Reports</div><div class="pg-sub" style="margin-bottom:12px">Snapshots are frozen copies of the report exactly as generated on that date.</div>';
+  reports.forEach(function(rp){
+    var dt=rp.createdAt?new Date(rp.createdAt).toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}):'Saved report';
+    h+='<div class="sess-card" style="border-left:3px solid var(--or)">'
+      +'<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">'
+      +'<div><div style="font-family:Inter,sans-serif;font-size:15px;font-weight:800;color:#fff">'+esc(rp.title||rp.reportTitle||'APE Client Report')+'</div>'
+      +'<div class="pg-sub">'+esc(dt)+' &middot; '+esc(rp.sport||a.sport||'')+(rp.position||a.position?' / '+esc(rp.position||a.position):'')+'</div></div>'
+      +'<div style="text-align:right"><div style="font-family:Inter,sans-serif;font-size:22px;font-weight:900;color:var(--or)">'+(rp.apeScore!=null?rp.apeScore:'—')+'</div><div style="font-size:10px;color:var(--mt);text-transform:uppercase;letter-spacing:.12em">APE Score</div></div>'
+      +'</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:12px 0">'
+      +'<div class="fb"><div class="fl">Classification</div><div class="fv">'+esc(rp.defType||'—')+'</div></div>'
+      +'<div class="fb"><div class="fl">Training Block</div><div class="fv">'+esc(rp.bucketName||'—')+'</div></div>'
+      +'<div class="fb"><div class="fl">Session</div><div class="fv">'+esc(rp.sessionId?'Linked':'Snapshot')+'</div></div>'
+      +'</div>'
+      +(rp.blockAlert?'<div style="margin:8px 0">'+renderAlertList([{text:rp.blockAlert,type:'blue'}])+'</div>':'')
+      +'<div class="btn-row" style="margin-top:10px">'
+      +'<button class="btn-s" onclick="viewSavedReportSnapshot(\''+aid+'\',\''+rp.id+'\')">View Report</button>'
+      +'<button class="btn-s" onclick="printSavedReportSnapshot(\''+aid+'\',\''+rp.id+'\')">Print / Save PDF</button>'
+      +'<button class="btn-s" onclick="exportSavedReportSnapshot(\''+aid+'\',\''+rp.id+'\')">Download / Export</button>'
+      +'<button class="del-btn" onclick="deleteSavedReportSnapshot(\''+aid+'\',\''+rp.id+'\')">Delete Report</button>'
+      +'</div></div>';
+  });
+  return h+'</div>';
+}
+function buildBlockProgressionPanel(a){
+  var sessions=a&&a.s||[];
+  if(!sessions.length)return'<div class="card"><div class="card-title">Block Progression</div><div class="pg-sub">No testing sessions yet.</div></div>';
+  var h='<div class="card"><div class="card-title">Block Progression</div><div class="pg-sub" style="margin-bottom:14px">Tracks how each evaluation moves the athlete through development blocks.</div>';
+  var changes=[];
+  h+='<div style="display:grid;gap:10px">';
+  sessions.forEach(function(s,i){
+    var ch=blockChangeForSession(sessions,i),label=blockBucketLabel(s),score=s.apeScore!=null?s.apeScore:(s.sc?getAPEScore(s.sc):null),changed=ch.changed,alert=blockProgressionAlert(ch),brand=bucketBrandByKey(s.bkt==='base'?2:s.bkt);
+    if(changed)changes.push({text:alert,type:'blue'});
+    h+='<div style="display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start">'
+      +'<div style="width:14px;height:14px;border-radius:50%;margin-top:5px;background:'+(changed?'var(--or)':brand.color)+';box-shadow:'+(changed?'0 0 18px var(--or-glow)':'none')+'"></div>'
+      +'<div style="padding:11px 13px;border-radius:10px;background:var(--dk3);border:1px solid '+(changed?'rgba(91,233,255,.35)':'var(--bd)')+'">'
+      +'<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><div style="font-size:13px;font-weight:800;color:#fff">'+esc(s.date||'Session '+(i+1))+'</div><div style="font-size:11px;color:var(--mt)">'+esc(s.defType||'—')+'</div></div><div style="font-family:Inter,sans-serif;font-size:22px;font-weight:900;color:var(--or)">'+(score!=null?score:'—')+'</div></div>'
+      +'<div style="margin-top:8px;font-size:13px;font-weight:800;color:'+(changed?'var(--or)':brand.color)+'">'+esc(label||'Base Build')+'</div>'
+      +(changed?'<div style="font-size:12px;color:var(--sb);margin-top:4px">'+esc(ch.from)+' &rarr; '+esc(ch.to)+'</div>':'')
+      +'</div></div>';
+  });
+  h+='</div>';
+  if(changes.length)h+='<div style="margin-top:14px">'+renderAlertList(changes)+'</div>';
+  return h+'</div>';
+}
+
 // ─── ATHLETE HISTORY ──────────────────────────────────────────────────────────
 function buildHist(aid){
   window._histAid=aid; // track current athlete for share
@@ -7251,9 +7445,11 @@ function buildHist(aid){
     h+='<div class="hist-tabs">'
       +'<button class="hist-tab act" id="hist-tab-sessions" onclick="switchHistoryTab(\'sessions\',\''+aid+'\')">Sessions</button>'
       +'<button class="hist-tab" id="hist-tab-progression" onclick="switchHistoryTab(\'progression\',\''+aid+'\')">Progression</button>'
+      +'<button class="hist-tab" id="hist-tab-reports" onclick="switchHistoryTab(\'reports\',\''+aid+'\')">Reports</button>'
       +'<button class="hist-tab" id="hist-tab-program" onclick="switchHistoryTab(\'program\',\''+aid+'\')">Program</button>'
       +'</div><div class="hist-panel act" id="hist-panel-sessions"><div class="empty-state"><div class="empty-p">No sessions recorded yet. Programming is still available for this athlete.</div></div></div>'
       +'<div class="hist-panel" id="hist-panel-progression"><div class="empty-state"><div class="empty-p">More sessions needed to show progression.</div></div></div>'
+      +'<div class="hist-panel" id="hist-panel-reports">'+buildSavedReportsPanel(aid)+'</div>'
       +'<div class="hist-panel" id="hist-panel-program">'+buildProgramPanel(aid)+'</div>';
     cont.innerHTML=h;setTimeout(function(){animateRadarCharts(cont);},40);return;
   }
@@ -7261,9 +7457,12 @@ function buildHist(aid){
   h+='<div class="hist-tabs">'
     +'<button class="hist-tab act" id="hist-tab-sessions" onclick="switchHistoryTab(\'sessions\',\''+aid+'\')">Sessions</button>'
     +'<button class="hist-tab" id="hist-tab-progression" onclick="switchHistoryTab(\'progression\',\''+aid+'\')">Progression</button>'
+    +'<button class="hist-tab" id="hist-tab-reports" onclick="switchHistoryTab(\'reports\',\''+aid+'\')">Reports</button>'
     +'<button class="hist-tab" id="hist-tab-program" onclick="switchHistoryTab(\'program\',\''+aid+'\')">Program</button>'
     +'</div>'
     +'<div class="hist-panel act" id="hist-panel-sessions">';
+
+  h+=buildBlockProgressionPanel(a);
 
   // Metric trends
   function _histTrendScore(s,k){
@@ -7353,7 +7552,7 @@ function buildHist(aid){
       +(gc.points.length<=1?'<div class="progression-note">More sessions needed to show progression</div>':(gc.pr?'<div class="progression-note"><span style="color:#C9A227;font-weight:800">&#9733;</span> PR: '+gc.pr.value+(gc.unit?' '+gc.unit:'')+'</div>':''))
       +'</div>';
   }
-  h+='</div></div><div class="hist-panel" id="hist-panel-program">'+buildProgramPanel(aid)+'</div>';
+  h+='</div></div><div class="hist-panel" id="hist-panel-reports">'+buildSavedReportsPanel(aid)+'</div><div class="hist-panel" id="hist-panel-program">'+buildProgramPanel(aid)+'</div>';
   h+='<div class="btn-row" style="margin-top:8px">'
     +'<button class="btn-s" onclick="goDash()">&larr; Back to Athletes</button>'
     +'<button class="btn-p" onclick="startTest(\''+aid+'\')">&#9889; New Test</button>'
@@ -7428,6 +7627,7 @@ function _sesRow(a,s){
   var cfg=DB.loadSettings(),v=getSessionVerification(s),profile=getAthletePositionProfile(a);
   var idx=(a.s||[]).findIndex(function(ss){return ss.id===s.id;}),prev=idx>0?a.s[idx-1]:null;
   var badges=getAthleteBadges(a,s,prev),alerts=getSessionAlerts(a,s,prev);
+  var blockChange=s.blockChange||getBlockChange(prev,s);
   // Resolve team name from stored team id
   var teamName='';
   if(a.team){var tms=DB.getTeams();for(var ti=0;ti<tms.length;ti++){if(tms[ti].id===a.team){teamName=tms[ti].name;break;}}}
@@ -7478,6 +7678,10 @@ function _sesRow(a,s){
     'APE Score':ape!=null?ape:'',
     'Classification':s.defType||'',
     'Training Bucket':bucketDisplay(s.bktName,s.bkt)||'',
+    'Block Changed':blockChange.changed?'Yes':'No',
+    'Previous Block':blockChange.from||'',
+    'New Block':blockChange.to||blockBucketLabel(s)||'',
+    'Block Progression Alert':blockProgressionAlert(blockChange),
     'Badges':badges.map(function(b){return b.label;}).join(', '),
     'Alerts':alerts.map(function(a){return a.text;}).join(' | '),
     'Position Group':profile.positionGroup,

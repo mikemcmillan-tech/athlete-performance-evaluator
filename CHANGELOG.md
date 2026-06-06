@@ -29,6 +29,7 @@ All notable changes to APE will be documented here.
 - Upgraded roster import with a coach-friendly Excel template, dropdown-ready columns, stricter profile validation, team-aware duplicate skipping, and downloadable error reports.
 - Added a coach-facing programming recommendation engine that returns prioritized focus, rationale, Schroeder-inspired method guidance, weekly emphasis, and progression triggers from each athlete profile.
 - Simplified roster upload for fast profile setup with first/last name, age, height, weight, optional team, and a cleaner Event Setup layout.
+- Added athlete profile report libraries, saved client report snapshots, block progression timelines, and block-change alerts.
 
 ## Earlier History
 

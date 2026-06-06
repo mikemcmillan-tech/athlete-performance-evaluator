@@ -152,5 +152,16 @@ assert.equal(beginnerRecommendation.primary_training_focus, 'Tendon Code');
 assert.match(beginnerRecommendation.schroeder_principle_applied, /Extreme isometrics/);
 assert.ok(beginnerRecommendation.avoid_until_ready.some((x) => /plyometric|Ballistic/i.test(x)));
 assert.equal(beginnerRecommendation.weekly_emphasis.cns_demand, 'low');
+const blockChange = sandbox.getBlockChange(
+  { bkt: 2, bktName: 'Tendon Code' },
+  { bkt: 4, bktName: 'Drive Phase' }
+);
+assert.equal(blockChange.changed, true);
+assert.equal(blockChange.from, 'Tendon Code');
+assert.equal(blockChange.to, 'Drive Phase');
+assert.match(sandbox.blockProgressionAlert(blockChange), /Speed block reached|Moved from/);
+assert.match(html, /saveCurrentReportToAthlete/);
+assert.match(html, /buildSavedReportsPanel/);
+assert.match(html, /buildBlockProgressionPanel/);
 
 console.log('launch feature tests passed');
